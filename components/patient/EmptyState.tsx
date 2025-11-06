@@ -1,0 +1,35 @@
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+
+interface EmptyStateProps {
+  type: 'loading' | 'no-studies' | 'no-patients';
+  onLogout?: () => void;
+}
+
+export function EmptyState({ type, onLogout }: EmptyStateProps) {
+  if (type === 'no-studies') {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50 p-4">
+        <Text className="mb-2 text-lg font-semibold text-slate-900">No Studies Available</Text>
+        <Text className="mb-4 text-center text-slate-600">
+          You don't have access to any studies yet. Please contact your administrator.
+        </Text>
+        {onLogout && (
+          <TouchableOpacity className="rounded-lg bg-red-500 px-6 py-3" onPress={onLogout}>
+            <Text className="text-base font-semibold text-white">Logout</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+
+  if (type === 'no-patients') {
+    return (
+      <View className="flex-1 items-center justify-center py-8">
+        <Text className="text-center text-sm text-slate-500">No patients found matching your criteria.</Text>
+      </View>
+    );
+  }
+
+  return null;
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { useAuth } from '@/context/AuthContext';
@@ -17,45 +17,56 @@ export default function Patients() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  const fetchPatients = async (page: number, filter: string) => {
-    try {
-      const response = await patientsAPI.fetchTestsDetails({
-        studyFilter: usersStudyList,
-        page: page,
-        count: 10,
-        searchQuery: '',
-        workflowStatusFilter: filter,
-      });
-      setTotalCount(response.totalCount);
-      setPatients(response.data || []);
-      setHasMore((response.data || []).length === 10);
-    } catch (error) {
-      setPatients([]);
-      console.error('Error fetching patients:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
-      Alert.alert('Error', errorMessage);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      setLoadingMore(false);
-    }
-  };
+  const fetchPatients = useCallback(
+    async (pageNum: number, filterValue: string, searchQuery: string, append = false) => {
+      try {
+        const response = await patientsAPI.fetchTestsDetails({
+          studyFilter: usersStudyList,
+          page: pageNum,
+          count: 10,
+          searchQuery: searchQuery,
+          workflowStatusFilter: filterValue,
+        });
+        console.log('Fetch called');
+        setTotalCount(response.totalCount);
 
-  useEffect(() => {
-    fetchPatients(page, filter);
-  }, []);
+        if (append) {
+          setPatients(prev => [...prev, ...(response.data || [])]);
+          setPage(pageNum);
+        } else {
+          setPatients(response.data || []);
+          setPage(pageNum);
+        }
 
-  const handleRefresh = () => {
+        setHasMore((response.data || []).length === 10);
+      } catch (error: any) {
+        if (!append) {
+          setPatients([]);
+        }
+        console.error('Error fetching patients:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
+        Alert.alert('Error', errorMessage);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        setLoadingMore(false);
+      }
+    },
+    [usersStudyList]
+  );
+
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    setPage(1);
-    fetchPatients(1, filter);
-  };
+    console.log('Refresh called');
+    fetchPatients(1, filter, query);
+  }, [filter, query, fetchPatients]);
 
   const handleLoadMore = useCallback(() => {
-    if (!loadingMore && hasMore) {
-      fetchPatients(page + 1, filter);
+    if (!loadingMore && hasMore && !loading && !refreshing) {
+      setLoadingMore(true);
+      fetchPatients(page + 1, filter, query, true);
     }
-  }, [fetchPatients, page, loadingMore, hasMore]);
+  }, [page, filter, query, loadingMore, hasMore, loading, refreshing, fetchPatients]);
 
   const handleSearch = useCallback((text: string) => {
     setQuery(text);
@@ -65,22 +76,22 @@ export default function Patients() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (usersStudyList.length > 0) {
-        setPage(1);
-        fetchPatients(1, filter);
+        setLoading(true);
+        fetchPatients(1, filter, query);
       }
-    }, 250);
+    }, 500); // Increased to 500ms for better UX
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, filter]); // Runs on mount and when query/filter changes
 
   const handleFilterChange = useCallback(
     (newFilter: string) => {
       setFilter(newFilter);
       setShowFilterModal(false);
-      setPage(1);
-      fetchPatients(1, newFilter);
+      setLoading(true);
+      fetchPatients(1, newFilter, query);
     },
-    [fetchPatients]
+    [query, fetchPatients]
   );
 
   // Render functions
@@ -97,7 +108,7 @@ export default function Patients() {
   }, [loading]);
 
   // Early returns for different states
-  if (usersStudyList.length === 0) {
+  if (usersStudyList.length === 0 && !loading) {
     return <EmptyState type="no-studies" onLogout={logout} />;
   }
 
@@ -138,7 +149,7 @@ export default function Patients() {
           initialNumToRender={10}
         />
 
-        {loading && (
+        {loading && !refreshing && (
           <View className="absolute inset-0 items-center justify-center bg-gray-50/80">
             <ActivityIndicator size="large" color="#daa521" />
             <Text className="mt-2 text-lg text-slate-600">Loading patients...</Text>

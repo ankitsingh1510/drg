@@ -44,14 +44,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const tokenValue = await AsyncStorage.getItem('token');
 
         if (!tokenValue) {
-          console.error('No token found. Please log in.');
+          console.log('No token found. Please log in.');
           setIsLoading(false);
+          await AsyncStorage.clear();
+          router.replace('/' as any);
           return;
         }
 
         const payload = decryptToken(tokenValue);
         if (!payload) {
-          console.error('Invalid or expired token. Please log in again.');
+          console.log('Invalid or expired token. Please log in again.');
           await AsyncStorage.removeItem('token');
           setIsLoading(false);
           return;
@@ -78,6 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const studyList = await studyAPI.getStudyList();
         const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
+        console.log(studyIds);
         setUsersStudyList(studyIds);
 
         setUser(userData);
