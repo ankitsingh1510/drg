@@ -59,6 +59,26 @@ class StorageAPI {
       throw error;
     }
   }
+
+  async getSignedUrl(blobPath: string, fileType: string): Promise<string> {
+    try {
+      const encodedPath = encodeURIComponent(blobPath);
+      const response = await axiosInstance.get(
+        `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl`,
+        {
+          params: {
+            viewFile: 'true',
+            fileType: encodeURIComponent(fileType),
+          },
+        }
+      );
+      console.log('Signed URL response:', response);
+      return response.data?.signedUrl;
+    } catch (error) {
+      console.error('Error fetching signed URL:', error);
+      throw error;
+    }
+  }
 }
 
 export const storageAPI = new StorageAPI();
