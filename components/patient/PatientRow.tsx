@@ -4,10 +4,21 @@ import { type Patient } from '@/services/patients';
 
 interface PatientRowProps {
   patient: Patient;
+  onViewReport: (patient: Patient) => Promise<void>;
 }
 
-export function PatientRow({ patient }: PatientRowProps) {
+export function PatientRow({ patient, onViewReport }: PatientRowProps) {
   const [open, setOpen] = useState(false);
+  const [loadingReport, setLoadingReport] = useState(false);
+
+  const handleViewReport = async () => {
+    setLoadingReport(true);
+    try {
+      await onViewReport(patient);
+    } finally {
+      setLoadingReport(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -46,16 +57,26 @@ export function PatientRow({ patient }: PatientRowProps) {
         </View>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm text-slate-600">
+          <Text className="flex-1 text-sm text-slate-600" numberOfLines={1} ellipsizeMode="tail">
             {patient.physicianName} • {patient.facility}
           </Text>
-          <TouchableOpacity
-            className="rounded-lg px-3 py-1.5"
-            style={{ backgroundColor: '#daa521' }}
-            onPress={() => setOpen(!open)}
-          >
-            <Text className="text-sm font-medium text-white">{open ? 'Close' : 'Details'}</Text>
-          </TouchableOpacity>
+          <View className="flex-row gap-2">
+            <TouchableOpacity
+              className="rounded-lg px-3 py-1.5"
+              style={{ backgroundColor: '#daa521' }}
+              onPress={() => setOpen(!open)}
+            >
+              <Text className="text-sm font-medium text-white">{open ? 'Close' : 'Details'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="rounded-lg px-3 py-1.5"
+              style={{ backgroundColor: '#1a355d' }}
+              onPress={handleViewReport}
+              disabled={loadingReport}
+            >
+              <Text className="text-sm font-medium text-white">{loadingReport ? 'Loading...' : 'View Report'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {open && (

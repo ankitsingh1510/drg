@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Linking, RefreshControl, Text, View } from 'react-native';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { useAuth } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
+import { storageAPI } from '@/services/storage';
 
 export default function Patients() {
   const { logout, user, usersStudyList } = useAuth();
@@ -94,8 +95,36 @@ export default function Patients() {
     [query, fetchPatients]
   );
 
+  const handleViewReport = useCallback(async (patient: Patient) => {
+    try {
+      if (!patient.full_report_finalized_path) {
+        Alert.alert('Error', 'Report path not available for this patient.');
+        return;
+      }
+
+      const blobPath = patient.full_report_finalized_path;
+      const fileType = 'application/pdf';
+
+      const signedUrl = await storageAPI.getSignedUrl(blobPath, fileType);
+      console.log('Signed URL:', signedUrl);
+      // Open the URL in browser
+      const supported = await Linking.canOpenURL(signedUrl);
+      if (supported) {
+        await Linking.openURL(signedUrl);
+      } else {
+        Alert.alert('Error', 'Unable to open report URL');
+      }
+    } catch (error) {
+      console.error('Error viewing report:', error);
+      Alert.alert('Error', 'Failed to load report. Please try again.');
+    }
+  }, []);
+
   // Render functions
-  const renderPatient = useCallback(({ item }: { item: Patient }) => <PatientRow patient={item} />, []);
+  const renderPatient = useCallback(
+    ({ item }: { item: Patient }) => <PatientRow patient={item} onViewReport={handleViewReport} />,
+    [handleViewReport]
+  );
 
   const renderFooter = useCallback(() => {
     if (!loadingMore) return null;
