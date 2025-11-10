@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { storageAPI } from '@/services/storage';
 import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
@@ -15,28 +16,27 @@ interface User {
   role_id: string;
 }
 
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  targetLocation: string | null;
-  studyIdentifier: string;
-  usersStudyList: number[];
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  getInitials: () => string;
-}
+// Jotai atoms
+export const userAtom = atom<User | null>(null);
+export const tokenAtom = atom<string | null>(null);
+export const isLoadingAtom = atom<boolean>(true);
+export const targetLocationAtom = atom<string | null>(null);
+export const studyIdentifierAtom = atom<string>('');
+export const usersStudyListAtom = atom<number[]>([]);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Derived atom for authentication status
+export const isAuthenticatedAtom = atom(get => {
+  const user = get(userAtom);
+  const token = get(tokenAtom);
+  return !!user && !!token;
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [targetLocation, setTargetLocation] = useState<string | null>(null);
-  const [studyIdentifier, setStudyIdentifier] = useState<string>('');
-  const [usersStudyList, setUsersStudyList] = useState<number[]>([]);
+  const [user, setUser] = useAtom(userAtom);
+  const [token, setToken] = useAtom(tokenAtom);
+  const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
+  const setTargetLocation = useSetAtom(targetLocationAtom);
+  const setUsersStudyList = useSetAtom(usersStudyListAtom);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -101,7 +101,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  return <>{children}</>;
+};
+
+// Custom hooks for authentication operations
+export const useLogin = () => {
+  const setUser = useSetAtom(userAtom);
+  const setToken = useSetAtom(tokenAtom);
+  const setIsLoading = useSetAtom(isLoadingAtom);
+  const setUsersStudyList = useSetAtom(usersStudyListAtom);
+  const setTargetLocation = useSetAtom(targetLocationAtom);
+
+  return async (email: string, password: string) => {
     try {
       setIsLoading(true);
       const response = await usersAPI.authenticateUser({ username: email, password });
@@ -155,42 +166,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   };
+};
 
-  const logout = async () => {
+export const useLogout = () => {
+  const setUser = useSetAtom(userAtom);
+  const setToken = useSetAtom(tokenAtom);
+  const setUsersStudyList = useSetAtom(usersStudyListAtom);
+
+  return async () => {
+    console.log('Logging out');
     await AsyncStorage.clear();
     setUser(null);
     setToken(null);
     setUsersStudyList([]);
     router.replace('/' as any);
   };
+};
 
-  const getInitials = (): string => {
+export const useGetInitials = () => {
+  const user = useAtomValue(userAtom);
+
+  return (): string => {
     if (!user) return 'IA';
     const firstInitial = user.name?.charAt(0)?.toUpperCase() || '';
     const lastInitial = user.lname?.charAt(0)?.toUpperCase() || '';
     return `${firstInitial}${lastInitial}` || 'IA';
   };
-
-  const value: AuthContextType = {
-    user,
-    token,
-    isLoading,
-    isAuthenticated: !!user && !!token,
-    targetLocation,
-    studyIdentifier,
-    usersStudyList,
-    login,
-    logout,
-    getInitials,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

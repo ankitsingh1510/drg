@@ -60,7 +60,7 @@ class StorageAPI {
     }
   }
 
-  async getSignedUrl(blobPath: string, fileType: string): Promise<string> {
+  async getSignedUrl(blobPath: string): Promise<string> {
     try {
       const encodedPath = encodeURIComponent(blobPath);
       const response = await axiosInstance.get(
@@ -68,11 +68,9 @@ class StorageAPI {
         {
           params: {
             viewFile: 'true',
-            fileType: encodeURIComponent(fileType),
           },
         }
       );
-      console.log('Signed URL response:', response);
       return response.data?.signedUrl;
     } catch (error) {
       console.error('Error fetching signed URL:', error);
