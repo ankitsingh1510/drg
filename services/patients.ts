@@ -162,6 +162,9 @@ class PatientsAPI {
             ],
             accession_attribute_value: [
               {
+                field: 'documentId',
+              },
+              {
                 field: 'physician_name',
                 alias: 'physicianName',
               },

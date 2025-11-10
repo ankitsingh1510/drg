@@ -29,12 +29,6 @@ export function PatientHeader({
 
   return (
     <>
-      {showMenu && (
-        <Modal transparent visible={showMenu} animationType="none">
-          <Pressable className="flex-1" onPress={() => setShowMenu(false)} />
-        </Modal>
-      )}
-
       <View className="border-b border-gray-200 bg-white px-4 pb-4 pt-12">
         <View className="mb-4 flex-row items-center justify-between">
           <View className="flex-1">
@@ -50,20 +44,6 @@ export function PatientHeader({
             <TouchableOpacity onPress={() => setShowMenu(!showMenu)} className="px-2 py-2">
               <Text className="text-2xl text-slate-700">⋮</Text>
             </TouchableOpacity>
-
-            {showMenu && (
-              <View className="absolute right-0 top-10 z-50 w-32 rounded-lg border border-gray-200 bg-white shadow-lg">
-                <TouchableOpacity
-                  className="rounded-lg px-4 py-3"
-                  onPress={() => {
-                    setShowMenu(false);
-                    onLogout();
-                  }}
-                >
-                  <Text className="text-sm font-semibold text-red-500">Logout</Text>
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
         </View>
 
@@ -96,6 +76,24 @@ export function PatientHeader({
           </View>
         )}
       </View>
+
+      {showMenu && (
+        <Modal transparent visible={showMenu} animationType="fade" onRequestClose={() => setShowMenu(false)}>
+          <Pressable className="flex-1" onPress={() => setShowMenu(false)}>
+            <View className="absolute right-4 top-24 z-50 w-32 rounded-lg border border-gray-200 bg-white shadow-lg">
+              <TouchableOpacity
+                className="rounded-lg px-4 py-3"
+                onPress={() => {
+                  setShowMenu(false);
+                  onLogout();
+                }}
+              >
+                <Text className="text-sm font-semibold text-red-500">Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
+      )}
     </>
   );
 }

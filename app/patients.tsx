@@ -1,12 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Linking, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, RefreshControl, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
+import { useAtomValue } from 'jotai';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
-import { useAuth } from '@/context/AuthContext';
+import { useLogout, userAtom, usersStudyListAtom } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 
 export default function Patients() {
-  const { logout, user, usersStudyList } = useAuth();
+  const logout = useLogout();
+  const user = useAtomValue(userAtom);
+  const usersStudyList = useAtomValue(usersStudyListAtom);
+  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,7 +34,6 @@ export default function Patients() {
           searchQuery: searchQuery,
           workflowStatusFilter: filterValue,
         });
-        console.log('Fetch called');
         setTotalCount(response.totalCount);
 
         if (append) {
@@ -58,7 +63,6 @@ export default function Patients() {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    console.log('Refresh called');
     fetchPatients(1, filter, query);
   }, [filter, query, fetchPatients]);
 
@@ -95,30 +99,28 @@ export default function Patients() {
     [query, fetchPatients]
   );
 
-  const handleViewReport = useCallback(async (patient: Patient) => {
-    try {
-      if (!patient.full_report_finalized_path) {
-        Alert.alert('Error', 'Report path not available for this patient.');
-        return;
-      }
+  const handleViewReport = useCallback(
+    async (patient: Patient) => {
+      try {
+        if (!patient.full_report_finalized_path) {
+          Alert.alert('Error', 'Report path not available for this patient.');
+          return;
+        }
 
-      const blobPath = patient.full_report_finalized_path;
-      const fileType = 'application/pdf';
+        const blobPath = patient.full_report_finalized_path;
 
-      const signedUrl = await storageAPI.getSignedUrl(blobPath, fileType);
-      console.log('Signed URL:', signedUrl);
-      // Open the URL in browser
-      const supported = await Linking.canOpenURL(signedUrl);
-      if (supported) {
-        await Linking.openURL(signedUrl);
-      } else {
-        Alert.alert('Error', 'Unable to open report URL');
+        const signedUrl = await storageAPI.getSignedUrl(blobPath);
+        router.push({
+          pathname: '/reports' as any,
+          params: { pdfUrl: encodeURIComponent(signedUrl), patientName: patient.patientName },
+        });
+      } catch (error) {
+        console.error('Error viewing report:', error);
+        Alert.alert('Error', 'Failed to load report. Please try again.');
       }
-    } catch (error) {
-      console.error('Error viewing report:', error);
-      Alert.alert('Error', 'Failed to load report. Please try again.');
-    }
-  }, []);
+    },
+    [router]
+  );
 
   // Render functions
   const renderPatient = useCallback(
@@ -154,10 +156,10 @@ export default function Patients() {
       />
 
       <View className="flex-1">
-        <FlatList
+        <FlashList
           data={patients}
           renderItem={renderPatient}
-          keyExtractor={(item, index) => `${item.sampleBarcode}-${index}`}
+          keyExtractor={(item: Patient, index: number) => `${item.sampleBarcode}-${index}`}
           contentContainerStyle={{ padding: 16 }}
           refreshControl={
             <RefreshControl
@@ -172,10 +174,6 @@ export default function Patients() {
           ListFooterComponent={renderFooter}
           ListEmptyComponent={renderEmptyComponent}
           showsVerticalScrollIndicator={false}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          windowSize={10}
-          initialNumToRender={10}
         />
 
         {loading && !refreshing && (
