@@ -12,6 +12,7 @@ interface FetchTestsDetailsParams {
 export interface Patient {
   assayName: string;
   suid: string;
+  documentId?: string;
   sampleBarcode: string;
   report_finalized_date: string;
   finalized_report_status: string;

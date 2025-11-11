@@ -112,7 +112,12 @@ export default function Patients() {
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
         router.push({
           pathname: '/reports' as any,
-          params: { pdfUrl: encodeURIComponent(signedUrl), patientName: patient.patientName },
+          params: {
+            pdfUrl: encodeURIComponent(signedUrl),
+            patientName: patient.patientName,
+            documentId: patient.hasOwnProperty('documentId') ? patient.documentId : null,
+            accession_id: patient.accession_id,
+          },
         });
       } catch (error) {
         console.error('Error viewing report:', error);
