@@ -2,16 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { useAtomValue } from 'jotai';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
-import { useLogout, userAtom, usersStudyListAtom } from '@/context/AuthContext';
+import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 
 export default function Patients() {
   const logout = useLogout();
-  const user = useAtomValue(userAtom);
-  const usersStudyList = useAtomValue(usersStudyListAtom);
+  const { user, usersStudyList } = useAuth();
   const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
