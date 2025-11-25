@@ -1,9 +1,10 @@
 import React from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from 'react-native';
 
 interface FilterModalProps {
   visible: boolean;
   currentFilter: string;
+  loading?: boolean;
   onClose: () => void;
   onFilterChange: (filter: string) => void;
 }
@@ -14,7 +15,7 @@ export function FilterModal({ visible, currentFilter, loading = false, onClose, 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity className="flex-1 items-center justify-center bg-black/50" activeOpacity={1} onPress={onClose}>
-        <View className="m-4 w-80 rounded-xl bg-white p-4">
+        <View className="m-4 w-80 rounded-lg bg-white p-4">
           <Text className="mb-4 text-lg font-semibold text-slate-900">Filter by Status</Text>
 
           {loading ? (
