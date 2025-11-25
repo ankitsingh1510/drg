@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { storageAPI } from '@/services/storage';
 import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
@@ -16,27 +15,41 @@ interface User {
   role_id: string;
 }
 
-// Jotai atoms
-export const userAtom = atom<User | null>(null);
-export const tokenAtom = atom<string | null>(null);
-export const isLoadingAtom = atom<boolean>(true);
-export const targetLocationAtom = atom<string | null>(null);
-export const studyIdentifierAtom = atom<string>('');
-export const usersStudyListAtom = atom<number[]>([]);
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  targetLocation: string | null;
+  studyIdentifier: string;
+  usersStudyList: number[];
+  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
+  setIsLoading: (loading: boolean) => void;
+  setTargetLocation: (location: string | null) => void;
+  setStudyIdentifier: (identifier: string) => void;
+  setUsersStudyList: (list: number[]) => void;
+}
 
-// Derived atom for authentication status
-export const isAuthenticatedAtom = atom(get => {
-  const user = get(userAtom);
-  const token = get(tokenAtom);
-  return !!user && !!token;
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useAtom(userAtom);
-  const [token, setToken] = useAtom(tokenAtom);
-  const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
-  const setTargetLocation = useSetAtom(targetLocationAtom);
-  const setUsersStudyList = useSetAtom(usersStudyListAtom);
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [targetLocation, setTargetLocation] = useState<string | null>(null);
+  const [studyIdentifier, setStudyIdentifier] = useState<string>('');
+  const [usersStudyList, setUsersStudyList] = useState<number[]>([]);
+
+  const isAuthenticated = !!user && !!token;
 
   useEffect(() => {
     const initAuth = async () => {
@@ -101,16 +114,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  return <>{children}</>;
+  const value: AuthContextType = {
+    user,
+    token,
+    isLoading,
+    targetLocation,
+    studyIdentifier,
+    usersStudyList,
+    isAuthenticated,
+    setUser,
+    setToken,
+    setIsLoading,
+    setTargetLocation,
+    setStudyIdentifier,
+    setUsersStudyList,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom hooks for authentication operations
 export const useLogin = () => {
-  const setUser = useSetAtom(userAtom);
-  const setToken = useSetAtom(tokenAtom);
-  const setIsLoading = useSetAtom(isLoadingAtom);
-  const setUsersStudyList = useSetAtom(usersStudyListAtom);
-  const setTargetLocation = useSetAtom(targetLocationAtom);
+  const { setUser, setToken, setIsLoading, setUsersStudyList, setTargetLocation } = useAuth();
 
   return async (email: string, password: string) => {
     try {
@@ -169,9 +194,7 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
-  const setUser = useSetAtom(userAtom);
-  const setToken = useSetAtom(tokenAtom);
-  const setUsersStudyList = useSetAtom(usersStudyListAtom);
+  const { setUser, setToken, setUsersStudyList } = useAuth();
 
   return async () => {
     console.log('Logging out');
@@ -184,7 +207,7 @@ export const useLogout = () => {
 };
 
 export const useGetInitials = () => {
-  const user = useAtomValue(userAtom);
+  const { user } = useAuth();
 
   return (): string => {
     if (!user) return 'IA';

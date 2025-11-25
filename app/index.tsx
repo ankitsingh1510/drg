@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAtomValue } from 'jotai';
-import { isAuthenticatedAtom, isLoadingAtom, useLogin } from '@/context/AuthContext';
+import { useAuth, useLogin } from '@/context/AuthContext';
 import '../global.css';
 
 export default function LoginScreen() {
@@ -10,8 +9,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
-  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
-  const isLoading = useAtomValue(isLoadingAtom);
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

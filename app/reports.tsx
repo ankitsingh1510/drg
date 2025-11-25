@@ -32,7 +32,7 @@ export default function Reports() {
       setDocId(res.data.documentId);
       Toast.show({
         type: 'success',
-        text1: res.data.message,
+        text1: res.message,
         visibilityTime: 3000,
       });
       console.log(res);
