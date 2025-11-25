@@ -22,7 +22,13 @@ export default function Reports() {
   const [ingesting, setIngesting] = useState(false);
 
   const handleTalkToDrG = () => {
-    console.log('Hello');
+    router.push({
+      pathname: '/chat',
+      params: {
+        patientName,
+        documentId: docId,
+      },
+    });
   };
 
   const handleIngestReport = async () => {
@@ -50,14 +56,15 @@ export default function Reports() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
       {/* Header */}
-      <View className="flex-row items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        <TouchableOpacity onPress={handleGoBack} className="p-2">
-          <Text className="text-base font-semibold text-[#daa521]">← Back</Text>
+      <View className="relative flex-row items-center border-b border-gray-200 bg-white px-4 py-3">
+        <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
+          <Text className="text-base font-semibold text-[#daa521]">←</Text>
         </TouchableOpacity>
-        <Text className="flex-1 text-center text-lg font-bold text-gray-800" numberOfLines={1} ellipsizeMode="tail">
-          {patientName}
-        </Text>
-        <View className="w-[60px]" />
+        <View className="absolute left-0 right-0 items-center">
+          <Text className="text-lg font-bold text-gray-800" numberOfLines={1} ellipsizeMode="tail">
+            {patientName}
+          </Text>
+        </View>
       </View>
 
       {/* PDF WebView */}
@@ -90,7 +97,7 @@ export default function Reports() {
       <View className="items-center border-t border-gray-200 bg-white px-4 py-5">
         {docId ? (
           <TouchableOpacity
-            className="min-w-[200px] flex-row items-center justify-center rounded-xl bg-[#daa521] px-6 py-4 shadow-md active:opacity-80"
+            className="min-w-[200px] flex-row items-center justify-center rounded-lg bg-[#daa521] px-6 py-4 shadow-md active:opacity-80"
             onPress={handleTalkToDrG}
           >
             <Entypo name="chat" size={22} color="white" />
@@ -98,7 +105,7 @@ export default function Reports() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            className="min-w-[200px] flex-row items-center justify-center rounded-xl bg-[#daa521] px-6 py-4 shadow-md active:opacity-80"
+            className="min-w-[200px] flex-row items-center justify-center rounded-lg bg-[#daa521] px-6 py-4 shadow-md active:opacity-80"
             onPress={handleIngestReport}
           >
             <MaterialIcons name="analytics" size={24} color="white" />
@@ -110,7 +117,7 @@ export default function Reports() {
       {/* Ingesting Overlay */}
       <Modal transparent visible={ingesting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50">
-          <View className="w-3/4 max-w-sm items-center rounded-2xl bg-white p-6 shadow-lg">
+          <View className="w-3/4 max-w-sm items-center rounded-lg bg-white p-6 shadow-lg">
             <ActivityIndicator size="large" color="#daa521" />
             <Text className="mt-4 text-lg font-semibold text-gray-700">Ingesting...</Text>
           </View>

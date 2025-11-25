@@ -38,7 +38,7 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
   };
 
   return (
-    <View className="mb-3 rounded-xl border border-blue-100 bg-white shadow-sm">
+    <View className="mb-3 rounded-lg border border-blue-100 bg-white shadow-sm">
       <View className="p-4">
         <View className="mb-3 flex-row items-start justify-between">
           <View className="mr-3 flex-1">
@@ -48,7 +48,7 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
             <Text className="text-sm text-slate-500">Date: {patient.reportFinalizedDate}</Text>
           </View>
           <View
-            className={`rounded-xl border px-3 py-1.5 text-xs font-medium ${getStatusColor(patient.workflowStatus)}`}
+            className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${getStatusColor(patient.workflowStatus)}`}
           >
             <Text className={`text-xs font-medium ${getStatusColor(patient.workflowStatus).split(' ')[0]}`}>
               {patient.workflowStatus}

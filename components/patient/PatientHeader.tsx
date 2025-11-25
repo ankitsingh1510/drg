@@ -29,7 +29,7 @@ export function PatientHeader({
 
   return (
     <>
-      <View className="border-b border-gray-200 bg-white px-4 pb-4 pt-12">
+      <View className="border-b border-gray-200 bg-white px-4 pb-4 pt-20">
         <View className="mb-4 flex-row items-center justify-between">
           <View className="flex-1">
             <Text className="text-2xl font-bold text-slate-900">Order List</Text>
@@ -48,15 +48,15 @@ export function PatientHeader({
         </View>
 
         {/* Search and Filter */}
-        <View className="flex-row items-center space-x-3">
+        <View className="flex-row items-center gap-1">
           <TextInput
             value={query}
             onChangeText={onSearch}
-            className="flex-1 rounded-xl border border-blue-100 bg-white px-4 py-3 text-slate-800"
+            className="flex-1 rounded-lg border border-blue-100 bg-white px-4 py-3 text-slate-800"
             placeholder="Search by patient name"
             placeholderTextColor="#64748b"
           />
-          <TouchableOpacity className="rounded-xl border border-blue-200 bg-white px-4 py-3" onPress={onFilterPress}>
+          <TouchableOpacity className="rounded-lg border border-blue-200 bg-white px-4 py-3" onPress={onFilterPress}>
             <Text className="text-sm font-medium text-blue-700">Filter ▾</Text>
           </TouchableOpacity>
         </View>
