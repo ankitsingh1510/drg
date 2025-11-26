@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -20,6 +20,12 @@ export default function Reports() {
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
   const [ingesting, setIngesting] = useState(false);
+
+  // Use Google Docs viewer for Android devices
+  const pdfViewerUrl =
+    Platform.OS === 'android'
+      ? `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
+      : pdfUrl;
 
   const handleTalkToDrG = () => {
     router.push({
@@ -76,7 +82,7 @@ export default function Reports() {
           </View>
         )}
         <WebView
-          source={{ uri: pdfUrl }}
+          source={{ uri: pdfViewerUrl }}
           className="flex-1 bg-white"
           onLoadStart={() => setLoading(true)}
           onLoadEnd={() => setLoading(false)}

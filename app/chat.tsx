@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Audio } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -12,6 +13,31 @@ export default function Chat() {
   }>();
 
   const [loading, setLoading] = useState(true);
+  const [permissionGranted, setPermissionGranted] = useState(false);
+
+  useEffect(() => {
+    requestMicrophonePermission();
+  }, []);
+
+  const requestMicrophonePermission = async () => {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status === 'granted') {
+        setPermissionGranted(true);
+        // Configure audio session for recording
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+      } else {
+        Alert.alert('Microphone Permission Required', 'Please enable microphone access in settings to talk to Dr.G', [
+          { text: 'OK' },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error requesting microphone permission:', error);
+    }
+  };
 
   const handleGoBack = () => {
     router.back();
@@ -40,7 +66,7 @@ export default function Chat() {
           </View>
         )}
         <WebView
-          source={{ uri: 'http://localhost:3002/' }}
+          source={{ uri: process.env.EXPO_PUBLIC_CHAT_URL }}
           className="flex-1 bg-white"
           onLoadStart={() => setLoading(true)}
           onLoadEnd={() => setLoading(false)}
@@ -57,6 +83,10 @@ export default function Chat() {
           allowsInlineMediaPlayback={true}
           allowsAirPlayForMediaPlayback={true}
           mediaPlaybackRequiresUserAction={false}
+          // Add these props for better media handling
+          allowFileAccess={true}
+          mixedContentMode="always"
+          sharedCookiesEnabled={true}
         />
       </View>
     </SafeAreaView>
