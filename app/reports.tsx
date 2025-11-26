@@ -3,13 +3,14 @@ import { ActivityIndicator, Modal, Platform, Text, TouchableOpacity, View } from
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { WebView } from 'react-native-webview';
 import { ragAPI } from '@/services/rag';
 
 export default function Reports() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   let { pdfUrl, patientName, documentId, accession_id } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
@@ -60,7 +61,7 @@ export default function Reports() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
+    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
       {/* Header */}
       <View className="relative flex-row items-center border-b border-gray-200 bg-white px-4 py-3">
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
@@ -129,6 +130,6 @@ export default function Reports() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
