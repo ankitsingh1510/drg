@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { AuthProvider } from '@/context/AuthContext';
+import NetworkChecker from '@/hooks/NetworkChecker';
 
 export default function RootLayout() {
   return (
@@ -14,6 +15,7 @@ export default function RootLayout() {
           <Toast position="bottom" />
         </AuthProvider>
       </SafeAreaProvider>
+      <NetworkChecker />
     </GestureHandlerRootView>
   );
 }

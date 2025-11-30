@@ -22,23 +22,22 @@ export default function Reports() {
     documentId: string;
     accession_id: string;
   }>();
-  console.log('documentId in VideoInteraction:', documentId);
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
   const [ingesting, setIngesting] = useState(false);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showInteraction, setShowInteraction] = useState<{ isVisble: boolean; mode: 'video' | 'chat' }>({
-    isVisble: false,
+  const [showInteraction, setShowInteraction] = useState<{ isVisible: boolean; mode: 'video' | 'chat' }>({
+    isVisible: false,
     mode: 'video',
   });
 
   const handleChatWithDrG = () => {
-    setShowInteraction({ isVisble: true, mode: 'chat' });
+    setShowInteraction({ isVisible: true, mode: 'chat' });
   };
 
   const handleTalkToDrG = () => {
-    setShowInteraction({ isVisble: true, mode: 'video' });
+    setShowInteraction({ isVisible: true, mode: 'video' });
   };
 
   const handleIngestReport = async () => {
@@ -63,10 +62,8 @@ export default function Reports() {
   };
 
   const handleOnInteractionClose = () => {
-    setShowInteraction({ isVisble: false, mode: 'video' });
+    setShowInteraction({ isVisible: false, mode: 'video' });
   };
-
-  useEffect(() => {}, [showInteraction]);
 
   return (
     <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
@@ -133,7 +130,7 @@ export default function Reports() {
       </View>
 
       {/* Talk to Dr.G / Analyze Report Button */}
-      {!showInteraction.isVisble && (
+      {!showInteraction.isVisible && (
         <View className="items-center border-t border-gray-200 bg-white px-4 py-5">
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
@@ -174,7 +171,7 @@ export default function Reports() {
         </View>
       </Modal>
       {/* Floating Interaction Box */}
-      {showInteraction.isVisble && (
+      {showInteraction.isVisible && (
         <InteractionBox
           documentId={String(docId)}
           token={token}
@@ -182,7 +179,7 @@ export default function Reports() {
           mode={showInteraction.mode}
         />
       )}
-      {!showInteraction.isVisble && (
+      {!showInteraction.isVisible && docId && (
         <TouchableOpacity
           onPress={() => console.log('Reingest Report')}
           style={{
@@ -193,7 +190,7 @@ export default function Reports() {
             borderRadius: 16,
             padding: 6,
           }}
-          accessibilityLabel="Close interaction"
+          accessibilityLabel="Reingest Report"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <MaterialCommunityIcons name="file-document-refresh-outline" size={24} color="#daa521" />

@@ -25,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS"],
+      "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS"],
       "package": "com.ankit.bisht.drg"
     },
     "web": {
