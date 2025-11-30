@@ -181,7 +181,7 @@ export default function Reports() {
       )}
       {!showInteraction.isVisible && docId && (
         <TouchableOpacity
-          onPress={() => console.log('Reingest Report')}
+          onPress={handleIngestReport}
           style={{
             position: 'absolute',
             top: insets.top + 12,
