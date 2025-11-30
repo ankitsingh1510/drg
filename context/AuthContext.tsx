@@ -93,7 +93,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const studyList = await studyAPI.getStudyList();
         const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
-        console.log(studyIds);
         setUsersStudyList(studyIds);
 
         setUser(userData);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Modal, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface User {
   name: string;
@@ -29,7 +29,7 @@ export function PatientHeader({
 
   return (
     <>
-      <View className="border-b border-gray-200 bg-white px-4 pb-4 pt-20">
+      <View className={`border-b border-gray-200 bg-white px-4 pb-4 ${Platform.OS === 'ios' ? 'pt-16' : 'pt-8'}`}>
         <View className="mb-4 flex-row items-center justify-between">
           <View className="flex-1">
             <Text className="text-2xl font-bold text-slate-900">Order List</Text>
