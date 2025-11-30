@@ -182,7 +182,7 @@ export default function Patients() {
         {loading && !refreshing && (
           <View className="absolute inset-0 items-center justify-center bg-gray-50/80">
             <ActivityIndicator size="large" color="#daa521" />
-            <Text className="mt-2 text-lg text-slate-600">Loading patients...</Text>
+            <Text className="mt-2 text-lg text-slate-600">Loading Orders...</Text>
           </View>
         )}
       </View>
