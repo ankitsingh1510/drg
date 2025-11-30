@@ -13,9 +13,6 @@ export default function InteractionBox({
   token: string;
   onClose?: () => void;
 }) {
-  useEffect(() => {
-    console.log('InteractionBox mounted with mode:', mode);
-  }, [mode]);
   if (mode === 'video') {
     return <VideoInteraction documentId={documentId} token={token} onClose={onClose} />;
   } else {

@@ -15,7 +15,6 @@ export default function VideoInteraction({
   onClose?: () => void;
 }) {
   const [loading, setLoading] = useState(true);
-  const [permissionGranted, setPermissionGranted] = useState(false);
   const screen = Dimensions.get('window');
   const BASE_WIDTH = screen.width * 0.5;
   const BASE_HEIGHT = screen.height * 0.3;
@@ -96,7 +95,6 @@ export default function VideoInteraction({
     try {
       const { status } = await Audio.requestPermissionsAsync();
       if (status === 'granted') {
-        setPermissionGranted(true);
         // Configure audio session for recording
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: true,
@@ -195,10 +193,6 @@ export default function VideoInteraction({
               const data = JSON.parse(event.nativeEvent.data);
 
               if (data.type === 'button_click') {
-                if (data.label === 'Start Interaction') {
-                  console.log('➡️ Start button clicked!');
-                }
-
                 if (data.label === 'Stop Interaction') {
                   onClose();
                 }
