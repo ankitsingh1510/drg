@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import ChatInteraction from './ChatInteraction';
+// import ChatInteraction from './ChatInteraction';
 import VideoInteraction from './VideoInteraction';
 
 export default function InteractionBox({
@@ -16,6 +16,6 @@ export default function InteractionBox({
   if (mode === 'video') {
     return <VideoInteraction documentId={documentId} token={token} onClose={onClose} />;
   } else {
-    return <ChatInteraction documentId={documentId} token={token} onClose={onClose} />;
+    // return <ChatInteraction documentId={documentId} token={token} onClose={onClose} />;
   }
 }

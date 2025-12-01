@@ -141,13 +141,13 @@ export default function Reports() {
                 <Feather name="video" size={22} color="white" />
                 <Text className="ml-2 text-lg font-bold text-white">Talk With Dr.G</Text>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-4 py-4 shadow-md active:opacity-80"
                 onPress={handleChatWithDrG}
               >
                 <Ionicons name="chatbubbles-outline" size={22} color="white" />
                 <Text className="ml-2 text-lg font-bold text-white">Chat With Dr.G</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           ) : (
             <TouchableOpacity
@@ -181,7 +181,7 @@ export default function Reports() {
       )}
       {!showInteraction.isVisible && docId && (
         <TouchableOpacity
-          onPress={() => console.log('Reingest Report')}
+          onPress={handleIngestReport}
           style={{
             position: 'absolute',
             top: insets.top + 12,
