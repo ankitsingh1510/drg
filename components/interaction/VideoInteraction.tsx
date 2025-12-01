@@ -28,18 +28,20 @@ export default function VideoInteraction({
   const translateX = useSharedValue((screen.width - BASE_WIDTH) / 2);
   const translateY = useSharedValue((screen.height - BASE_HEIGHT) / 3);
   const scale = useSharedValue(1);
+  const startTranslateX = useSharedValue(0);
+  const startTranslateY = useSharedValue(0);
+  const startScale = useSharedValue(1);
 
   // Pan (drag) gesture
-  let panStartX = 0;
-  let panStartY = 0;
   const panGesture = Gesture.Pan()
+    .activeCursor('grab')
     .onStart(() => {
-      panStartX = translateX.value;
-      panStartY = translateY.value;
+      startTranslateX.value = translateX.value;
+      startTranslateY.value = translateY.value;
     })
     .onUpdate(e => {
-      const nextX = panStartX + e.translationX;
-      const nextY = panStartY + e.translationY;
+      const nextX = startTranslateX.value + e.translationX;
+      const nextY = startTranslateY.value + e.translationY;
       const boxW = BASE_WIDTH * scale.value;
       const boxH = BASE_HEIGHT * scale.value;
       const minX = -0.5 * boxW;
@@ -51,13 +53,12 @@ export default function VideoInteraction({
     });
 
   // Pinch gesture to resize width/height (using scale multiplier)
-  let pinchStartScale = 1;
   const pinchGesture = Gesture.Pinch()
     .onStart(() => {
-      pinchStartScale = scale.value;
+      startScale.value = scale.value;
     })
     .onUpdate(e => {
-      const next = pinchStartScale * e.scale;
+      const next = startScale.value * e.scale;
       scale.value = next < MIN_SCALE ? MIN_SCALE : next;
       // Ensure after scaling, position remains within 50% overflow bounds
       const boxW = BASE_WIDTH * scale.value;
@@ -174,8 +175,18 @@ export default function VideoInteraction({
             mediaPlaybackRequiresUserAction={false}
             allowFileAccess
             mixedContentMode="always"
+            setSupportMultipleWindows={false}
             sharedCookiesEnabled
             injectedJavaScript={`
+              const meta = document.createElement('meta');
+              meta.setAttribute('name', 'viewport');
+              meta.setAttribute(
+                'content',
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+              );
+              document.head.appendChild(meta);
+              true;
+
               document.addEventListener("click", function(e) {
                 const el = e.target.closest("button");
                 if (!el) return;
@@ -198,6 +209,7 @@ export default function VideoInteraction({
                 }
               }
             }}
+            scrollEnabled={false}
           />
         </Animated.View>
       </GestureDetector>
