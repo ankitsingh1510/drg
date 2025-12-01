@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, useLogin } from '@/context/AuthContext';
 import '../global.css';
 
@@ -45,7 +46,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white px-6">
+    <SafeAreaView style={{ flex: 1, padding: 22 }}>
       <View className="flex-1 justify-center">
         <View className="mb-10">
           <Text className="mb-2 text-2xl font-extrabold text-gray-900">Welcome back! Glad</Text>
@@ -55,7 +56,7 @@ export default function LoginScreen() {
         <View className="mb-6 space-y-4">
           <View className="mb-4">
             <TextInput
-              className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-base"
+              className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black"
               placeholder="Enter your email"
               placeholderTextColor="#9CA3AF"
               value={email}
@@ -69,7 +70,7 @@ export default function LoginScreen() {
           <View>
             <View className="relative">
               <TextInput
-                className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-base"
+                className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black"
                 placeholder="Enter your password"
                 placeholderTextColor="#9CA3AF"
                 value={password}
@@ -99,6 +100,6 @@ export default function LoginScreen() {
           <Text className="text-base font-semibold text-white">{isLoading ? 'Logging in...' : 'Login'}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
