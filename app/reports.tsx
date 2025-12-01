@@ -84,7 +84,7 @@ export default function Reports() {
       <View className="relative flex-1">
         <Pdf
           trustAllCerts={false}
-          source={{ uri: pdfUrl, cache: true, expiration: 3000 }}
+          source={{ uri: pdfUrl, cache: true, expiration: 60 }}
           style={styles.pdf}
           onLoadComplete={(numberOfPages, filePath) => {
             setNumPages(numberOfPages);
