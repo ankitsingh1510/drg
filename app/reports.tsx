@@ -16,11 +16,12 @@ export default function Reports() {
   const { token } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  let { pdfUrl, patientName, documentId, accession_id } = useLocalSearchParams<{
+  let { pdfUrl, patientName, documentId, accession_id, showIngestOption } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
     documentId: string;
     accession_id: string;
+    showIngestOption: string;
   }>();
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ export default function Reports() {
       </View>
 
       {/* Talk to Dr.G / Analyze Report Button */}
-      {!showInteraction.isVisible && (
+      {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
         <View className="items-center border-t border-gray-200 bg-white px-4 py-5">
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
@@ -178,23 +179,6 @@ export default function Reports() {
           onClose={handleOnInteractionClose}
           mode={showInteraction.mode}
         />
-      )}
-      {!showInteraction.isVisible && docId && (
-        <TouchableOpacity
-          onPress={handleIngestReport}
-          style={{
-            position: 'absolute',
-            top: insets.top + 12,
-            right: 12,
-            zIndex: 50,
-            borderRadius: 16,
-            padding: 6,
-          }}
-          accessibilityLabel="Reingest Report"
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <MaterialCommunityIcons name="file-document-refresh-outline" size={24} color="#daa521" />
-        </TouchableOpacity>
       )}
     </View>
   );

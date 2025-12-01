@@ -104,17 +104,23 @@ export default function Patients() {
           Alert.alert('Error', 'Report path not available for this patient.');
           return;
         }
-
         const blobPath = patient.full_report_finalized_path;
-
+        const documentId = patient.hasOwnProperty('documentId') ? patient.documentId : null;
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
+        const ingested_file_path = patient.hasOwnProperty('ingested_file_path') ? patient.ingested_file_path : null;
+        let showIngestOption = 'false';
+        if (ingested_file_path !== patient.full_report_finalized_path || !documentId) {
+          showIngestOption = 'true';
+        }
+
         router.push({
           pathname: '/reports' as any,
           params: {
             pdfUrl: encodeURIComponent(signedUrl),
             patientName: patient.patientName,
-            documentId: patient.hasOwnProperty('documentId') ? patient.documentId : null,
+            documentId: documentId,
             accession_id: patient.accession_id,
+            showIngestOption,
           },
         });
       } catch (error) {
