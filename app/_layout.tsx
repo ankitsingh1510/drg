@@ -13,9 +13,9 @@ export default function RootLayout() {
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
           <Toast position="bottom" />
+          <NetworkChecker />
         </AuthProvider>
       </SafeAreaProvider>
-      <NetworkChecker />
     </GestureHandlerRootView>
   );
 }

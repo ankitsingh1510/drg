@@ -14,7 +14,7 @@
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to communicate with Dr.G",
         "NSCameraUsageDescription": "This app needs access to your camera for video calls"
       },
-      "bundleIdentifier": "com.ankit.bisht.drg"
+      "bundleIdentifier": "com.onecellai.drg"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": ["RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS"],
-      "package": "com.ankit.bisht.drg"
+      "package": "com.onecellai.drg"
     },
     "web": {
       "bundler": "metro",
