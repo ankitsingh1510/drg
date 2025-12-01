@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
@@ -21,6 +22,7 @@ export default function Patients() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const insets = useSafeAreaInsets();
 
   const fetchPatients = useCallback(
     async (pageNum: number, filterValue: string, searchQuery: string, append = false) => {
@@ -153,7 +155,7 @@ export default function Patients() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView style={{ flex: 1 }}>
       <PatientHeader
         user={user}
         totalCount={totalCount}
@@ -199,6 +201,6 @@ export default function Patients() {
         onClose={() => setShowFilterModal(false)}
         onFilterChange={handleFilterChange}
       />
-    </View>
+    </SafeAreaView>
   );
 }

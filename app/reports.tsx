@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Pdf from 'react-native-pdf';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import InteractionBox from '@/components/interaction/Interactions';
 import { useAuth } from '@/context/AuthContext';
@@ -67,7 +67,7 @@ export default function Reports() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
+    <SafeAreaView style={{ flex: 1 }}>
       {/* Header */}
       <View className="relative flex-row items-center border-b border-gray-200 bg-white px-4 py-3">
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
@@ -132,11 +132,11 @@ export default function Reports() {
 
       {/* Talk to Dr.G / Analyze Report Button */}
       {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
-        <View className="items-center border-t border-gray-200 bg-white px-4 py-5">
+        <View className="items-center border-t border-gray-200 bg-white px-4 py-2">
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
               <TouchableOpacity
-                className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-4 py-4 shadow-md active:opacity-80"
+                className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-3 py-3 shadow-md active:opacity-80"
                 onPress={handleTalkToDrG}
               >
                 <Feather name="video" size={22} color="white" />
@@ -180,7 +180,7 @@ export default function Reports() {
           mode={showInteraction.mode}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
