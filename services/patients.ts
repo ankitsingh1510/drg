@@ -13,6 +13,7 @@ export interface Patient {
   assayName: string;
   suid: string;
   documentId?: string;
+  ingested_file_path?: string | null;
   sampleBarcode: string;
   report_finalized_date: string;
   finalized_report_status: string;
@@ -164,6 +165,9 @@ class PatientsAPI {
             accession_attribute_value: [
               {
                 field: 'documentId',
+              },
+              {
+                field: 'ingested_file_path',
               },
               {
                 field: 'physician_name',
