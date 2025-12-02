@@ -14,7 +14,7 @@
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to communicate with Dr.G",
         "NSCameraUsageDescription": "This app needs access to your camera for video calls"
       },
-      "bundleIdentifier": "com.onecellai.drg"
+      "bundleIdentifier": "ai.onecell.drg"
     },
     "android": {
       "adaptiveIcon": {

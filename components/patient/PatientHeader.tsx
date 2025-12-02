@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import IconNavBar from '../navigation/IconNavBar';
 
 interface User {
   name: string;
@@ -40,11 +41,13 @@ export function PatientHeader({
             )}
             {totalCount > 0 && <Text className="mt-1 text-xs text-slate-400">{totalCount} total cases</Text>}
           </View>
-          <View className="relative">
-            <TouchableOpacity onPress={() => setShowMenu(!showMenu)} className="px-2 py-2">
-              <Text className="text-2xl text-slate-700">⋮</Text>
-            </TouchableOpacity>
-          </View>
+          <IconNavBar />
+          {/* <View className="flex flex-row items-center justify-center">
+              <Text className="text-2xl text-slate-700">Home</Text>
+              <TouchableOpacity onPress={() => setShowMenu(!showMenu)} className="px-2 py-2">
+                <Text className="text-2xl text-slate-700">⋮</Text>
+              </TouchableOpacity>
+            </View> */}
         </View>
 
         {/* Search and Filter */}

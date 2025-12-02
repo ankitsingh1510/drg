@@ -101,7 +101,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTargetLocation(config?.data?.targetLocation || null);
 
         // Redirect to patients page if already authenticated
-        router.replace('/patients' as any);
+        // router.replace('/patients' as any);
+        router.replace('/landing' as any);
       } catch (error) {
         console.error('Error initializing auth:', error);
         await AsyncStorage.removeItem('token');
@@ -179,7 +180,8 @@ export const useLogin = () => {
         setTargetLocation(config?.data?.targetLocation || null);
 
         // Navigate to patients page
-        router.replace('/patients' as any);
+        // router.replace('/patients' as any);
+        router.replace('/landing' as any);
       } else {
         throw new Error('Authentication failed');
       }
