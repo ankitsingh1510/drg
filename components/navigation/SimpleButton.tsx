@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { LucideIcon } from 'lucide-react-native';
 
 interface SimpleButtonProps {
@@ -17,7 +18,7 @@ export default function SimpleButton({
   subheading,
   onPress,
   iconColor = 'orangered',
-  iconSize = 32,
+  iconSize = 40,
 }: SimpleButtonProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
