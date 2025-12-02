@@ -137,7 +137,7 @@ export default function Reports() {
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
               <TouchableOpacity
-                className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-3 py-3 shadow-md active:opacity-80"
+                className="xshadow-md flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
                 onPress={handleTalkToDrG}
               >
                 <Feather name="video" size={22} color="white" />
@@ -153,7 +153,7 @@ export default function Reports() {
             </View>
           ) : (
             <TouchableOpacity
-              className="min-w-[200px] flex-row items-center justify-center rounded-lg bg-[#daa521] px-6 py-4 shadow-md active:opacity-80"
+              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
               onPress={handleIngestReport}
             >
               <MaterialIcons name="analytics" size={22} color="white" />
