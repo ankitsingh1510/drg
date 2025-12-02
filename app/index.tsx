@@ -15,6 +15,6 @@ export default function Index() {
       </View>
     );
   }
-
-  return <Redirect href={isAuthenticated ? '/patients' : '/login'} />;
+  return <Redirect href={isAuthenticated ? '/landing' : '/login'} />;
+  // return <Redirect href={isAuthenticated ? '/patients' : '/login'} />;
 }

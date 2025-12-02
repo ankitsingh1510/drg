@@ -15,7 +15,9 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/patients' as any);
+      // router.replace('/patients' as any);
+      console.log('User is authenticated, navigating to landing page');
+      router.replace('/landing' as any);
     }
   }, [isAuthenticated]);
 
