@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button, FlatList, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { ClipboardList, Dna, LogOut, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import * as WebBrowser from 'expo-web-browser';
+import { ClipboardList, CogIcon, Dna, LogOut, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import SimpleButton from '@/components/navigation/SimpleButton';
@@ -14,6 +15,10 @@ export default function LandingScreen() {
       day: 'numeric',
     };
     return date.toLocaleDateString('en-US', options);
+  };
+
+  const openInBrowser = (url: string) => {
+    WebBrowser.openBrowserAsync(url);
   };
 
   return (
@@ -29,7 +34,7 @@ export default function LandingScreen() {
           <View
             style={{
               // flex: 1,
-              // backgroundColor: '#F9FAFB',
+              backgroundColor: '#F9FAFB',
               flexDirection: 'row',
               flexWrap: 'wrap',
               justifyContent: 'center',
@@ -51,13 +56,19 @@ export default function LandingScreen() {
               icon={TestTube2}
               heading="Order Tests"
               subheading="1Ceall.Ai tests for Pathology & Genomics"
-              onPress={() => router.replace('/patients' as any)}
+              onPress={() => openInBrowser('https://1cell.ai/in/products/')}
             />
 
             <SimpleButton
               icon={Dna}
               heading="MTB"
               subheading="Case discussions & insights from MTB"
+              onPress={() => openInBrowser('https://mtb.1cell.ai/reports')}
+            />
+            <SimpleButton
+              icon={CogIcon}
+              heading="Settings"
+              subheading="Profile & App Preferences"
               onPress={() => router.replace('/patients' as any)}
             />
           </View>
@@ -80,7 +91,7 @@ export default function LandingScreen() {
               icon={Microscope}
               heading="Publcations"
               subheading="1Cell.Ai Posters & publications Library"
-              onPress={() => router.replace('/patients' as any)}
+              onPress={() => openInBrowser('https://publication-agent.1cell.ai/')}
             />
 
             <SimpleButton

@@ -171,7 +171,7 @@ export default function Patients() {
           data={patients}
           renderItem={renderPatient}
           keyExtractor={(item: Patient, index: number) => `${item.sampleBarcode}-${index}`}
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={{ padding: 16, backgroundColor: '#F9FAFB' }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

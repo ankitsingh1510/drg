@@ -38,7 +38,17 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
   };
 
   return (
-    <View className="mb-3 rounded-lg border border-blue-100 bg-white shadow-sm">
+    <View
+      className="mb-3 bg-white "
+      style={{
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      }}
+    >
       <View className="p-4">
         <View className="mb-3 flex-row items-start justify-between">
           <View className="mr-3 flex-1">
