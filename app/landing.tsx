@@ -68,14 +68,14 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={TestTube2}
                 heading="Order Tests"
-                subheading="1Ceall.Ai Genomic Tests & Panels"
+                subheading="1Cell.Ai Tests & Panels"
                 onPress={() => openInBrowser('https://1cell.ai/in/products/')}
               />
 
               <SimpleButton
                 icon={Dna}
                 heading="MTB"
-                subheading="Case discussions & insights from MTB"
+                subheading="Case discussions & insights"
                 onPress={() => openInBrowser('https://mtb.1cell.ai/reports')}
               />
               <SimpleButton
