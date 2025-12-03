@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to communicate with Dr.G",
-        "NSCameraUsageDescription": "This app needs access to your camera for video calls"
+        "NSCameraUsageDescription": "This app needs access to your camera for video calls",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "ai.onecell.drg"
     },
@@ -27,7 +28,11 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "RECORD_AUDIO",
-        "MODIFY_AUDIO_SETTINGS"
+        "MODIFY_AUDIO_SETTINGS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
       ],
       "package": "com.onecellai.drg"
     },
@@ -57,6 +62,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2ac9e79c-febc-4189-a14f-4f8a60f52bc3"
+      }
     }
   }
 }
