@@ -17,13 +17,13 @@ export default function SimpleButton({
   heading,
   subheading,
   onPress,
-  iconColor = 'orangered',
+  iconColor = 'white',
   iconSize = 40,
 }: SimpleButtonProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.iconContainer}>
-        <Icon color={iconColor} size={iconSize} strokeWidth={1} />
+        <Icon color={iconColor} size={iconSize} strokeWidth={1.7} />
       </View>
       <Text style={styles.heading}>{heading}</Text>
       <Text style={styles.subheading}>{subheading}</Text>
@@ -46,19 +46,19 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     // backgroundColor: '#EFF6FF',
-    backgroundColor: 'lemonchiffon',
-    borderRadius: 12,
+    backgroundColor: '#003366',
+    borderRadius: '50%',
     padding: 12,
     marginBottom: 12,
   },
   heading: {
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1F2937',
     marginBottom: 4,
   },
   subheading: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#9CA3AF',
   },
 });

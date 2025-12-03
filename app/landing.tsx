@@ -60,15 +60,15 @@ export default function LandingScreen() {
             >
               <SimpleButton
                 icon={ClipboardList}
-                heading="Patient Reports"
-                subheading="My patients Recent labs & imaging"
+                heading="Patient"
+                subheading="Patients Recent labs & imaging"
                 onPress={() => router.replace('/patients' as any)}
               />
 
               <SimpleButton
                 icon={TestTube2}
                 heading="Order Tests"
-                subheading="1Ceall.Ai tests for Pathology & Genomics"
+                subheading="1Ceall.Ai Genomic Tests & Panels"
                 onPress={() => openInBrowser('https://1cell.ai/in/products/')}
               />
 
@@ -82,7 +82,7 @@ export default function LandingScreen() {
                 icon={CogIcon}
                 heading="Settings"
                 subheading="Profile & App Preferences"
-                onPress={() => router.replace('/patients' as any)}
+                onPress={() => router.replace('/settings' as any)}
               />
             </View>
             <HeadingDivider hideRightIcon={true} iconName="book-outline" title="Education & Research" />
@@ -100,14 +100,14 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={Microscope}
                 heading="Publcations"
-                subheading="1Cell.Ai Posters & publications Library"
+                subheading="1Cell.Ai Posters & publications"
                 onPress={() => openInBrowser('https://publication-agent.1cell.ai/')}
               />
 
               <SimpleButton
                 icon={TrendingUp}
-                heading="Oncology Trends"
-                subheading="Latest in Oncology Research around NGS"
+                heading="Trends"
+                subheading="Latest around Genomics & NGS"
                 onPress={() => router.replace('/news' as any)}
               />
             </View>

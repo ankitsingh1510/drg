@@ -21,13 +21,13 @@ export default function IconNavBar() {
     <View style={styles.container}>
       <TouchableOpacity onPress={goHome} style={styles.iconButton}>
         <View style={styles.iconContainer}>
-          <Home pointerEvents="none" size={25} strokeWidth={1} color={'dodgerblue'} />
+          <Home pointerEvents="none" size={25} strokeWidth={1} color={'white'} />
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={goLogout} style={styles.iconButton}>
         <View style={styles.iconContainer}>
-          <LogOut pointerEvents="none" size={25} strokeWidth={1} color={'salmon'} />
+          <LogOut pointerEvents="none" size={25} strokeWidth={1} color={'white'} />
         </View>
       </TouchableOpacity>
     </View>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     // padding: 12,
   },
   iconContainer: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#003366',
     borderRadius: '50%',
     padding: 8,
     // marginBottom: 12,
