@@ -7,8 +7,11 @@ import { ClipboardList, CogIcon, Dna, LogOut, Microscope, TestTube2, TrendingUp 
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import SimpleButton from '@/components/navigation/SimpleButton';
 import VSpace from '@/components/navigation/VSpace';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LandingScreen() {
+  const { user, usersStudyList } = useAuth();
+
   const formatDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
@@ -28,9 +31,13 @@ export default function LandingScreen() {
       data={[]}
       renderItem={null}
       ListHeaderComponent={
-        <LinearGradient colors={['#fff', '#f5f5f5']} style={{ flex: 1 }}>
+        <LinearGradient colors={['#FDF5E6', '#FDF5E6', '#FFF8DC']} style={{ flex: 1 }}>
           <View className="flex-1 pt-20">
-            <Text className="mt-10 pl-6 text-xl font-semibold text-gray-600">{formatDate(new Date())}</Text>
+            <Text className="text-blue mt-10 pl-6 text-2xl font-semibold">
+              {'Welcome, ' + user.name + ' ' + user.lname}
+            </Text>
+
+            <Text className="pl-6 text-xl text-gray-500">🗓️ {formatDate(new Date())}</Text>
             <Image
               source={require('@/assets/dr1.png')}
               style={{
@@ -61,6 +68,7 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={ClipboardList}
                 heading="Patient"
+                iconContainerColor="#006400"
                 subheading="Patients Recent labs & imaging"
                 onPress={() => router.replace('/patients' as any)}
               />
@@ -68,6 +76,7 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={TestTube2}
                 heading="Order Tests"
+                iconContainerColor="#5C7AC6"
                 subheading="1Cell.Ai Tests & Panels"
                 onPress={() => openInBrowser('https://1cell.ai/in/products/')}
               />
@@ -75,12 +84,14 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={Dna}
                 heading="MTB"
+                iconContainerColor="#91A3B0"
                 subheading="Case discussions & insights"
                 onPress={() => openInBrowser('https://mtb.1cell.ai/reports')}
               />
               <SimpleButton
                 icon={CogIcon}
                 heading="Settings"
+                iconContainerColor="#E5575E"
                 subheading="Profile & App Preferences"
                 onPress={() => router.replace('/settings' as any)}
               />
@@ -100,6 +111,7 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={Microscope}
                 heading="Publcations"
+                iconContainerColor="#445278"
                 subheading="1Cell.Ai Posters & publications"
                 onPress={() => openInBrowser('https://publication-agent.1cell.ai/')}
               />
@@ -107,6 +119,7 @@ export default function LandingScreen() {
               <SimpleButton
                 icon={TrendingUp}
                 heading="Trends"
+                iconContainerColor="#738BD6"
                 subheading="Latest around Genomics & NGS"
                 onPress={() => router.replace('/news' as any)}
               />

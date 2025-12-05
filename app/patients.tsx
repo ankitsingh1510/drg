@@ -155,7 +155,7 @@ export default function Patients() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FDF5E6' }}>
       <PatientHeader
         user={user}
         totalCount={totalCount}
@@ -171,7 +171,7 @@ export default function Patients() {
           data={patients}
           renderItem={renderPatient}
           keyExtractor={(item: Patient, index: number) => `${item.sampleBarcode}-${index}`}
-          contentContainerStyle={{ padding: 16, backgroundColor: '#F9FAFB' }}
+          contentContainerStyle={{ padding: 16, backgroundColor: '#FDF5E6' }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

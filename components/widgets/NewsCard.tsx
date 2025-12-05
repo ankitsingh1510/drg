@@ -30,7 +30,7 @@ const NewsCard = ({ count }: NewsCardProps) => {
     <>
       <FlatList
         data={count == -1 ? news : news.slice(0, count)}
-        contentContainerStyle={{ backgroundColor: '#F9FAFB', flexGrow: 1, paddingTop: 25 }}
+        contentContainerStyle={{ backgroundColor: '#FDF5E6', flexGrow: 1, paddingTop: 25 }}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({ item }) => (
           <Pressable
