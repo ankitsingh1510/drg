@@ -6,8 +6,8 @@ import { useAuth, useLogin } from '@/context/AuthContext';
 import '../global.css';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(__DEV__ ? 'rohit.chavan@1cell.ai' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'Indx@12345' : '');
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
   const { isAuthenticated, isLoading } = useAuth();
