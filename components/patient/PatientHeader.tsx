@@ -30,7 +30,10 @@ export function PatientHeader({
 
   return (
     <>
-      <View className={`border-b border-gray-200 bg-white px-4 pb-4 ${Platform.OS === 'ios' ? 'pt-2' : 'pt-2'}`}>
+      <View
+        className={`border-b border-gray-200 bg-white px-4 pb-4 ${Platform.OS === 'ios' ? 'pt-2' : 'pt-2'}`}
+        style={{ backgroundColor: '#FDF5E6' }}
+      >
         <View className="mb-4 flex-row items-center justify-between">
           <View className="flex-1">
             <Text className="text-2xl font-bold text-slate-900">Order List</Text>

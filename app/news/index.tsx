@@ -15,7 +15,7 @@ export default class index extends Component {
       //   </View>
       // </SafeAreaView>
 
-      <SafeAreaView className="flex-1 bg-white">
+      <SafeAreaView className="flex-1 bg-white" style={{ backgroundColor: '#FDF5E6' }}>
         {/* <View className="flex-row items-start p-2 bg-transparent"> */}
         {/* <IconButton
           iconName="arrow-back-outline"
@@ -27,7 +27,7 @@ export default class index extends Component {
           <IconNavBar />
         </View>
 
-        <View className="flex-1 bg-slate-100 ">
+        <View className="flex-1">
           <NewsCard count={-1} />
         </View>
       </SafeAreaView>

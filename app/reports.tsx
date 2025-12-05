@@ -67,12 +67,12 @@ export default function Reports() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FDF5E6' }}>
       {/* Header */}
-      <View className="relative flex-row items-center border-b border-gray-200 bg-white px-4 py-3">
+      <View className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3">
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
           {/* <Text className="text-base font-semibold text-[#daa521]">←</Text> */}
-          <Ionicons name="arrow-back" size={24} color="#daa521" />
+          <Ionicons name="arrow-back" size={24} color="##003366" />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
           <Text className="text-lg font-bold text-gray-800" numberOfLines={1} ellipsizeMode="tail">
@@ -82,7 +82,20 @@ export default function Reports() {
       </View>
 
       {/* PDF Viewer */}
-      <View className="relative flex-1">
+      <View
+        className="relative flex-1"
+        style={{
+          backgroundColor: 'gray',
+          marginHorizontal: 5,
+          borderRadius: 5,
+          padding: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 3,
+        }}
+      >
         <Pdf
           trustAllCerts={false}
           source={{ uri: pdfUrl, cache: true, expiration: 60 }}
@@ -133,7 +146,7 @@ export default function Reports() {
 
       {/* Talk to Dr.G / Analyze Report Button */}
       {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
-        <View className="items-center border-t border-gray-200 bg-white px-4 py-2">
+        <View className="items-center border-t border-gray-200  px-4 py-2" style={{ backgroundColor: '#FDF5E6' }}>
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
               <TouchableOpacity

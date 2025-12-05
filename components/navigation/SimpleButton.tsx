@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { LucideIcon } from 'lucide-react-native';
 
 interface SimpleButtonProps {
@@ -10,6 +9,8 @@ interface SimpleButtonProps {
   onPress: () => void;
   iconColor?: string;
   iconSize?: number;
+  containerColor?: string;
+  iconContainerColor?: string; // 👈 added
 }
 
 export default function SimpleButton({
@@ -19,12 +20,15 @@ export default function SimpleButton({
   onPress,
   iconColor = 'white',
   iconSize = 40,
+  containerColor = '#FFFFFF',
+  iconContainerColor = '#003366', // 👈 default
 }: SimpleButtonProps) {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      <View style={styles.iconContainer}>
+    <TouchableOpacity style={[styles.container, { backgroundColor: containerColor }]} onPress={onPress}>
+      <View style={[styles.iconContainer, { backgroundColor: iconContainerColor }]}>
         <Icon color={iconColor} size={iconSize} strokeWidth={1.7} />
       </View>
+
       <Text style={styles.heading}>{heading}</Text>
       <Text style={styles.subheading}>{subheading}</Text>
     </TouchableOpacity>
@@ -33,7 +37,6 @@ export default function SimpleButton({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
@@ -45,9 +48,7 @@ const styles = StyleSheet.create({
     width: 150,
   },
   iconContainer: {
-    // backgroundColor: '#EFF6FF',
-    backgroundColor: '#003366',
-    borderRadius: '50%',
+    borderRadius: 50, // RN can't use '50%'
     padding: 12,
     marginBottom: 12,
   },
@@ -60,5 +61,6 @@ const styles = StyleSheet.create({
   subheading: {
     fontSize: 12,
     color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
