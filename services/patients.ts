@@ -16,6 +16,10 @@ export interface Patient {
   ingested_file_path?: string | null;
   sampleBarcode: string;
   report_finalized_date: string;
+  full_report_path: string;
+  summary_report_path: string | null;
+  released_full_report_path: string | null;
+  released_summary_report_path: string | null;
   finalized_report_status: string;
   workflowStatus: string;
   full_report_finalized_path: string;
@@ -63,16 +67,9 @@ class PatientsAPI {
   async fetchTestsDetails(params: FetchTestsDetailsParams): Promise<FetchTestsDetailsResponse> {
     const { studyFilter, page = 1, count = 10, searchQuery, workflowStatusFilter } = params;
 
-    const filters = [
+    const filters: { field: string; sourceTable?: string; type: string; values?: string[] }[] = [
       {
-        field: 'finalized_report_status',
-        sourceTable: 'assay_attribute_value',
-        type: 'exact',
-        values: ['true'],
-      },
-      {
-        field: 'full_report_finalized_path',
-        sourceTable: 'assay_attribute_value',
+        field: 'full_report_path',
         type: 'not-empty',
       },
     ];
@@ -136,6 +133,12 @@ class PatientsAPI {
               {
                 field: 'summary_report_finalized_path',
               },
+              {
+                field: 'released_full_report_path',
+              },
+              {
+                field: 'released_summary_report_path',
+              },
             ],
             subject_attribute_value: [
               {
@@ -188,6 +191,34 @@ class PatientsAPI {
           },
           aggregations: [
             {
+              alias: 'full_report_path',
+              expression: 'COALESCE([0], [1])',
+              sourceColumns: [
+                {
+                  field: 'released_full_report_path',
+                  sourceTable: 'assay_attribute_value',
+                },
+                {
+                  field: 'full_report_finalized_path',
+                  sourceTable: 'assay_attribute_value',
+                },
+              ],
+            },
+            {
+              alias: 'summary_report_path',
+              expression: 'COALESCE([0], [1])',
+              sourceColumns: [
+                {
+                  field: 'released_summary_report_path',
+                  sourceTable: 'assay_attribute_value',
+                },
+                {
+                  field: 'summary_report_finalized_path',
+                  sourceTable: 'assay_attribute_value',
+                },
+              ],
+            },
+            {
               alias: 'patientName',
               expression: "CONCAT_WS(' ', NULLIF(TRIM([0]), ''), NULLIF(TRIM([1]), ''), NULLIF(TRIM([2]), ''))",
               sourceColumns: [
@@ -212,16 +243,6 @@ class PatientsAPI {
               sourceColumns: [
                 {
                   field: 'report_finalized_date',
-                  sourceTable: 'assay_attribute_value',
-                },
-              ],
-            },
-            {
-              alias: 'full_report_html_path',
-              expression: "REGEXP_REPLACE([0], '/[^/]+$', '/body.html')",
-              sourceColumns: [
-                {
-                  field: 'full_report_finalized_path',
                   sourceTable: 'assay_attribute_value',
                 },
               ],
