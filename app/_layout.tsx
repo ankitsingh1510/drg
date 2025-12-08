@@ -9,15 +9,15 @@ import NetworkChecker from '@/hooks/NetworkChecker';
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar style="dark" backgroundColor="#ffffff" />
+    <SafeAreaProvider>
+      <GestureHandlerRootView>
+        <StatusBar style="dark" backgroundColor="#FDF5E6" />
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
           <Toast position="bottom" />
           <NetworkChecker />
         </AuthProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
