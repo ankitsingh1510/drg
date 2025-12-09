@@ -49,7 +49,15 @@ function HCard({ item, onPress }: { item: any; onPress: () => void }) {
   return (
     <TouchableOpacity onPress={onPress}>
       {/* <View className="justify-center items-center"> */}
-      <Image source={item.image} resizeMode="contain" className="h-[250px] w-[250px] rounded-3xl" />
+      <Image
+        source={item.image}
+        resizeMode="contain"
+        style={{
+          width: 300,
+          height: 300,
+          borderRadius: 20,
+        }}
+      />
       {/* </View> */}
     </TouchableOpacity>
   );
