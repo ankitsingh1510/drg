@@ -6,18 +6,19 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
+import '../global.css';
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar style="dark" backgroundColor="#ffffff" />
+    <SafeAreaProvider>
+      <GestureHandlerRootView>
+        <StatusBar style="dark" backgroundColor="#FDF5E6" />
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
           <Toast position="bottom" />
           <NetworkChecker />
         </AuthProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

@@ -102,16 +102,16 @@ export default function Patients() {
   const handleViewReport = useCallback(
     async (patient: Patient) => {
       try {
-        if (!patient.full_report_finalized_path) {
+        if (!patient.full_report_path) {
           Alert.alert('Error', 'Report path not available for this patient.');
           return;
         }
-        const blobPath = patient.full_report_finalized_path;
+        const blobPath = patient.full_report_path;
         const documentId = patient.hasOwnProperty('documentId') ? patient.documentId : null;
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
         const ingested_file_path = patient.hasOwnProperty('ingested_file_path') ? patient.ingested_file_path : null;
         let showIngestOption = 'false';
-        if (ingested_file_path !== patient.full_report_finalized_path || !documentId) {
+        if (ingested_file_path !== patient.full_report_path || !documentId) {
           showIngestOption = 'true';
         }
 
