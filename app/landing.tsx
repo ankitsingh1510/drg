@@ -1,147 +1,142 @@
-import React, { useState } from 'react';
-import { Button, FlatList, Image, Text, View } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { ClipboardList, CogIcon, Dna, LogOut, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import SimpleButton from '@/components/navigation/SimpleButton';
-import VSpace from '@/components/navigation/VSpace';
 import { useAuth } from '@/context/AuthContext';
+import { formatDate } from '@/util/helpers';
+
+const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
 
 export default function LandingScreen() {
   const { user, usersStudyList } = useAuth();
+  const date = useMemo(() => formatDate(), []);
 
-  const formatDate = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
+  const clinicalButtons = useMemo(
+    () => [
+      {
+        icon: ClipboardList,
+        heading: 'Patient',
+        color: '#006400',
+        sub: 'Patients Recent labs & imaging',
+        onPress: () => router.push('/patients' as any),
+      },
+      {
+        icon: TestTube2,
+        heading: 'Order Tests',
+        color: '#5C7AC6',
+        sub: '1Cell.Ai Tests & Panels',
+        onPress: () => openInBrowser('https://1cell.ai/in/products/'),
+      },
+      {
+        icon: Dna,
+        heading: 'MTB',
+        color: '#91A3B0',
+        sub: 'Case discussions & insights',
+        onPress: () => openInBrowser('https://mtb.1cell.ai/reports'),
+      },
+      {
+        icon: CogIcon,
+        heading: 'Settings',
+        color: '#E5575E',
+        sub: 'Profile & App Preferences',
+        onPress: () => router.push('/settings' as any),
+      },
+    ],
+    []
+  );
+
+  const educationButtons = useMemo(
+    () => [
+      {
+        icon: Microscope,
+        heading: 'Publications',
+        color: '#445278',
+        sub: '1Cell.Ai Posters & publications',
+        onPress: () => openInBrowser('https://publication-agent.1cell.ai/'),
+      },
+      {
+        icon: TrendingUp,
+        heading: 'Trends',
+        color: '#738BD6',
+        sub: 'Latest around Genomics & NGS',
+        onPress: () => router.push('/news' as any),
+      },
+    ],
+    []
+  );
+
+  // Exit dialog for Android
+  useEffect(() => {
+    const onBackPress = () => {
+      if (router.canGoBack()) return false;
+      Alert.alert('Exit App', 'Are you sure you want to exit the app?', [
+        { text: 'No' },
+        { text: 'Yes', onPress: () => BackHandler.exitApp() },
+      ]);
+
+      return true;
     };
-    return date.toLocaleDateString('en-US', options);
-  };
-
-  const openInBrowser = (url: string) => {
-    WebBrowser.openBrowserAsync(url);
-  };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, []);
 
   return (
-    <SafeAreaView>
-      <FlatList
-        //   contentContainerStyle={{ backgroundColor: '#F9FAFB', flex: 1 }}
-        data={[]}
-        renderItem={null}
-        ListHeaderComponent={
-          <LinearGradient colors={['#FDF5E6', '#FDF5E6', '#FFF8DC']} style={{ flex: 1 }}>
-            <View className="flex-1 pt-20">
-              <Text className="text-blue mt-1 pl-6 text-2xl font-semibold">
-                {'Welcome, ' + user?.name + ' ' + user?.lname}
-              </Text>
+    <SafeAreaView className="flex-1 bg-[#FDF5E6]">
+      <ScrollView>
+        <LinearGradient colors={['#FDF5E6', '#FDF5E6', '#FFF8DC']} className="pb-8">
+          <Text className="text-blue mt-10 pl-6 text-2xl font-semibold">
+            Welcome, {user?.name} {user?.lname}
+          </Text>
+          <Text className="pl-6 text-xl text-gray-500">🗓️ {date}</Text>
 
-              <Text className="pl-6 text-xl text-gray-500">🗓️ {formatDate(new Date())}</Text>
-              <Image
-                source={require('@/assets/dr1.png')}
-                style={{
-                  width: '100%',
-                  height: 150,
-                  paddingHorizontal: 20,
-                  resizeMode: 'cover',
-                  borderRadius: 20,
-                  marginVertical: 20,
-                }}
+          <Image
+            source={require('@/assets/dr1.png')}
+            className="my-5 h-[150px] w-[94%] self-center rounded-2xl"
+            resizeMode="cover"
+          />
+
+          <HeadingDivider hideRightIcon iconName="albums-outline" title="Clinical Workspace" />
+
+          <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
+            {clinicalButtons.map((item, idx) => (
+              <SimpleButton
+                key={idx}
+                icon={item.icon}
+                heading={item.heading}
+                iconContainerColor={item.color}
+                subheading={item.sub}
+                onPress={item.onPress}
               />
-              <View className="h-3"></View>
-              <HeadingDivider hideRightIcon={true} iconName="albums-outline" title="Clinical Workspace" />
-              <View
-                style={{
-                  // backgroundColor: '#F9FAFB',
+            ))}
+          </View>
 
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  padding: 20,
-                  gap: 20,
-                  //   borderRadius: 12,
-                  marginBottom: 20,
-                }}
-              >
-                <SimpleButton
-                  icon={ClipboardList}
-                  heading="Patient"
-                  iconContainerColor="#006400"
-                  subheading="Patients Recent labs & imaging"
-                  onPress={() => router.replace('/patients' as any)}
-                />
+          <HeadingDivider hideRightIcon iconName="book-outline" title="Education & Research" />
 
-                <SimpleButton
-                  icon={TestTube2}
-                  heading="Order Tests"
-                  iconContainerColor="#5C7AC6"
-                  subheading="1Cell.Ai Tests & Panels"
-                  onPress={() => openInBrowser('https://1cell.ai/in/products/')}
-                />
-
-                <SimpleButton
-                  icon={Dna}
-                  heading="MTB"
-                  iconContainerColor="#91A3B0"
-                  subheading="Case discussions & insights"
-                  onPress={() => openInBrowser('https://mtb.1cell.ai/reports')}
-                />
-                <SimpleButton
-                  icon={CogIcon}
-                  heading="Settings"
-                  iconContainerColor="#E5575E"
-                  subheading="Profile & App Preferences"
-                  onPress={() => router.replace('/settings' as any)}
-                />
-              </View>
-              <HeadingDivider hideRightIcon={true} iconName="book-outline" title="Education & Research" />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  padding: 20,
-                  gap: 20,
-                  marginBottom: 20,
-                }}
-              >
-                <SimpleButton
-                  icon={Microscope}
-                  heading="Publcations"
-                  iconContainerColor="#445278"
-                  subheading="1Cell.Ai Posters & publications"
-                  onPress={() => openInBrowser('https://publication-agent.1cell.ai/')}
-                />
-
-                <SimpleButton
-                  icon={TrendingUp}
-                  heading="Trends"
-                  iconContainerColor="#738BD6"
-                  subheading="Latest around Genomics & NGS"
-                  onPress={() => router.replace('/news' as any)}
-                />
-              </View>
-              <Image
-                source={require('@/assets/banner.png')}
-                style={{
-                  width: '100%',
-                  height: 120,
-                  paddingHorizontal: 20,
-                  resizeMode: 'cover',
-                  borderRadius: 20,
-                  marginVertical: 10,
-                }}
+          <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
+            {educationButtons.map((item, idx) => (
+              <SimpleButton
+                key={idx}
+                icon={item.icon}
+                heading={item.heading}
+                iconContainerColor={item.color}
+                subheading={item.sub}
+                onPress={item.onPress}
               />
-              <View className="h-3"></View>
-            </View>
-          </LinearGradient>
-        }
-      />
+            ))}
+          </View>
+
+          <Image
+            source={require('@/assets/banner.png')}
+            className="mt-3 h-[120px] w-[94%] self-center rounded-2xl"
+            resizeMode="cover"
+          />
+        </LinearGradient>
+      </ScrollView>
     </SafeAreaView>
   );
 }
