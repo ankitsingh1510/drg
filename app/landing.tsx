@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
+import HScroller from '@/components/navigation/HScroller';
 import SimpleButton from '@/components/navigation/SimpleButton';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
@@ -30,14 +31,14 @@ export default function LandingScreen() {
         heading: 'Order Tests',
         color: '#5C7AC6',
         sub: '1Cell.Ai Tests & Panels',
-        onPress: () => openInBrowser('https://1cell.ai/in/products/'),
+        onPress: () => openInBrowser(process.env.EXPO_PUBLIC_ORDER_TESTS_URL || ''),
       },
       {
         icon: Dna,
         heading: 'MTB',
         color: '#91A3B0',
         sub: 'Case discussions & insights',
-        onPress: () => openInBrowser('https://mtb.1cell.ai/reports'),
+        onPress: () => openInBrowser(process.env.EXPO_PUBLIC_MTB_URL || ''),
       },
       {
         icon: CogIcon,
@@ -57,7 +58,7 @@ export default function LandingScreen() {
         heading: 'Publications',
         color: '#445278',
         sub: '1Cell.Ai Posters & publications',
-        onPress: () => openInBrowser('https://publication-agent.1cell.ai/'),
+        onPress: () => openInBrowser(process.env.EXPO_PUBLIC_PUBLICATIONS_URL || ''),
       },
       {
         icon: TrendingUp,
@@ -92,14 +93,10 @@ export default function LandingScreen() {
           <Text className="text-blue mt-10 pl-6 text-2xl font-semibold">
             Welcome, {user?.name} {user?.lname}
           </Text>
-          <Text className="pl-6 text-xl text-gray-500">🗓️ {date}</Text>
+          <Text className="mb-6 pl-6 text-xl text-gray-500">🗓️ {date}</Text>
 
-          <Image
-            source={require('@/assets/dr1.png')}
-            className="my-5 h-[150px] w-[94%] self-center rounded-2xl"
-            resizeMode="cover"
-          />
-
+          <HScroller />
+          <View className="mt-6 h-3"></View>
           <HeadingDivider hideRightIcon iconName="albums-outline" title="Clinical Workspace" />
 
           <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
