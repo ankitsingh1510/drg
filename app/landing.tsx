@@ -73,7 +73,7 @@ export default function LandingScreen() {
   // Exit dialog for Android
   useEffect(() => {
     const onBackPress = () => {
-      if (router.canGoBack()) return false;
+      // if (router.canGoBack()) return false;
       Alert.alert('Exit App', 'Are you sure you want to exit the app?', [
         { text: 'No' },
         { text: 'Yes', onPress: () => BackHandler.exitApp() },
