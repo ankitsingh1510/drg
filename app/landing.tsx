@@ -93,7 +93,7 @@ export default function LandingScreen() {
           <Text className="text-blue mt-10 pl-6 text-2xl font-semibold">
             Welcome, {user?.name} {user?.lname}
           </Text>
-          <Text className="mb-6 pl-6 text-xl text-gray-500">🗓️ {date}</Text>
+          <Text className="mb-8 pl-6 text-xl text-gray-500">🗓️ {date}</Text>
 
           <HScroller />
           <View className="mt-6 h-3"></View>
@@ -111,10 +111,10 @@ export default function LandingScreen() {
               />
             ))}
           </View>
-
+          <View className="mt-2 h-1"></View>
           <HeadingDivider hideRightIcon iconName="book-outline" title="Education & Research" />
 
-          <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
+          <View className="mb-8 flex-row flex-wrap justify-evenly gap-5 p-5">
             {educationButtons.map((item, idx) => (
               <SimpleButton
                 key={idx}
@@ -127,11 +127,9 @@ export default function LandingScreen() {
             ))}
           </View>
 
-          <Image
-            source={require('@/assets/banner.png')}
-            className="mt-3 h-[120px] w-[94%] self-center rounded-2xl"
-            resizeMode="cover"
-          />
+          <View className="flex-1 items-center justify-center px-6">
+            <Image source={require('@/assets/dr1.png')} resizeMode="fit" className="h-[150px] w-full rounded-3xl" />
+          </View>
         </LinearGradient>
       </ScrollView>
     </SafeAreaView>
