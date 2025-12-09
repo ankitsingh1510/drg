@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    width: 150,
+    width: '46%',
   },
   iconContainer: {
     borderRadius: 50, // RN can't use '50%'
