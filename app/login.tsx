@@ -3,7 +3,6 @@ import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } fro
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, useLogin } from '@/context/AuthContext';
-import '../global.css';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
