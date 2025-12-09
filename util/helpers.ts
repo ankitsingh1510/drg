@@ -9,3 +9,12 @@ const isTokenValid = (payload: any) => {
 };
 
 export { decryptToken, isTokenValid };
+
+export const formatDate = () => {
+  const now = new Date();
+  return now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+};

@@ -16,8 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, useLogin } from '@/context/AuthContext';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(__DEV__ ? 'rohit.chavan@1cell.ai' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'Indx@12345' : '');
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
   const { isAuthenticated, isLoading } = useAuth();
@@ -63,8 +63,7 @@ export default function LoginScreen() {
         <SafeAreaView style={{ flex: 1, padding: 22 }}>
           <View className="flex-1 justify-center">
             <View className="mb-10">
-              <Text className="mb-2 text-2xl font-extrabold text-gray-900">Welcome back! Glad</Text>
-              <Text className="text-2xl font-extrabold text-gray-900">to see you, Again!</Text>
+              <Text className="mb-2 text-2xl font-extrabold text-gray-900">{`Welcome back! \nGlad to see you, Again!`}</Text>
             </View>
 
             <View className="mb-6 space-y-4">
