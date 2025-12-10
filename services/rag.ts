@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import axiosInstance from '@/services/axios';
+import { storage } from '@/stores/mmkv';
+import { apiFetch } from './fetchClient';
 
 class RagAPI {
   baseUrl: string;
@@ -14,14 +14,11 @@ class RagAPI {
   async getSignedUrl(blobPath: string): Promise<string> {
     try {
       const encodedPath = encodeURIComponent(blobPath);
-      const response = await axiosInstance.get(
-        `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl`,
-        {
-          params: {
-            viewFile: 'true',
-          },
-        }
-      );
+      const url = `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl` + `?viewFile=true`;
+      // Fetch GET call, removed axios Instance
+      const response = await apiFetch(url, {
+        method: 'GET',
+      });
       return response.data?.signedUrl;
     } catch (error) {
       console.error('Error fetching signed URL:', error);
@@ -32,7 +29,8 @@ class RagAPI {
   async ingestReport(accession_id: string) {
     try {
       console.log(accession_id);
-      const token = await AsyncStorage.getItem('token');
+      // const token = await AsyncStorage.getItem('token');
+      const token = storage.getString('token') ?? null;
       const formData = new FormData();
       formData.append('isBlocking', 'true');
       formData.append('accession_id', accession_id);

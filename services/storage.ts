@@ -1,6 +1,6 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type ESignatureData } from '../types/types';
-import axiosInstance from './axios';
+import { apiFetch } from './fetchClient';
 
 class StorageAPI {
   baseUrl: string;
@@ -13,12 +13,12 @@ class StorageAPI {
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
     return new Promise((resolve, reject) => {
-      axiosInstance
-        .post(this.gqlUrl + '/graphql', reqParams, {})
-        .then(response => resolve(response))
-        .catch(error => {
-          reject(error);
-        });
+      apiFetch(this.gqlUrl + '/graphql', {
+        method: 'POST',
+        body: JSON.stringify(reqParams),
+      })
+        .then(response => resolve(response.data as GQLResponse))
+        .catch(error => reject(error));
     });
   }
 
@@ -42,13 +42,16 @@ class StorageAPI {
       formData.append('size', file.size.toString());
       formData.append('anonymized', 'no');
 
-      const response = await axiosInstance.post(`${this.baseUrl}/api/v1/storage/blobStoreObjects`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      // Do NOT set Content-Type manually for FormData in fetch
+      const response = await apiFetch(`${this.baseUrl}/api/v1/storage/blobStoreObjects`, {
+        method: 'POST',
+        body: formData,
       });
-      if (response.data && response.data.fileInfo && response.data.fileInfo.length > 0) {
-        const paramData = response.data.fileInfo.pop();
+
+      const data = response.data;
+
+      if (data && data.fileInfo && data.fileInfo.length > 0) {
+        const paramData = data.fileInfo.pop();
         const storageId = paramData.storageId;
         return storageId;
       } else {
@@ -63,14 +66,8 @@ class StorageAPI {
   async getSignedUrl(blobPath: string): Promise<string> {
     try {
       const encodedPath = encodeURIComponent(blobPath);
-      const response = await axiosInstance.get(
-        `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl`,
-        {
-          params: {
-            viewFile: 'true',
-          },
-        }
-      );
+      const url = `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl` + `?viewFile=true`;
+      const response = await apiFetch(url, { method: 'GET' });
       return response.data?.signedUrl;
     } catch (error) {
       console.error('Error fetching signed URL:', error);
