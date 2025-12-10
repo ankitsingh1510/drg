@@ -1,5 +1,5 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
-import axiosInstance from './axios';
+import { apiFetch } from './fetchClient';
 
 interface FetchTestsDetailsParams {
   studyFilter: number[];
@@ -53,15 +53,17 @@ class PatientsAPI {
     this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
   }
 
-  getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
-    return new Promise((resolve, reject) => {
-      axiosInstance
-        .post(this.gqlUrl + '/graphql', reqParams, {})
-        .then(response => resolve(response))
-        .catch(error => {
-          reject(error);
-        });
-    });
+  async getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
+    try {
+      const response = await apiFetch(this.gqlUrl + '/graphql', {
+        method: 'POST',
+        body: JSON.stringify(reqParams),
+      });
+
+      return response.data as GQLResponse;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async fetchTestsDetails(params: FetchTestsDetailsParams): Promise<FetchTestsDetailsResponse> {

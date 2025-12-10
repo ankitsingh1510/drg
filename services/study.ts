@@ -1,5 +1,5 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
-import axiosInstance from './axios';
+import { apiFetch } from './fetchClient';
 
 class StudyAPI {
   baseUrl: string;
@@ -12,12 +12,12 @@ class StudyAPI {
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
     return new Promise((resolve, reject) => {
-      axiosInstance
-        .post(this.gqlUrl + '/graphql', reqParams, {})
-        .then(response => resolve(response))
-        .catch(error => {
-          reject(error);
-        });
+      apiFetch(this.gqlUrl + '/graphql', {
+        method: 'POST',
+        body: JSON.stringify(reqParams),
+      })
+        .then(response => resolve(response.data as GQLResponse))
+        .catch(error => reject(error));
     });
   }
 
