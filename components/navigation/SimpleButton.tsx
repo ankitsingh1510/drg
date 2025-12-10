@@ -24,7 +24,11 @@ export default function SimpleButton({
   iconContainerColor = '#003366', // 👈 default
 }: SimpleButtonProps) {
   return (
-    <TouchableOpacity style={[styles.container, { backgroundColor: containerColor }]} onPress={onPress}>
+    <TouchableOpacity
+      activeOpacity={1}
+      style={[styles.container, { backgroundColor: containerColor }]}
+      onPress={onPress}
+    >
       <View style={[styles.iconContainer, { backgroundColor: iconContainerColor }]}>
         <Icon color={iconColor} size={iconSize} strokeWidth={1.7} />
       </View>

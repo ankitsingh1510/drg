@@ -57,7 +57,7 @@ export default function HScroller() {
 
 function HCard({ item, onPress }: { item: any; onPress: () => void }) {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} activeOpacity={1}>
       {/* <View className="justify-center items-center"> */}
       <Image
         source={item.image}
