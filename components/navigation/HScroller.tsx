@@ -1,5 +1,6 @@
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import { FlashList } from '@shopify/flash-list';
 import { FlatList } from 'react-native-gesture-handler';
 
 export default function HScroller() {
@@ -33,7 +34,7 @@ export default function HScroller() {
 
   return (
     <View className=" flex-row items-center justify-center ">
-      <FlatList
+      <FlashList
         data={data}
         horizontal
         contentContainerStyle={{ paddingHorizontal: 16 }}

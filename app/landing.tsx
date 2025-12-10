@@ -3,6 +3,7 @@ import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { FlashList } from '@shopify/flash-list';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
