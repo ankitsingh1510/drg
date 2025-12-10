@@ -2,24 +2,6 @@ import { router } from 'expo-router';
 import { storage } from '@/stores/mmkv';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
-const TIMEOUT = 120000; // 2 min timeout as per axios
-
-const withTimeout = <T>(promise: Promise<T>, ms: number) =>
-  new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error('Request timed out'));
-    }, ms);
-
-    promise
-      .then(res => {
-        clearTimeout(timer);
-        resolve(res);
-      })
-      .catch(err => {
-        clearTimeout(timer);
-        reject(err);
-      });
-  });
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
   try {
@@ -42,13 +24,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const fetchPromise = fetch(finalURL, {
+    const response = await fetch(finalURL, {
       ...options,
       headers,
     });
-
-    // Applied timeout to fetch
-    const response = await withTimeout(fetchPromise, TIMEOUT);
 
     // For RESPONSE INTERCEPTOR
     if (response.status === 401) {
