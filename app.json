@@ -58,14 +58,7 @@
           }
         }
       ],
-      "expo-web-browser",
-      [
-        "expo-build-properties",
-        {
-          "android": { "newArchEnabled": true },
-          "ios": { "newArchEnabled": true }
-        }
-      ]
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
