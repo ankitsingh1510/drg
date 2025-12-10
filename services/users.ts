@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type userParams } from '../types/users';
 import { apiFetch } from './fetchClient';
@@ -43,7 +42,10 @@ class UsersAPI {
 
   async authenticateUser(paramInfo: { username: string; password: string }): Promise<any> {
     try {
-      const response = await axios.post(process.env.EXPO_PUBLIC_API_BASE_URL + `/api/token`, paramInfo);
+      const response = await apiFetch(process.env.EXPO_PUBLIC_API_BASE_URL + `/api/token`, {
+        method: 'POST',
+        body: JSON.stringify(paramInfo),
+      });
       return response.data;
     } catch (error) {
       console.error('Error authenticating user:', error);
