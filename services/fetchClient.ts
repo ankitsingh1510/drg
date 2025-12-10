@@ -21,21 +21,28 @@ const withTimeout = <T>(promise: Promise<T>, ms: number) =>
       });
   });
 
-export async function apiFetch(endpoint: string, options: RequestInit = {}) {
+export async function apiFetch(path: string, options: RequestInit = {}) {
   try {
     // For REQUEST INTERCEPTOR
+    // Check if path is endpoint or full url
+    const isFull = path.startsWith('http://') || path.startsWith('https://');
+    const finalURL = isFull ? path : `${BASE_URL}${path}`;
+
     const token = storage.getString('token') ?? null;
 
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
       ...(options.headers || {}),
     };
 
-    if (token) {
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+    }
+
+    if (token && !headers['Authorization']) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const fetchPromise = fetch(`${BASE_URL}${endpoint}`, {
+    const fetchPromise = fetch(finalURL, {
       ...options,
       headers,
     });
@@ -57,8 +64,8 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     }
 
     const contentType = response.headers.get('content-type');
+    let data = null;
 
-    let data: any = null;
     if (contentType?.includes('application/json')) {
       data = await response.json().catch(() => null);
     } else {
@@ -66,17 +73,13 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     }
 
     if (!response.ok) {
-      console.log('API Error:', {
+      console.error('API Error:', {
         status: response.status,
-        url: endpoint,
+        url: finalURL,
         data,
       });
 
-      throw {
-        status: response.status,
-        message: 'Request failed',
-        data,
-      };
+      throw { status: response.status, message: 'Request failed', data };
     }
 
     return {
@@ -89,10 +92,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 
     // NETWORK / TIMEOUT ERROR
     if (error.message === 'Request timed out') {
-      throw {
-        status: 0,
-        message: 'Network timeout — please try again.',
-      };
+      throw { status: 0, message: 'Network timeout — please try again.' };
     }
 
     throw error;

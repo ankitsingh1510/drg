@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { storage } from '@/stores/mmkv';
 import { apiFetch } from './fetchClient';
 
@@ -34,10 +33,11 @@ class RagAPI {
       const formData = new FormData();
       formData.append('isBlocking', 'true');
       formData.append('accession_id', accession_id);
-      const response = await axios.post(`${this.baseUrl}/api/v1/drg/rag`, formData, {
+      const response = await apiFetch(`${this.baseUrl}/api/v1/drg/rag`, {
+        method: 'POST',
+        body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
         },
       });
       return response.data;
