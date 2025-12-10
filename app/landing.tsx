@@ -32,7 +32,7 @@ export default function LandingScreen() {
         icon: TestTube2,
         heading: 'Order Tests',
         color: '#5C7AC6',
-        sub: '1Cell.Ai Tests & Panels',
+        sub: '1Cell.Ai Tests and Panels',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_ORDER_TESTS_URL || ''),
       },
       {
