@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { router } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storageAPI } from '@/services/storage';
 import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
+import { storage } from '@/stores/mmkv';
 import { decryptToken } from '@/util/helpers';
 
 interface User {
@@ -54,12 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const tokenValue = await AsyncStorage.getItem('token');
-
+        // const tokenValue = await AsyncStorage.getItem('token');
+        const tokenValue = storage.getString('token') ?? null;
         if (!tokenValue) {
           console.log('No token found. Please log in.');
           setIsLoading(false);
-          await AsyncStorage.clear();
+          storage.clearAll();
           router.replace('/' as any);
           return;
         }
@@ -67,7 +67,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const payload = decryptToken(tokenValue);
         if (!payload) {
           console.log('Invalid or expired token. Please log in again.');
-          await AsyncStorage.removeItem('token');
+          // await AsyncStorage.removeItem('token');
+          storage.remove('token');
           setIsLoading(false);
           return;
         }
@@ -105,7 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         router.replace('/landing' as any);
       } catch (error) {
         console.error('Error initializing auth:', error);
-        await AsyncStorage.removeItem('token');
+        // await AsyncStorage.removeItem('token');
+        storage.remove('token');
       } finally {
         setIsLoading(false);
       }
@@ -149,7 +151,10 @@ export const useLogin = () => {
         }
 
         // Store token
-        await AsyncStorage.setItem('token', tokenValue);
+        // await AsyncStorage.setItem('token', tokenValue);
+        if (tokenValue) {
+          storage.set('token', tokenValue);
+        }
         setToken(tokenValue);
 
         // Fetch user details
@@ -199,7 +204,8 @@ export const useLogout = () => {
 
   return async () => {
     console.log('Logging out');
-    await AsyncStorage.clear();
+    // await AsyncStorage.clear();
+    storage.clearAll();
     setUser(null);
     setToken(null);
     setUsersStudyList([]);
