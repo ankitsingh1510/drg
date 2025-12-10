@@ -35,7 +35,7 @@ class StudyAPI {
         },
       };
       let response = await this.getGQLResponse(reqParams);
-      return response.data.data.getStudyList.data;
+      return response.data.getStudyList.data;
     } catch (error) {
       console.error('Error fetching study list:', error);
       throw error;
@@ -61,7 +61,7 @@ class StudyAPI {
       },
     };
     let response = await this.getGQLResponse(reqParams);
-    return response.data.data.getStudyList;
+    return response.data.getStudyList;
   }
 }
 

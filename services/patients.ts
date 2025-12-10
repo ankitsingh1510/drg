@@ -271,7 +271,7 @@ class PatientsAPI {
 
     try {
       const response = await this.getGQLResponse(reqParams);
-      return response.data.data.fetchTestsDetails;
+      return response.data.fetchTestsDetails;
     } catch (error) {
       console.error('Error fetching tests details:', error);
       throw error;

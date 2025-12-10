@@ -33,7 +33,7 @@ class UsersAPI {
         },
       };
       const response: GQLResponse = await this.getGQLResponse(reqParams);
-      return response.data.data.getUserDetail;
+      return response.data.getUserDetail;
     } catch (error) {
       console.error('Error fetching user details:', error);
       return error;

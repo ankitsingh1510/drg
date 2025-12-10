@@ -28,7 +28,7 @@ class StorageAPI {
     };
 
     const response = await this.getGQLResponse(reqParams);
-    return response.data.data.getUploadConfig;
+    return response.data.getUploadConfig;
   }
 
   async uploadFile(file: File, targetLocation: string, esigature: ESignatureData): Promise<any> {
