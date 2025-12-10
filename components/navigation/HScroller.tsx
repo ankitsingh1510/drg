@@ -1,4 +1,5 @@
 import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
 import { FlatList } from 'react-native-gesture-handler';
@@ -9,27 +10,35 @@ export default function HScroller() {
       url: 'https://nandiraju.github.io/drg/',
       image: require('@/assets/menu_images/1.png'),
       external: true,
+      route: '/test',
     },
     {
       url: 'https://apps.apple.com/app/6747797336',
       image: require('@/assets/menu_images/5.png'),
       external: true,
+      route: '/test',
     },
     {
       url: 'https://1cell.ai/in/poles2026/',
       image: require('@/assets/menu_images/3.png'),
       external: true,
+      route: '/test',
     },
     {
       url: 'https://www.youtube.com/@1CellAi/videos',
       image: require('@/assets/menu_images/6.png'),
       external: true,
+      route: '/test',
     },
   ];
 
-  const handleItemPress = item => {
-    WebBrowser.openBrowserAsync(item.url);
-    console.log('Clicked:', item);
+  const handleItemPress = ({ item }) => {
+    console.log('Clicked:', { item });
+    if (item.external) {
+      WebBrowser.openBrowserAsync(item.url);
+      return;
+    }
+    router.push(item.route);
   };
 
   return (

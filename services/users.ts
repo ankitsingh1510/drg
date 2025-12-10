@@ -1,7 +1,6 @@
-import axios from 'axios';
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type userParams } from '../types/users';
-import axiosInstance from './axios';
+import { apiFetch } from './fetchClient';
 
 class UsersAPI {
   baseUrl: string;
@@ -14,12 +13,12 @@ class UsersAPI {
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
     return new Promise((resolve, reject) => {
-      axiosInstance
-        .post(this.gqlUrl + '/graphql', reqParams, {})
-        .then(response => resolve(response))
-        .catch(error => {
-          reject(error);
-        });
+      apiFetch(this.gqlUrl + '/graphql', {
+        method: 'POST',
+        body: JSON.stringify(reqParams),
+      })
+        .then(response => resolve(response.data as GQLResponse))
+        .catch(error => reject(error));
     });
   }
 
@@ -34,7 +33,7 @@ class UsersAPI {
         },
       };
       const response: GQLResponse = await this.getGQLResponse(reqParams);
-      return response.data.data.getUserDetail;
+      return response.data.getUserDetail;
     } catch (error) {
       console.error('Error fetching user details:', error);
       return error;
@@ -43,7 +42,10 @@ class UsersAPI {
 
   async authenticateUser(paramInfo: { username: string; password: string }): Promise<any> {
     try {
-      const response = await axios.post(process.env.EXPO_PUBLIC_API_BASE_URL + `/api/token`, paramInfo);
+      const response = await apiFetch(process.env.EXPO_PUBLIC_API_BASE_URL + `/api/token`, {
+        method: 'POST',
+        body: JSON.stringify(paramInfo),
+      });
       return response.data;
     } catch (error) {
       console.error('Error authenticating user:', error);
