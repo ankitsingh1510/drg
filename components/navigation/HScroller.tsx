@@ -32,7 +32,7 @@ export default function HScroller() {
     },
   ];
 
-  const handleItemPress = ({ item }) => {
+  const handleItemPress = item => {
     console.log('Clicked:', { item });
     if (item.external) {
       WebBrowser.openBrowserAsync(item.url);
