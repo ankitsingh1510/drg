@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
 import SimpleButton from '@/components/navigation/SimpleButton';
+import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
 
@@ -127,6 +128,8 @@ export default function LandingScreen() {
               />
             ))}
           </View>
+          <HeadingDivider hideRightIcon iconName="bulb-outline" title="Tip of the day" />
+          <TipOfTheDay />
 
           <View className="flex-1 items-center justify-center px-6">
             <Image source={require('@/assets/dr1.png')} resizeMode="fit" className="h-[150px] w-full rounded-3xl" />
