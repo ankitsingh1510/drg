@@ -1,4 +1,6 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -9,13 +11,16 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
+import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import NetworkLoggers from '@/components/NetworkLoggers';
 import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
 import '../global.css';
 
 export default function RootLayout() {
+  const [showLogger, setShowLogger] = useState(false);
   const [loaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -30,6 +35,10 @@ export default function RootLayout() {
   if (TextInput.defaultProps == null) TextInput.defaultProps = {};
   TextInput.defaultProps.style = { fontFamily: 'Poppins_400Regular' };
 
+  useEffect(() => {
+    startNetworkLogging();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView>
@@ -38,6 +47,7 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false }} />
           <Toast position="bottom" />
           <NetworkChecker />
+          <NetworkLoggers />
         </AuthProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
