@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useLogout } from '@/context/AuthContext';
 import IconNavBar from '../navigation/IconNavBar';
 
 interface User {
@@ -91,7 +92,7 @@ export function PatientHeader({
                 className="rounded-lg px-4 py-3"
                 onPress={() => {
                   setShowMenu(false);
-                  onLogout();
+                  useLogout();
                 }}
               >
                 <Text className="text-sm font-semibold text-red-500">Logout</Text>
