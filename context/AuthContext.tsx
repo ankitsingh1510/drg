@@ -205,11 +205,14 @@ export const useLogout = () => {
   return async () => {
     console.log('Logging out');
     // await AsyncStorage.clear();
-    storage.clearAll();
+    // storage.clearAll();
     setUser(null);
     setToken(null);
     setUsersStudyList([]);
-    router.replace('/' as any);
+    setTimeout(() => {
+      storage.clearAll();
+      router.replace('/');
+    }, 0);
   };
 };
 
