@@ -25,7 +25,8 @@ export default function Reports() {
   }>();
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
-  const [ingesting, setIngesting] = useState(false);
+  // const [ingesting, setIngesting] = useState(false);
+  const [buttonTitle, setButtonTitle] = useState('');
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [showInteraction, setShowInteraction] = useState<{ isVisible: boolean; mode: 'video' | 'chat' }>({
@@ -42,8 +43,14 @@ export default function Reports() {
   };
 
   const handleIngestReport = async () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Ingesting Report. This may take sometime...',
+      visibilityTime: 2000,
+    });
     try {
-      setIngesting(true);
+      // setIngesting(true);
+      setButtonTitle('Ingesting Report...');
       const res = await ragAPI.ingestReport(accession_id);
       setDocId(res.data.documentId);
       Toast.show({
@@ -51,10 +58,12 @@ export default function Reports() {
         text1: res.message,
         visibilityTime: 3000,
       });
+      setButtonTitle('');
     } catch (error) {
       console.error('Failed to ingest the file');
     } finally {
-      setIngesting(false);
+      // setIngesting(false);
+      setButtonTitle('');
     }
   };
 
@@ -154,7 +163,7 @@ export default function Reports() {
                 onPress={handleTalkToDrG}
               >
                 <Feather name="video" size={22} color="white" />
-                <Text className="ml-2 text-lg font-bold text-white">Talk With Dr.G</Text>
+                <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Talk With Dr.G'}</Text>
               </TouchableOpacity>
               {/* <TouchableOpacity
                 className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-4 py-4 shadow-md active:opacity-80"
@@ -170,21 +179,21 @@ export default function Reports() {
               onPress={handleIngestReport}
             >
               <MaterialIcons name="analytics" size={22} color="white" />
-              <Text className="ml-2 text-lg font-bold text-white">Ingest Report</Text>
+              <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Ingest Report'}</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
 
       {/* Ingesting Overlay */}
-      <Modal transparent visible={ingesting} animationType="fade">
+      {/* <Modal transparent visible={ingesting} animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/50">
           <View className="w-3/4 max-w-sm items-center rounded-lg bg-white p-6 shadow-lg">
             <ActivityIndicator size="large" color="#daa521" />
             <Text className="mt-4 text-lg font-semibold text-gray-700">Ingesting...</Text>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
       {/* Floating Interaction Box */}
       {showInteraction.isVisible && (
         <InteractionBox
