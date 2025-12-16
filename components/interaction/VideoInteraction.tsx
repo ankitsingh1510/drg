@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -14,6 +14,7 @@ export default function VideoInteraction({
   token: string;
   onClose?: () => void;
 }) {
+  const webViewRef = useRef<WebView>(null);
   const [loading, setLoading] = useState(true);
   const screen = Dimensions.get('window');
   const BASE_WIDTH = screen.width * 0.5;
@@ -111,6 +112,13 @@ export default function VideoInteraction({
     }
   };
 
+  const handleClose = () => {
+    webViewRef.current?.postMessage(JSON.stringify({ type: 'END_CALL' }));
+    setTimeout(() => {
+      onClose?.();
+    }, 300);
+  };
+
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none" className="bg-transparent">
       <GestureDetector gesture={composedGesture}>
@@ -129,9 +137,7 @@ export default function VideoInteraction({
             pointerEvents="box-none"
           >
             <Text
-              onPress={() => {
-                if (onClose) onClose();
-              }}
+              onPress={handleClose}
               style={{
                 paddingHorizontal: 10,
                 paddingVertical: 6,
@@ -152,6 +158,7 @@ export default function VideoInteraction({
             </View>
           )}
           <WebView
+            ref={webViewRef}
             source={{
               uri:
                 process.env.EXPO_PUBLIC_CHAT_URL +
@@ -160,9 +167,8 @@ export default function VideoInteraction({
             style={{ flex: 1, backgroundColor: 'white' }}
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
-            onError={syntheticEvent => {
-              const { nativeEvent } = syntheticEvent;
-              console.error('WebView error: ', nativeEvent);
+            onError={err => {
+              console.error('WebView error:', err.nativeEvent);
               setLoading(false);
             }}
             originWhitelist={['*']}
@@ -178,36 +184,76 @@ export default function VideoInteraction({
             setSupportMultipleWindows={false}
             sharedCookiesEnabled
             injectedJavaScript={`
-              const meta = document.createElement('meta');
-              meta.setAttribute('name', 'viewport');
-              meta.setAttribute(
-                'content',
-                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-              );
-              document.head.appendChild(meta);
-              true;
+                (function () {
+                  function stopAllMedia() {
+                    // Stop camera & mic
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                      navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+                        .then(stream => {
+                          stream.getTracks().forEach(track => track.stop());
+                        })
+                        .catch(() => {});
+                    }
 
-              document.addEventListener("click", function(e) {
-                const el = e.target.closest("button");
-                if (!el) return;
+                    document.querySelectorAll('video').forEach(v => {
+                      v.pause();
+                      v.srcObject = null;
+                      v.removeAttribute('src');
+                      v.load();
+                    });
 
-                const label = el.getAttribute("aria-label") || el.getAttribute("title") || "";
-                
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: "button_click",
-                  label
-                }));
-              });
-              true;
+                    if (window.pc) {
+                      window.pc.close();
+                    }
+
+                    if (window.endCall) {
+                      window.endCall();
+                    }
+                  }
+
+                  document.addEventListener('message', function (event) {
+                    try {
+                      const data = JSON.parse(event.data);
+                      if (data.type === 'END_CALL') {
+                        stopAllMedia();
+                      }
+                    } catch (e) {}
+                  });
+
+                  document.addEventListener('click', function (e) {
+                    const el = e.target.closest('button');
+                    if (!el) return;
+
+                    const label =
+                      el.getAttribute('aria-label') ||
+                      el.getAttribute('title') ||
+                      '';
+
+                    if (label === 'Stop Interaction') {
+                      stopAllMedia();
+                      window.ReactNativeWebView.postMessage(
+                        JSON.stringify({ type: 'STOP_INTERACTION' })
+                      );
+                    }
+                  });
+
+                  const meta = document.createElement('meta');
+                  meta.setAttribute('name', 'viewport');
+                  meta.setAttribute(
+                    'content',
+                    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+                  );
+                  document.head.appendChild(meta);
+                })();
+                true;
             `}
             onMessage={event => {
-              const data = JSON.parse(event.nativeEvent.data);
-
-              if (data.type === 'button_click') {
-                if (data.label === 'Stop Interaction') {
-                  onClose();
+              try {
+                const data = JSON.parse(event.nativeEvent.data);
+                if (data.type === 'STOP_INTERACTION') {
+                  handleClose();
                 }
-              }
+              } catch (e) {}
             }}
             scrollEnabled={false}
           />
