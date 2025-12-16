@@ -1,6 +1,3 @@
-// Not Recommended: Using @ts-nocheck disables all TypeScript checks in this file,
-// But it's used here to bypass type errors from `defaultProps` assignments which is deprecated.
-// @ts-nocheck
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
