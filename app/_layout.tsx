@@ -1,6 +1,6 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -21,7 +21,6 @@ import '../global.css';
 
 export default function RootLayout() {
   startNetworkLogging();
-  const [showLogger, setShowLogger] = useState(false);
   const [loaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,

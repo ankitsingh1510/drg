@@ -60,6 +60,8 @@ export default function Reports() {
     }
     if (saved.status === 'COMPLETED' && saved.documentId) {
       setDocId(saved.documentId);
+      setIngesting(false);
+      setButtonTitle('');
     }
   }, [accession_id]);
 
@@ -95,6 +97,7 @@ export default function Reports() {
         visibilityTime: 3000,
       });
     } catch (error) {
+      console.log('Error while ingesting report:', error);
       ingestionStore.clear(accession_id);
       setIngesting(false);
       setButtonTitle('');

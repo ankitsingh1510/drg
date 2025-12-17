@@ -11,7 +11,16 @@ const key = (accessionId: string) => `ingest:${accessionId}`;
 export const ingestionStore = {
   get(accessionId: string): IngestState | null {
     const raw = storage.getString(key(accessionId));
-    return raw ? JSON.parse(raw) : null;
+    // return raw ? JSON.parse(raw) : null;
+    if (!raw) {
+      return null;
+    }
+    try {
+      return JSON.parse(raw) as IngestState;
+    } catch {
+      storage.remove(key(accessionId));
+      return null;
+    }
   },
 
   set(accessionId: string, value: IngestState) {
