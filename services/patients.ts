@@ -69,10 +69,27 @@ class PatientsAPI {
   async fetchTestsDetails(params: FetchTestsDetailsParams): Promise<FetchTestsDetailsResponse> {
     const { studyFilter, page = 1, count = 10, searchQuery, workflowStatusFilter } = params;
 
-    const filters: { field: string; sourceTable?: string; type: string; values?: string[] }[] = [
+    const filters: Array<
+      | { field: string; sourceTable?: string; type: string; values?: string[] }
+      | { OR: Array<{ field: string; sourceTable?: string; type: string; values?: string[] }> }
+    > = [
       {
         field: 'full_report_path',
         type: 'not-empty',
+      },
+      {
+        OR: [
+          {
+            field: 'oncoindx_sub_pipeline',
+            type: 'case_insensitive_not',
+            values: ['edta'],
+          },
+          {
+            field: 'oncoindx_sub_pipeline',
+            type: 'is-null',
+            values: [],
+          },
+        ],
       },
     ];
 
@@ -188,6 +205,11 @@ class PatientsAPI {
               {
                 field: 'physician_name_1',
                 alias: 'additionalPhysician',
+              },
+            ],
+            case_sample_attribute_value: [
+              {
+                field: 'oncoindx_sub_pipeline',
               },
             ],
           },
