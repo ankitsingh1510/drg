@@ -3,7 +3,6 @@ import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { FlashList } from '@shopify/flash-list';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
@@ -16,7 +15,7 @@ import { formatDate } from '@/util/helpers';
 const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
 
 export default function LandingScreen() {
-  const { user, usersStudyList } = useAuth();
+  const { user } = useAuth();
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(

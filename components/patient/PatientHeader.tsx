@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
 import IconNavBar from '../navigation/IconNavBar';
 
 interface User {
