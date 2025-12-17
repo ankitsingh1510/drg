@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { FlashList } from '@shopify/flash-list';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
@@ -16,7 +15,7 @@ import { formatDate } from '@/util/helpers';
 const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
 
 export default function LandingScreen() {
-  const { user, usersStudyList } = useAuth();
+  const { user } = useAuth();
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(
@@ -74,19 +73,19 @@ export default function LandingScreen() {
   );
 
   // Exit dialog for Android
-  useEffect(() => {
-    const onBackPress = () => {
-      // if (router.canGoBack()) return false;
-      Alert.alert('Exit App', 'Are you sure you want to exit the app?', [
-        { text: 'No' },
-        { text: 'Yes', onPress: () => BackHandler.exitApp() },
-      ]);
-
-      return true;
-    };
-    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    return () => subscription.remove();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert('Exit App', 'Are you sure you want to exit the app?', [
+          { text: 'No', style: 'cancel' },
+          { text: 'Yes', onPress: () => BackHandler.exitApp() },
+        ]);
+        return true;
+      };
+      const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => sub.remove();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6]">
@@ -132,7 +131,7 @@ export default function LandingScreen() {
           <TipOfTheDay />
 
           <View className="flex-1 items-center justify-center px-6">
-            <Image source={require('@/assets/dr1.png')} resizeMode="fit" className="h-[150px] w-full rounded-3xl" />
+            <Image source={require('@/assets/dr1.png')} resizeMode="contain" className="h-[150px] w-full rounded-3xl" />
           </View>
         </LinearGradient>
       </ScrollView>
