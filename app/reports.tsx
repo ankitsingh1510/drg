@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import InteractionBox from '@/components/interaction/Interactions';
 import { useAuth } from '@/context/AuthContext';
 import { ragAPI } from '@/services/rag';
+import { ingestionStore } from '@/stores/ingestionStore';
 
 export default function Reports() {
   const { token } = useAuth();
@@ -25,7 +26,7 @@ export default function Reports() {
   }>();
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
-  // const [ingesting, setIngesting] = useState(false);
+  const [ingesting, setIngesting] = useState(false);
   const [buttonTitle, setButtonTitle] = useState('');
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -42,27 +43,60 @@ export default function Reports() {
     setShowInteraction({ isVisible: true, mode: 'video' });
   };
 
+  useEffect(() => {
+    const saved = ingestionStore.get(accession_id);
+    if (!saved) return;
+    const MAX_INGEST_TIME = 5 * 60 * 1000; // Edge case handling: 5 minutes
+
+    if (saved.status === 'INGESTING' && Date.now() - saved.startedAt > MAX_INGEST_TIME) {
+      ingestionStore.clear(accession_id);
+      setIngesting(false);
+      setButtonTitle('');
+      return;
+    }
+    if (saved.status === 'INGESTING') {
+      setIngesting(true);
+      setButtonTitle('Ingesting Report...');
+    }
+    if (saved.status === 'COMPLETED' && saved.documentId) {
+      setDocId(saved.documentId);
+    }
+  }, [accession_id]);
+
   const handleIngestReport = async () => {
     Toast.show({
       type: 'success',
-      text1: 'Ingesting Report. This may take sometime...',
+      text1: 'Ingesting Report. This may take some time...',
       visibilityTime: 2000,
     });
+
+    setIngesting(true);
+    setButtonTitle('Ingesting Report...');
+
+    ingestionStore.set(accession_id, {
+      status: 'INGESTING',
+      startedAt: Date.now(),
+    });
+
     try {
-      // setIngesting(true);
-      setButtonTitle('Ingesting Report...');
       const res = await ragAPI.ingestReport(accession_id);
+
+      ingestionStore.set(accession_id, {
+        status: 'COMPLETED',
+        documentId: res.data.documentId,
+        startedAt: Date.now(),
+      });
       setDocId(res.data.documentId);
+      setIngesting(false);
+      setButtonTitle('');
       Toast.show({
         type: 'success',
         text1: res.message,
         visibilityTime: 3000,
       });
-      setButtonTitle('');
     } catch (error) {
-      console.error('Failed to ingest the file');
-    } finally {
-      // setIngesting(false);
+      ingestionStore.clear(accession_id);
+      setIngesting(false);
       setButtonTitle('');
     }
   };
@@ -159,6 +193,7 @@ export default function Reports() {
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
               <TouchableOpacity
+                disabled={ingesting}
                 className="xshadow-md flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
                 onPress={handleTalkToDrG}
               >
@@ -175,6 +210,7 @@ export default function Reports() {
             </View>
           ) : (
             <TouchableOpacity
+              disabled={ingesting}
               className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
               onPress={handleIngestReport}
             >
