@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import tips from './tips';
 
 export default function TipOfTheDay() {
@@ -8,10 +8,10 @@ export default function TipOfTheDay() {
   const [currentTip, setCurrentTip] = useState(getRandomTip());
 
   return (
-    <View className="mb-6 rounded-lg border border-gray-100 px-4">
-      <View className="h-20 w-20 items-center justify-center self-center rounded-full border border-gray-300 bg-white">
-        <Text className="self-center p-2 text-center text-3xl">{currentTip.emoji}</Text>
-      </View>
+    <View style={styles.container}>
+      {/* <View className="h-20 w-20 items-center justify-center self-center rounded-full border border-gray-300 bg-white"> */}
+      <Text className="self-center p-2 text-center text-3xl">{currentTip.emoji}</Text>
+      {/* </View> */}
 
       <Text className="mb-3 text-center text-lg">{currentTip.tip}</Text>
       <TouchableOpacity
@@ -23,3 +23,18 @@ export default function TipOfTheDay() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    backgroundColor: 'white',
+    margin: 16,
+  },
+});
