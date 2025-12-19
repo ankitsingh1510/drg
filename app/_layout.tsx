@@ -17,10 +17,12 @@ import Toast from 'react-native-toast-message';
 import NetworkLoggers from '@/components/NetworkLoggers';
 import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
+import { useThemeSync } from '@/hooks/useThemeSync';
 import '../global.css';
 
 export default function RootLayout() {
   startNetworkLogging();
+  const { theme } = useThemeSync();
   const [loaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -37,8 +39,8 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <GestureHandlerRootView>
-        <StatusBar style="dark" backgroundColor="#FDF5E6" />
+      <GestureHandlerRootView className="flex-1 bg-white dark:bg-black">
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
         <AuthProvider>
           <Stack screenOptions={{ headerShown: false }} />
           <Toast position="bottom" />

@@ -12,7 +12,9 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
 
 export default function LoginScreen() {
@@ -22,6 +24,8 @@ export default function LoginScreen() {
   const login = useLogin();
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -46,11 +50,11 @@ export default function LoginScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-lg text-gray-600">
-          <View className="absolute inset-0 items-center justify-center bg-gray-50/80">
-            <ActivityIndicator size="large" color="#daa521" />
-            <Text className="mt-2 text-lg text-slate-600">Loading</Text>
+      <View className="flex-1 items-center justify-center bg-white dark:bg-gray-700">
+        <Text className="text-lg text-gray-600 dark:text-gray-400">
+          <View className="absolute inset-0 items-center justify-center bg-gray-50/80 dark:bg-gray-800/80">
+            <ActivityIndicator size="large" color={colors.common.primary} />
+            <Text className="mt-2 text-lg text-slate-600 dark:text-gray-300">Loading</Text>
           </View>
         </Text>
       </View>
@@ -60,18 +64,18 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={{ flex: 1, padding: 22 }}>
+        <SafeAreaView className="bg-white dark:bg-gray-900" style={{ flex: 1, padding: 22 }}>
           <View className="flex-1 justify-center">
             <View className="mb-10">
-              <Text className="mb-2 text-2xl font-extrabold text-gray-900">{`Welcome back! \nGlad to see you, Again!`}</Text>
+              <Text className="mb-2 text-2xl font-extrabold text-gray-900 dark:text-gray-100">{`Welcome back! \nGlad to see you, Again!`}</Text>
             </View>
 
             <View className="mb-6 space-y-4">
               <View className="mb-4">
                 <TextInput
-                  className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black"
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter your email"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={isDark ? colors.dark.textTertiary : '#9CA3AF'}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -83,9 +87,9 @@ export default function LoginScreen() {
               <View>
                 <View className="relative">
                   <TextInput
-                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black"
+                    className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-black dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter your password"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={isDark ? colors.dark.textTertiary : '#9CA3AF'}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
@@ -105,7 +109,8 @@ export default function LoginScreen() {
             </View>
 
             <TouchableOpacity
-              className="items-center rounded-lg bg-[#daa521] py-4"
+              className="items-center rounded-lg py-4"
+              style={{ backgroundColor: colors.common.primary }}
               onPress={handleLogin}
               disabled={isLoading}
             >

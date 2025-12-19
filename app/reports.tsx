@@ -5,10 +5,12 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import InteractionBox from '@/components/interaction/Interactions';
+import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { ragAPI } from '@/services/rag';
 import { ingestionStore } from '@/stores/ingestionStore';
@@ -17,6 +19,8 @@ export default function Reports() {
   const { token } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
   let { pdfUrl, patientName, documentId, accession_id, showIngestOption } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
@@ -113,15 +117,15 @@ export default function Reports() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#FDF5E6' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
       {/* Header */}
-      <View className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3">
+      <View className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
           {/* <Text className="text-base font-semibold text-[#daa521]">←</Text> */}
-          <Ionicons name="arrow-back" size={24} color="##003366" />
+          <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
-          <Text className="text-lg font-bold text-gray-800" numberOfLines={1} ellipsizeMode="tail">
+          <Text className="text-lg font-bold text-gray-800 dark:text-gray-100" numberOfLines={1} ellipsizeMode="tail">
             {patientName}
           </Text>
         </View>
@@ -183,21 +187,25 @@ export default function Reports() {
 
         {/* Loading overlay */}
         {loading && (
-          <View className="absolute inset-0 items-center justify-center bg-white">
-            <ActivityIndicator size="large" color="#daa521" />
-            <Text className="mt-3 text-base text-slate-600">Loading PDF...</Text>
+          <View className="absolute inset-0 items-center justify-center bg-white dark:bg-gray-900">
+            <ActivityIndicator size="large" color={colors.common.primary} />
+            <Text className="mt-3 text-base text-slate-600 dark:text-gray-300">Loading PDF...</Text>
           </View>
         )}
       </View>
 
       {/* Talk to Dr.G / Analyze Report Button */}
       {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
-        <View className="items-center border-t border-gray-200  px-4 py-2" style={{ backgroundColor: '#FDF5E6' }}>
+        <View
+          className="items-center border-t border-gray-200 px-4 py-2 dark:border-gray-700"
+          style={{ backgroundColor: isDark ? colors.dark.cardBackground : colors.light.background }}
+        >
           {docId ? (
             <View className="flex-row items-center justify-center gap-4">
               <TouchableOpacity
                 disabled={ingesting}
-                className="xshadow-md flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
+                className="xshadow-md flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
+                style={{ backgroundColor: colors.common.primary }}
                 onPress={handleTalkToDrG}
               >
                 <Feather name="video" size={22} color="white" />
@@ -214,7 +222,8 @@ export default function Reports() {
           ) : (
             <TouchableOpacity
               disabled={ingesting}
-              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full bg-[#daa521] px-6 py-3 active:opacity-80"
+              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
+              style={{ backgroundColor: colors.common.primary }}
               onPress={handleIngestReport}
             >
               <MaterialIcons name="analytics" size={22} color="white" />

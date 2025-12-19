@@ -4,11 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
 import SimpleButton from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
+import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
 
@@ -16,6 +18,9 @@ const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
 
 export default function LandingScreen() {
   const { user } = useAuth();
+  const { colorScheme } = useColorScheme();
+
+  const gradientColors = colorScheme === 'dark' ? colors.gradients.dark : colors.gradients.light;
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(
@@ -88,13 +93,13 @@ export default function LandingScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6]">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView>
-        <LinearGradient colors={['#FDF5E6', '#FDF5E6', '#FFF8DC']} className="pb-8">
-          <Text className="text-blue mt-10 pl-6 text-2xl font-semibold">
+        <LinearGradient colors={gradientColors} className="pb-8">
+          <Text className="text-blue mt-10 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
             Welcome, {user?.name} {user?.lname}
           </Text>
-          <Text className="mb-8 pl-6 text-xl text-gray-500">🗓️ {date}</Text>
+          <Text className="mb-8 pl-6 text-xl text-gray-500 dark:text-gray-400">🗓️ {date}</Text>
 
           <HScroller />
           <View className="mt-6 h-3"></View>

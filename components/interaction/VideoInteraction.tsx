@@ -4,6 +4,7 @@ import { Audio } from 'expo-av';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { WebView } from 'react-native-webview';
+import { colors } from '@/constants/colors';
 
 export default function VideoInteraction({
   documentId,
@@ -153,7 +154,7 @@ export default function VideoInteraction({
 
           {loading && (
             <View className="absolute inset-0 z-10 items-center justify-center bg-white/90">
-              <ActivityIndicator size="large" color="#daa521" />
+              <ActivityIndicator size="large" color={colors.common.primary} />
               <Text className="mt-3 text-base text-slate-600">Loading Dr.G...</Text>
             </View>
           )}
