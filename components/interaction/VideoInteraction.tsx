@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, Dimensions, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -16,6 +16,7 @@ export default function VideoInteraction({
   onClose?: () => void;
 }) {
   const webViewRef = useRef<WebView>(null);
+  const appStateRef = useRef(AppState.currentState);
   const [loading, setLoading] = useState(true);
   const screen = Dimensions.get('window');
   const BASE_WIDTH = screen.width * 0.5;
@@ -92,6 +93,25 @@ export default function VideoInteraction({
 
   useEffect(() => {
     requestMicrophonePermission();
+
+    appStateRef.current = AppState.currentState;
+    let isFirstEvent = true;
+
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (isFirstEvent) {
+        isFirstEvent = false;
+        appStateRef.current = nextAppState;
+        return;
+      }
+
+      if (appStateRef.current === 'active' && (nextAppState === 'inactive' || nextAppState === 'background')) {
+        stopInteraction();
+      }
+
+      appStateRef.current = nextAppState;
+    });
+
+    return () => subscription.remove();
   }, []);
 
   const requestMicrophonePermission = async () => {
@@ -113,11 +133,23 @@ export default function VideoInteraction({
     }
   };
 
+  const stopInteraction = () => {
+    webViewRef.current?.injectJavaScript(`
+      (function() {
+        const stopButton = document.querySelector('button[aria-label="Stop Interaction"]');
+        if (stopButton) {
+          stopButton.click();
+        }
+      })();
+      true;
+    `);
+  };
+
   const handleClose = () => {
-    webViewRef.current?.postMessage(JSON.stringify({ type: 'END_CALL' }));
+    stopInteraction();
     setTimeout(() => {
       onClose?.();
-    }, 300);
+    }, 500);
   };
 
   return (
@@ -173,6 +205,8 @@ export default function VideoInteraction({
               setLoading(false);
             }}
             originWhitelist={['*']}
+            incognito={true}
+            cacheEnabled={false}
             javaScriptEnabled
             domStorageEnabled
             startInLoadingState
@@ -185,68 +219,15 @@ export default function VideoInteraction({
             setSupportMultipleWindows={false}
             sharedCookiesEnabled
             injectedJavaScript={`
-                (function () {
-                  function stopAllMedia() {
-                    // Stop camera & mic
-                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                      navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-                        .then(stream => {
-                          stream.getTracks().forEach(track => track.stop());
-                        })
-                        .catch(() => {});
-                    }
-
-                    document.querySelectorAll('video').forEach(v => {
-                      v.pause();
-                      v.srcObject = null;
-                      v.removeAttribute('src');
-                      v.load();
-                    });
-
-                    if (window.pc) {
-                      window.pc.close();
-                    }
-
-                    if (window.endCall) {
-                      window.endCall();
-                    }
-                  }
-
-                  document.addEventListener('message', function (event) {
-                    try {
-                      const data = JSON.parse(event.data);
-                      if (data.type === 'END_CALL') {
-                        stopAllMedia();
-                      }
-                    } catch (e) {}
-                  });
-
-                  document.addEventListener('click', function (e) {
-                    const el = e.target.closest('button');
-                    if (!el) return;
-
-                    const label =
-                      el.getAttribute('aria-label') ||
-                      el.getAttribute('title') ||
-                      '';
-
-                    if (label === 'Stop Interaction') {
-                      stopAllMedia();
-                      window.ReactNativeWebView.postMessage(
-                        JSON.stringify({ type: 'STOP_INTERACTION' })
-                      );
-                    }
-                  });
-
-                  const meta = document.createElement('meta');
-                  meta.setAttribute('name', 'viewport');
-                  meta.setAttribute(
-                    'content',
-                    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
-                  );
-                  document.head.appendChild(meta);
-                })();
-                true;
+              const meta = document.createElement('meta');
+              meta.setAttribute('name', 'viewport');
+              meta.setAttribute(
+                'content',
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+              );
+              document.head.appendChild(meta);
+              })();
+              true;
             `}
             onMessage={event => {
               try {
@@ -254,7 +235,9 @@ export default function VideoInteraction({
                 if (data.type === 'STOP_INTERACTION') {
                   handleClose();
                 }
-              } catch (e) {}
+              } catch (e) {
+                console.log('[WebView]', event.nativeEvent.data);
+              }
             }}
             scrollEnabled={false}
           />
