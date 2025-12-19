@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
+import { useColorScheme } from 'nativewind';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
+import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
@@ -12,6 +14,8 @@ export default function Patients() {
   const logout = useLogout();
   const { user, usersStudyList } = useAuth();
   const router = useRouter();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -166,7 +170,7 @@ export default function Patients() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#FDF5E6' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
       <PatientHeader
         user={user}
         totalCount={totalCount}
@@ -182,13 +186,16 @@ export default function Patients() {
           data={patients}
           renderItem={renderPatient}
           keyExtractor={(item: Patient, index: number) => `${item.sampleBarcode}-${index}`}
-          contentContainerStyle={{ padding: 16, backgroundColor: '#FDF5E6' }}
+          contentContainerStyle={{
+            padding: 16,
+            backgroundColor: isDark ? colors.dark.background : colors.light.background,
+          }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor="#daa521"
-              colors={['#daa521']}
+              tintColor={colors.common.primary}
+              colors={[colors.common.primary]}
             />
           }
           onEndReached={handleLoadMore}
@@ -199,9 +206,9 @@ export default function Patients() {
         />
 
         {loading && !refreshing && (
-          <View className="absolute inset-0 items-center justify-center bg-gray-50/80">
-            <ActivityIndicator size="large" color="#daa521" />
-            <Text className="mt-2 text-lg text-slate-600">Loading Orders...</Text>
+          <View className="absolute inset-0 items-center justify-center bg-gray-50/80 dark:bg-gray-900/80">
+            <ActivityIndicator size="large" color={colors.common.primary} />
+            <Text className="mt-2 text-lg text-slate-600 dark:text-gray-300">Loading Orders...</Text>
           </View>
         )}
       </View>
