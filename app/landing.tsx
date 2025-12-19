@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
@@ -20,7 +19,6 @@ export default function LandingScreen() {
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
 
-  const gradientColors = colorScheme === 'dark' ? colors.gradients.dark : colors.gradients.light;
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(
@@ -95,7 +93,7 @@ export default function LandingScreen() {
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView>
-        <LinearGradient colors={gradientColors} className="pb-8">
+        <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
           <Text className="text-blue mt-10 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
             Welcome, {user?.name} {user?.lname}
           </Text>
@@ -138,7 +136,7 @@ export default function LandingScreen() {
           <View className="flex-1 items-center justify-center px-6">
             <Image source={require('@/assets/dr1.png')} resizeMode="contain" className="h-[150px] w-full rounded-3xl" />
           </View>
-        </LinearGradient>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
