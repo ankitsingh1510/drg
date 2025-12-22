@@ -2,14 +2,13 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import { CalendarDays, ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
 import SimpleButton from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
-import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
 
@@ -92,12 +91,15 @@ export default function LandingScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <Text className="text-blue mt-10 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
+          <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
             Welcome, {user?.name} {user?.lname}
           </Text>
-          <Text className="mb-8 pl-6 text-xl text-gray-500 dark:text-gray-400">🗓️ {date}</Text>
+          <View className="mb-6 flex-row items-center pl-6">
+            <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
+            <Text className="ml-2 text-xl text-gray-500 dark:text-gray-400">{date}</Text>
+          </View>
 
           <HScroller />
           <View className="mt-6 h-3"></View>
