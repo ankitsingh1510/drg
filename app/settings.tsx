@@ -37,7 +37,7 @@ const Settings = () => {
       <View className="flex-1">
         {/* Theme Toggle Card */}
         <View className="mx-5 mb-5 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800">
-          <View className="flex-row items-center">
+          <View className="flex-1 flex-row items-center">
             <View className="rounded-full bg-gray-100 p-3 dark:bg-blue-900/30">
               {isDark ? <Moon size={24} color={colors.common.info} /> : <Sun size={24} color={colors.common.warning} />}
             </View>
@@ -65,7 +65,7 @@ const Settings = () => {
 
         {/* Delete Account Card */}
         <View className="mx-5 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800">
-          <View className="flex-row items-center">
+          <View className="flex-1 flex-row items-center">
             <View className="rounded-full bg-red-100 p-3 dark:bg-red-900/30">
               <Trash2 size={20} color="#dc2626" />
             </View>
