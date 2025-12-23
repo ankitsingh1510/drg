@@ -20,8 +20,8 @@ import { useAuth, useLogin } from '@/context/AuthContext';
 import { storage } from '@/stores/mmkv';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState(__DEV__ ? 'rohit.chavan@1cell.ai' : '');
-  const [password, setPassword] = useState(__DEV__ ? 'Indx@12345' : '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setUsersStudyList, setTargetLocation } =
