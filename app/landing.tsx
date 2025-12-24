@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import { CalendarDays, ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
 import SimpleButton from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
-import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
 
@@ -20,7 +18,6 @@ export default function LandingScreen() {
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
 
-  const gradientColors = colorScheme === 'dark' ? colors.gradients.dark : colors.gradients.light;
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(
@@ -37,7 +34,8 @@ export default function LandingScreen() {
         heading: 'Order Tests',
         color: '#5C7AC6',
         sub: '1Cell.Ai Tests and Panels',
-        onPress: () => openInBrowser(process.env.EXPO_PUBLIC_ORDER_TESTS_URL || ''),
+        // onPress: () => openInBrowser(process.env.EXPO_PUBLIC_ORDER_TESTS_URL || ''),
+        onPress: () => router.push('/tests' as any),
       },
       {
         icon: Dna,
@@ -94,12 +92,15 @@ export default function LandingScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <ScrollView>
-        <LinearGradient colors={gradientColors} className="pb-8">
-          <Text className="text-blue mt-10 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
+          <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
             Welcome, {user?.name} {user?.lname}
           </Text>
-          <Text className="mb-8 pl-6 text-xl text-gray-500 dark:text-gray-400">🗓️ {date}</Text>
+          <View className="mb-6 flex-row items-center pl-6">
+            <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
+            <Text className="ml-2 text-xl text-gray-500 dark:text-gray-400">{date}</Text>
+          </View>
 
           <HScroller />
           <View className="mt-6 h-3"></View>
@@ -138,7 +139,7 @@ export default function LandingScreen() {
           <View className="flex-1 items-center justify-center px-6">
             <Image source={require('@/assets/dr1.png')} resizeMode="contain" className="h-[150px] w-full rounded-3xl" />
           </View>
-        </LinearGradient>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
