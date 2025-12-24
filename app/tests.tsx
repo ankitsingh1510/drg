@@ -1,15 +1,37 @@
-import React from 'react';
-import { FlatList, Text, View } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-import { useColorScheme } from 'nativewind';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
+import { EmptyState } from '@/components/patient';
 import OncoCard from '@/components/widgets/OncoCard';
-import { useAuth } from '@/context/AuthContext';
+import { colors } from '@/constants/colors';
+import { apiFetch } from '@/services/fetchClient';
+
+type TestData = {
+  fileName: string;
+  title: string;
+  summary: string;
+};
 
 export default function TestsScreen() {
-  const { user } = useAuth();
-  const { colorScheme } = useColorScheme();
+  const [data, setData] = useState<TestData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getAllTests = async () => {
+    try {
+      setLoading(true);
+      const response = await apiFetch('https://nandiraju.github.io/lab_tests/tests.json');
+      setData(response?.data);
+    } catch (err) {
+      console.error('Error fetching tests:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAllTests();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
@@ -19,58 +41,20 @@ export default function TestsScreen() {
         </View>
         <IconNavBar />
       </View>
-      <FlatList
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 10 }}
-        data={data}
-        keyExtractor={item => item.fileName}
-        renderItem={({ item }) => <OncoCard item={item} />}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={colors.common.primary} />
+        </View>
+      ) : (
+        <FlatList
+          className="px-4 pb-2"
+          data={data}
+          keyExtractor={item => item.fileName}
+          renderItem={({ item }) => <OncoCard item={item} />}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => <EmptyState type="no-tests" />}
+        />
+      )}
     </SafeAreaView>
   );
 }
-
-const data = [
-  {
-    fileName: 'OncoHRD new brochure.pdf',
-    title: 'OncoHRD – Homologous Recombination Deficiency Test',
-    summary:
-      'An NGS-based assay designed to detect homologous recombination deficiency and related genomic signatures to guide targeted therapy and treatment selection in solid tumors.',
-  },
-  {
-    fileName: 'OncoIndx new brochure.pdf',
-    title: 'OncoIndx – Comprehensive Tumor Genomic Profiling',
-    summary:
-      'A broad genomic profiling test that analyzes multiple cancer-related genes to identify actionable mutations and support personalized oncology treatment decisions.',
-  },
-  {
-    fileName: 'OncoIndx prime+ new brochure.pdf',
-    title: 'OncoIndx Prime+ – Enhanced Precision Oncology Panel',
-    summary:
-      'An advanced version of OncoIndx offering expanded gene coverage and deeper insights for complex cancer cases requiring high-confidence, precision-guided therapy.',
-  },
-  {
-    fileName: 'OncoIndx tbx new brochure.pdf',
-    title: 'OncoIndx TBx – Integrated DNA & RNA NGS Test',
-    summary:
-      'An integrated genomic and transcriptomic profiling assay covering 1000+ genes, fusions, TMB, MSI, and HRD to enable evidence-based, AI-assisted clinical decisions in advanced and refractory solid tumors.',
-  },
-  {
-    fileName: 'OncoMonitor new brochure.pdf',
-    title: 'OncoMonitor – Longitudinal Cancer Monitoring',
-    summary:
-      'A monitoring solution designed to track cancer progression, treatment response, and emerging resistance markers over time using molecular insights.',
-  },
-  {
-    fileName: 'OncoRisk new brochure.pdf',
-    title: 'OncoRisk – Cancer Risk Assessment',
-    summary:
-      'A genomic test focused on identifying inherited and acquired cancer risk markers to support early detection, prevention strategies, and informed clinical management.',
-  },
-  {
-    fileName: 'OncoTarget new brochure.pdf',
-    title: 'OncoTarget – Actionable Mutation Identification',
-    summary:
-      'A targeted NGS panel aimed at detecting clinically actionable genetic alterations to match patients with the most effective targeted and immunotherapy options.',
-  },
-];
