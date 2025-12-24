@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 interface EmptyStateProps {
-  type: 'loading' | 'no-studies' | 'no-patients';
+  type: 'loading' | 'no-studies' | 'no-patients' | 'no-tests';
   onLogout?: () => void;
 }
 
@@ -29,6 +29,14 @@ export function EmptyState({ type, onLogout }: EmptyStateProps) {
         <Text className="text-center text-sm text-slate-500 dark:text-gray-400">
           No patients found matching your criteria.
         </Text>
+      </View>
+    );
+  }
+
+  if (type === 'no-tests') {
+    return (
+      <View className="flex-1 items-center justify-center py-8">
+        <Text className="text-center text-xl text-slate-500 dark:text-gray-400">No tests found.</Text>
       </View>
     );
   }
