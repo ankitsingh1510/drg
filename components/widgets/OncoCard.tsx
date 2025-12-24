@@ -19,7 +19,7 @@ export default function OncoCard({ item }: Props) {
   // image: require('@/assets/menu_images/slider1.png'),
   return (
     <View className="my-3 rounded-2xl border border-gray-100 bg-white p-2 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-      <View className="h-[250px] w-full overflow-hidden rounded-xl">
+      <View className="h-[200px] w-full overflow-hidden rounded-xl">
         <ImageBackground source={{ uri: item.image }} resizeMode="cover" className="flex-1">
           <View className="absolute inset-0 bg-black/30" />
 
