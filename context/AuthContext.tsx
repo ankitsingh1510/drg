@@ -200,16 +200,10 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
-  const { setUser, setToken, setUsersStudyList } = useAuth();
-
   return async () => {
     console.log('Logging out');
-    // await AsyncStorage.clear();
-    storage.clearAll();
-    setUser(null);
-    setToken(null);
-    setUsersStudyList([]);
-    router.replace('/' as any);
+    // The login page will handle clearing storage and contexts
+    router.replace('/login?logout=true' as any);
   };
 };
 

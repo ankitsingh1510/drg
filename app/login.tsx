@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -11,29 +12,53 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
+import { storage } from '@/stores/mmkv';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setUsersStudyList, setTargetLocation } =
+    useAuth();
   const router = useRouter();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const params = useLocalSearchParams();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // router.replace('/patients' as any);
-      console.log('User is authenticated, navigating to landing page');
-      router.replace('/landing' as any);
+    if (params.logout === 'true') {
+      setIsLoading(true);
+      storage.clearAll();
+
+      setUser(null);
+      setToken(null);
+      setUsersStudyList([]);
+      setTargetLocation(null);
+
+      if (router.canDismiss()) {
+        router.dismissAll();
+      }
+      router.replace('/' as any);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
     }
-  }, [isAuthenticated]);
+  }, [params.logout]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      BackHandler.exitApp();
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -52,7 +77,7 @@ export default function LoginScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white dark:bg-gray-700">
         <Text className="text-lg text-gray-600 dark:text-gray-400">
-          <View className="absolute inset-0 items-center justify-center bg-gray-50/80 dark:bg-gray-800/80">
+          <View className="absolute inset-0 items-center justify-center">
             <ActivityIndicator size="large" color={colors.common.primary} />
             <Text className="mt-2 text-lg text-slate-600 dark:text-gray-300">Loading</Text>
           </View>
@@ -64,7 +89,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView className="bg-white dark:bg-gray-900" style={{ flex: 1, padding: 22 }}>
+        <SafeAreaView className="bg-[#FDF5E6] dark:bg-gray-900" style={{ flex: 1, padding: 22 }}>
           <View className="flex-1 justify-center">
             <View className="mb-10">
               <Text className="mb-2 text-2xl font-extrabold text-gray-900 dark:text-gray-100">{`Welcome back! \nGlad to see you, Again!`}</Text>
