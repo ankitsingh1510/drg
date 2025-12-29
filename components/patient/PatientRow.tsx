@@ -15,6 +15,21 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   const handleViewReport = async () => {
     setLoadingReport(true);
     try {
@@ -59,7 +74,9 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
             <Text className="text-lg font-semibold text-slate-900 dark:text-gray-100">{patient.patientName}</Text>
             <Text className="mt-1 text-sm text-slate-500 dark:text-gray-400">Sample: {patient.sampleBarcode}</Text>
             <Text className="text-sm text-slate-500 dark:text-gray-400">Assay: {patient.assayName}</Text>
-            <Text className="text-sm text-slate-500 dark:text-gray-400">Date: {patient.reportFinalizedDate}</Text>
+            <Text className="text-sm text-slate-500 dark:text-gray-400">
+              Date: {formatDate(patient.analysisCompletionDate)}
+            </Text>
           </View>
           <View
             className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${getStatusColor(patient.workflowStatus)}`}
