@@ -78,18 +78,10 @@ class PatientsAPI {
         type: 'not-empty',
       },
       {
-        OR: [
-          {
-            field: 'oncoindx_sub_pipeline',
-            type: 'case_insensitive_not',
-            values: ['edta'],
-          },
-          {
-            field: 'oncoindx_sub_pipeline',
-            type: 'is-null',
-            values: [],
-          },
-        ],
+        field: 'oncoindx_sub_pipeline',
+        type: 'case_insensitive_not',
+        sourceTable: 'case_sample_attribute_value',
+        values: ['edta'],
       },
     ];
 
@@ -106,7 +98,6 @@ class PatientsAPI {
       filters.push({
         field: 'patientName',
         type: 'fuzzy',
-        sourceTable: '',
         values: [searchQuery.trim()],
       });
     }
