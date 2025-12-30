@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image, ImageBackground, Pressable, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as WebBrowser from 'expo-web-browser';
 
 type OncoItem = {
