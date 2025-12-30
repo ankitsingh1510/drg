@@ -15,14 +15,22 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
+import { storageAPI } from '@/services/storage';
+import { studyAPI } from '@/services/study';
+import { usersAPI } from '@/services/users';
 import { storage } from '@/stores/mmkv';
+import { decryptToken } from '@/util/helpers';
+import { toast } from '@/util/toast';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showMfaModal, setShowMfaModal] = useState(false);
+  const [pendingToken, setPendingToken] = useState('');
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setUsersStudyList, setTargetLocation } =
     useAuth();
@@ -67,10 +75,105 @@ export default function LoginScreen() {
     }
 
     try {
-      await login(email, password);
+      setIsLoading(true);
+      // Authenticate and get token
+      const response = await usersAPI.authenticateUser({ username: email, password });
+      if (response && response.token) {
+        const token = response.token;
+        const tokenPayload = decryptToken(token);
+        if (!tokenPayload) {
+          throw new Error('Invalid token received');
+        }
+        // Check if MFA is enabled and not verified
+        if (
+          tokenPayload.user_type === 'localUser' &&
+          (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
+          !tokenPayload.isMfaVerified
+        ) {
+          // Store token temporarily in storage for API calls
+          storage.set('token', token);
+          setPendingToken(token);
+          // Send OTP to email
+          await usersAPI.sendMfaOtp('email');
+          toast.success('OTP Sent', 'Please check your email for the verification code');
+          setIsLoading(false);
+          setShowMfaModal(true);
+        } else {
+          // No MFA required, proceed with normal login
+          await completeLogin(email, password);
+        }
+      } else {
+        throw new Error('Authentication failed');
+      }
     } catch (error: any) {
+      setIsLoading(false);
       Alert.alert('Login Failed', error.message || 'Invalid credentials');
     }
+  };
+
+  const completeLogin = async (username: string, pwd: string) => {
+    try {
+      await login(username, pwd);
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  const completeMfaLogin = async (verifiedToken: string) => {
+    try {
+      const payload = decryptToken(verifiedToken);
+      if (!payload) {
+        throw new Error('Invalid token');
+      }
+      setToken(verifiedToken);
+      // Fetch user details using the verified token
+      const userDetails = await usersAPI.getUserDetail({ userMasterId: payload.sub });
+      const userFields = userDetails.data.userMasterModel.fields;
+
+      const nameField = userFields.find((x: any) => x.name === 'name')?.value;
+      const lnameField = userFields.find((x: any) => x.name === 'lname')?.value;
+      const emailField = userFields.find((x: any) => x.name === 'email')?.value;
+
+      const userData = {
+        name: nameField,
+        lname: lnameField,
+        email: emailField,
+        sub: payload.sub,
+        username: payload.username,
+        role_id: payload.role_id,
+      };
+
+      setUser(userData);
+      // Fetch study list
+      const studyList = await studyAPI.getStudyList();
+      const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
+      setUsersStudyList(studyIds);
+      // Get upload config
+      const config = await storageAPI.getUploadConfig();
+      setTargetLocation(config?.data?.targetLocation || null);
+      // Navigate to landing page
+      router.replace('/landing' as any);
+    } catch (error) {
+      console.error('Error completing MFA login:', error);
+      throw error;
+    }
+  };
+
+  const handleOtpVerified = async (verifiedToken: string) => {
+    try {
+      // Store the verified token
+      storage.set('token', verifiedToken);
+      setShowMfaModal(false);
+      // Complete login using the verified token
+      await completeMfaLogin(verifiedToken);
+    } catch (error: any) {
+      setIsLoading(false);
+      Alert.alert('Error', error.message || 'Failed to complete login');
+    }
+  };
+
+  const handleOtpModalClose = () => {
+    setShowMfaModal(false);
   };
 
   if (isLoading) {
@@ -142,6 +245,14 @@ export default function LoginScreen() {
               <Text className="text-base font-semibold text-white">{isLoading ? 'Logging in...' : 'Login'}</Text>
             </TouchableOpacity>
           </View>
+
+          <OtpVerificationModal
+            visible={showMfaModal}
+            onClose={handleOtpModalClose}
+            onVerifySuccess={handleOtpVerified}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
         </SafeAreaView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

@@ -1,89 +1,120 @@
 import React from 'react';
-import { Alert, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { Moon, Sun, Trash2 } from 'lucide-react-native';
+import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import { ChevronRight, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
 
+type SettingCardProps = {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  iconBgColor: string;
+  btn?: React.ReactNode;
+  onPress?: () => void;
+};
+
+const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: SettingCardProps) => {
+  const Card = onPress ? TouchableOpacity : View;
+
+  return (
+    <Card
+      onPress={onPress}
+      activeOpacity={0.7}
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
+    >
+      <View className="flex-1 flex-row items-center">
+        <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
+
+        <View className="ml-3 flex-1">
+          <Text className="text-lg font-medium text-gray-800 dark:text-gray-100">{title}</Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</Text>
+        </View>
+      </View>
+
+      {btn}
+    </Card>
+  );
+};
+
 const Settings = () => {
   const logout = useLogout();
   const { theme, toggleTheme } = useThemeSync();
 
-  const isDark = theme === 'dark';
+  const isDarkMode = theme === 'dark';
 
-  const handleDeleteAccount = () => {
-    Alert.alert('Delete Account', 'Are you sure you want to delete your account? This action cannot be undone.', [
+  const confirmDeleteAccount = () => {
+    Alert.alert('Delete Account', 'Are you sure you want to delete your account? This btn cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'No',
-        style: 'cancel',
-      },
-      {
-        text: 'Yes',
+        text: 'Delete',
         style: 'destructive',
         onPress: logout,
       },
     ]);
   };
 
+  const goToProfile = () => {
+    router.push('/profile' as any);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      {/* Header */}
       <View className="mb-2 items-end pb-2 pr-8">
         <IconNavBar />
       </View>
 
-      <View className="flex-1">
-        {/* Theme Toggle Card */}
-        <View className="mx-5 mb-5 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800">
-          <View className="flex-1 flex-row items-center">
-            <View className="rounded-full bg-gray-100 p-3 dark:bg-blue-900/30">
-              {isDark ? <Moon size={24} color={colors.common.info} /> : <Sun size={24} color={colors.common.warning} />}
-            </View>
+      <ScrollView className="mt-4 flex-1" showsVerticalScrollIndicator={false}>
+        <SettingCard
+          icon={<User size={24} color={colors.common.info} />}
+          title="My Profile"
+          subtitle="View and edit your profile"
+          iconBgColor="bg-blue-100 dark:bg-blue-900/30"
+          btn={<ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />}
+          onPress={goToProfile}
+        />
 
-            <View className="ml-3 flex-1">
-              <Text className="text-lg font-medium text-gray-800 dark:text-gray-100">
-                {isDark ? 'Dark Mode' : 'Light Mode'}
-              </Text>
-              <Text className="text-sm text-gray-500 dark:text-gray-400">
-                {isDark ? 'Dark theme is active' : 'Light theme is active'}
-              </Text>
-            </View>
-          </View>
+        <SettingCard
+          icon={
+            isDarkMode ? <Moon size={24} color={colors.common.info} /> : <Sun size={24} color={colors.common.warning} />
+          }
+          title={isDarkMode ? 'Dark Mode' : 'Light Mode'}
+          subtitle={isDarkMode ? 'Dark theme is active' : 'Light theme is active'}
+          iconBgColor={isDarkMode ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100'}
+          btn={
+            <Switch
+              value={isDarkMode}
+              onValueChange={toggleTheme}
+              trackColor={{
+                false: colors.light.border,
+                true: colors.common.info,
+              }}
+              thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
+            />
+          }
+        />
 
-          <Switch
-            value={isDark}
-            onValueChange={toggleTheme}
-            trackColor={{
-              false: colors.light.border,
-              true: colors.common.info,
-            }}
-            thumbColor={isDark ? '#1e40af' : '#f3f4f6'}
-          />
-        </View>
+        <SettingCard
+          icon={<Trash2 size={20} color="#dc2626" />}
+          title="Delete Account"
+          subtitle="Permanently remove all data"
+          iconBgColor="bg-red-100 dark:bg-red-900/30"
+          btn={
+            <TouchableOpacity
+              onPress={confirmDeleteAccount}
+              className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
+            >
+              <Text className="text-sm font-semibold text-white">Delete</Text>
+            </TouchableOpacity>
+          }
+        />
 
-        {/* Delete Account Card */}
-        <View className="mx-5 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800">
-          <View className="flex-1 flex-row items-center">
-            <View className="rounded-full bg-red-100 p-3 dark:bg-red-900/30">
-              <Trash2 size={20} color="#dc2626" />
-            </View>
-
-            <View className="ml-3 flex-1">
-              <Text className="text-lg font-medium text-gray-800 dark:text-gray-100">Delete Account</Text>
-              <Text className="text-sm text-gray-500 dark:text-gray-400">Permanently remove all data</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            onPress={handleDeleteAccount}
-            className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
-          >
-            <Text className="text-sm font-semibold text-white">Delete</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <View className="h-6" />
+      </ScrollView>
     </SafeAreaView>
   );
 };
