@@ -11,16 +11,13 @@ interface FetchTestsDetailsParams {
 
 export interface Patient {
   assayName: string;
-  suid: string;
   documentId?: string;
   ingested_file_path?: string | null;
   sampleBarcode: string;
-  report_finalized_date: string;
   full_report_path: string;
   summary_report_path: string | null;
   released_full_report_path: string | null;
   released_summary_report_path: string | null;
-  finalized_report_status: string;
   workflowStatus: string;
   full_report_finalized_path: string;
   summary_report_finalized_path: string | null;
@@ -78,18 +75,10 @@ class PatientsAPI {
         type: 'not-empty',
       },
       {
-        OR: [
-          {
-            field: 'oncoindx_sub_pipeline',
-            type: 'case_insensitive_not',
-            values: ['edta'],
-          },
-          {
-            field: 'oncoindx_sub_pipeline',
-            type: 'is-null',
-            values: [],
-          },
-        ],
+        field: 'oncoindx_sub_pipeline',
+        type: 'case_insensitive_not',
+        sourceTable: 'case_sample_attribute_value',
+        values: ['edta'],
       },
     ];
 
@@ -106,7 +95,6 @@ class PatientsAPI {
       filters.push({
         field: 'patientName',
         type: 'fuzzy',
-        sourceTable: '',
         values: [searchQuery.trim()],
       });
     }
@@ -118,15 +106,14 @@ class PatientsAPI {
       variables: {
         fetchTestsDetailsModel: {
           fields: {
-            subject: [
-              {
-                field: 'suid',
-              },
-            ],
             case_sample: [
               {
                 field: 'sample_barcode',
                 alias: 'sampleBarcode',
+              },
+              {
+                field: 'case_sample_id',
+                alias: 'case_sample_id',
               },
             ],
             case_assay_sample: [
@@ -136,12 +123,6 @@ class PatientsAPI {
               },
             ],
             assay_attribute_value: [
-              {
-                field: 'report_finalized_date',
-              },
-              {
-                field: 'finalized_report_status',
-              },
               {
                 field: 'workflow_status',
                 alias: 'workflowStatus',
@@ -261,19 +242,19 @@ class PatientsAPI {
               ],
             },
             {
-              alias: 'reportFinalizedDate',
+              alias: 'analysisCompletionDate',
               expression:
-                "CASE WHEN [0] IS NULL OR [0] = '' THEN NULL ELSE TO_CHAR(TO_DATE([0], 'YYYY-MM-DD\"T\"HH24:MI'), 'DD Mon YYYY') END",
+                "coalesce(( select csav.date_modified from case_sample_attribute_value csav where csav.case_sample_id = [0] and csav.attribute_name = 'pipelineStatus' and csav.is_deleted = 0 ),( select csav.date_created  from case_sample_attribute_value csav where csav.case_sample_id = [0] and csav.attribute_name = 'pipelineStatus' and csav.is_deleted = 0 ))",
               sourceColumns: [
                 {
-                  field: 'report_finalized_date',
-                  sourceTable: 'assay_attribute_value',
+                  field: 'case_sample_id',
+                  sourceTable: 'case_sample',
                 },
               ],
             },
           ],
           pagination: {
-            sort: 'desc.report_finalized_date',
+            sort: 'desc.analysisCompletionDate',
             page,
             count,
           },
