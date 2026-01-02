@@ -24,7 +24,7 @@ export default function OtpVerificationModal({
   const isDark = colorScheme === 'dark';
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4) {
+    if (!otp || otp.length !== 6) {
       toast.error('Invalid OTP', 'Please enter a valid 6-digit OTP');
       return;
     }
@@ -70,7 +70,7 @@ export default function OtpVerificationModal({
         <View className="mx-5 w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
           <Text className="mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">Enter Verification Code</Text>
           <Text className="text-m mb-6 text-gray-600 dark:text-gray-400">
-            We've sent a OTP to your email. Please enter it below.
+            We've sent an OTP to your email. Please enter it below.
           </Text>
 
           <View className="mb-4">

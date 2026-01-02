@@ -3,7 +3,6 @@ import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-n
 import { router } from 'expo-router';
 import { ChevronRight, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useLogout } from '@/context/AuthContext';
@@ -48,7 +47,7 @@ const Settings = () => {
   const isDarkMode = theme === 'dark';
 
   const confirmDeleteAccount = () => {
-    Alert.alert('Delete Account', 'Are you sure you want to delete your account? This btn cannot be undone.', [
+    Alert.alert('Delete Account', 'Are you sure you want to delete your account? This action cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
