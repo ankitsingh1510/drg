@@ -30,7 +30,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaModal, setShowMfaModal] = useState(false);
-  const [pendingToken, setPendingToken] = useState('');
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setUsersStudyList, setTargetLocation } =
     useAuth();
@@ -92,7 +91,6 @@ export default function LoginScreen() {
         ) {
           // Store token temporarily in storage for API calls
           storage.set('token', token);
-          setPendingToken(token);
           const otpResponse = await usersAPI.sendMfaOtp('email');
           if (otpResponse?.statusCode === 200 || otpResponse?.statusCode === 201) {
             toast.success('OTP Sent', 'Please check your email for the verification code');
