@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ChevronDown, Edit2, Save, X } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
@@ -22,7 +22,7 @@ import { toast } from '@/util/toast';
 
 const Profile = () => {
   const router = useRouter();
-  //   const { user } = useAuth();
+
   const { theme } = useThemeSync();
   const isDarkMode = theme === 'dark';
 
@@ -32,6 +32,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [formFields, setFormFields] = useState<ProfileField[]>([]);
   const [originalMfaEnabled, setOriginalMfaEnabled] = useState<string>('');
+  const [originalFormFields, setOriginalFormFields] = useState<ProfileField[]>([]);
   const [showESignatureModal, setShowESignatureModal] = useState(false);
   const [showReloginModal, setShowReloginModal] = useState(false);
   const [mfaChanged, setMfaChanged] = useState(false);
@@ -112,6 +113,7 @@ const Profile = () => {
     const emailField = formFields.find(f => f.name === 'email');
     const emailValue = emailField?.value?.toString() || '';
     setESignatureUsername(emailValue);
+    setOriginalFormFields([...formFields]);
     setShowESignatureModal(true);
   };
 
@@ -131,6 +133,7 @@ const Profile = () => {
       if (response?.statusCode !== 200 && response?.statusCode !== 201) {
         const errorMessage = response?.message || 'Failed to update profile';
         toast.error('Error', errorMessage);
+        setFormFields([...originalFormFields]);
         setShowESignatureModal(true);
         setIsLoading(false);
         return;
@@ -150,6 +153,7 @@ const Profile = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error', 'Failed to update profile');
+      setFormFields([...originalFormFields]);
       setShowESignatureModal(true);
     } finally {
       setIsLoading(false);
@@ -323,7 +327,10 @@ const Profile = () => {
       <ESignatureModal
         visible={showESignatureModal}
         username={eSignatureUsername}
-        onCancel={() => setShowESignatureModal(false)}
+        onCancel={() => {
+          setFormFields([...originalFormFields]);
+          setShowESignatureModal(false);
+        }}
         onConfirm={handleESignatureSubmit}
       />
       <MfaChangeWarningModal visible={showReloginModal} onContinue={handleRelogin} />
