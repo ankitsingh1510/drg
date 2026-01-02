@@ -93,9 +93,10 @@ export default function LoginScreen() {
           // Store token temporarily in storage for API calls
           storage.set('token', token);
           setPendingToken(token);
-          // Send OTP to email
-          await usersAPI.sendMfaOtp('email');
-          toast.success('OTP Sent', 'Please check your email for the verification code');
+          const otpResponse = await usersAPI.sendMfaOtp('email');
+          if (otpResponse?.statusCode === 200 || otpResponse?.statusCode === 201) {
+            toast.success('OTP Sent', 'Please check your email for the verification code');
+          }
           setIsLoading(false);
           setShowMfaModal(true);
         } else {
