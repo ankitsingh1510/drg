@@ -119,7 +119,7 @@ const Profile = () => {
     try {
       setIsLoading(true);
       setShowESignatureModal(false);
-      await usersAPI.updateUserProfile({
+      const response = await usersAPI.updateUserProfile({
         userMasterModel: { fields: formFields },
         eSignatureModel: {
           username: eSignatureUsername,
@@ -128,10 +128,17 @@ const Profile = () => {
         },
       });
 
-      toast.success('Profile Updated', 'Your profile has been updated successfully');
+      if (response?.statusCode !== 200 && response?.statusCode !== 201) {
+        const errorMessage = response?.message || 'Failed to update profile';
+        toast.error('Error', errorMessage);
+        setShowESignatureModal(true);
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success('Profile Updated', response?.data?.msg || 'Your profile has been updated successfully');
       setIsEditing(false);
       setESignatureUsername('');
-      // If MFA value is changed, navigate to login
       if (mfaChanged) {
         setIsLoading(false);
         setTimeout(() => {
@@ -143,6 +150,7 @@ const Profile = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Error', 'Failed to update profile');
+      setShowESignatureModal(true);
     } finally {
       setIsLoading(false);
     }
