@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { ingestionStore } from '@/stores/ingestionStore';
 
@@ -38,9 +47,27 @@ export default function Reports() {
     isVisible: false,
     mode: 'video',
   });
+  const [chatSignedUrl, setChatSignedUrl] = useState<string | null>(null);
+  const [loadingChat, setLoadingChat] = useState(false);
 
-  const handleChatWithDrG = () => {
-    setShowInteraction({ isVisible: true, mode: 'chat' });
+  const handleChatWithDrG = async () => {
+    if (loadingChat) return;
+    try {
+      setLoadingChat(true);
+      const signedUrl = await elevenLabsAPI.getSignedUrl();
+      setChatSignedUrl(signedUrl);
+      setShowInteraction({ isVisible: true, mode: 'chat' });
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to connect to chat',
+        text2: 'Please try again',
+        visibilityTime: 3000,
+      });
+    } finally {
+      setLoadingChat(false);
+    }
   };
 
   const handleTalkToDrG = () => {
@@ -116,6 +143,11 @@ export default function Reports() {
     setShowInteraction({ isVisible: false, mode: 'video' });
   };
 
+  const handleCloseChatSplit = () => {
+    setChatSignedUrl(null);
+    setShowInteraction({ isVisible: false, mode: 'chat' });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
       {/* Header */}
@@ -131,68 +163,89 @@ export default function Reports() {
         </View>
       </View>
 
-      {/* PDF Viewer */}
-      <View
-        className="relative flex-1"
-        style={{
-          backgroundColor: 'gray',
-          marginHorizontal: 5,
-          borderRadius: 5,
-          padding: 10,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
-        }}
+      {/* Main Content Area - Split or Full */}
+      <KeyboardAvoidingView
+        className="flex-1"
+        style={{ flexDirection: 'column' }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <Pdf
-          trustAllCerts={false}
-          source={{ uri: pdfUrl, cache: true, expiration: 60 }}
-          style={styles.pdf}
-          onLoadComplete={(numberOfPages, filePath) => {
-            setNumPages(numberOfPages);
-            setLoading(false);
-          }}
-          onPageChanged={(page, numberOfPages) => {
-            setCurrentPage(page);
-          }}
-          onError={error => {
-            console.error('PDF error:', error);
-            setLoading(false);
-            Toast.show({
-              type: 'error',
-              text1: 'Failed to load PDF',
-              text2: 'Please try again',
-              visibilityTime: 3000,
-            });
-          }}
-          onLoadProgress={percent => {}}
-          enablePaging={true}
-          horizontal={false}
-          spacing={10}
-          fitPolicy={0}
-          maxScale={3}
-          minScale={0.5}
-        />
+        {/* PDF Viewer */}
+        <View
+          className="relative flex-1"
+          style={[
+            {
+              backgroundColor: 'gray',
+              marginHorizontal: 5,
+              borderRadius: 5,
+              padding: 10,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 3,
+            },
+          ]}
+        >
+          <Pdf
+            trustAllCerts={false}
+            source={{ uri: pdfUrl, cache: true, expiration: 60 }}
+            style={styles.pdf}
+            onLoadComplete={(numberOfPages, filePath) => {
+              setNumPages(numberOfPages);
+              setLoading(false);
+            }}
+            onPageChanged={(page, numberOfPages) => {
+              setCurrentPage(page);
+            }}
+            onError={error => {
+              console.error('PDF error:', error);
+              setLoading(false);
+              Toast.show({
+                type: 'error',
+                text1: 'Failed to load PDF',
+                text2: 'Please try again',
+                visibilityTime: 3000,
+              });
+            }}
+            onLoadProgress={percent => {}}
+            enablePaging={true}
+            horizontal={false}
+            spacing={10}
+            fitPolicy={0}
+            maxScale={3}
+            minScale={0.5}
+          />
 
-        {/* Page indicator */}
-        {!loading && numPages > 0 && (
-          <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-2">
-            <Text className="text-sm font-semibold text-white">
-              {currentPage} / {numPages}
-            </Text>
+          {/* Page indicator */}
+          {!loading && numPages > 0 && (
+            <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-2">
+              <Text className="text-sm font-semibold text-white">
+                {currentPage} / {numPages}
+              </Text>
+            </View>
+          )}
+
+          {/* Loading overlay */}
+          {loading && (
+            <View className="absolute inset-0 items-center justify-center bg-white dark:bg-gray-900">
+              <ActivityIndicator size="large" color={colors.common.primary} />
+              <Text className="mt-3 text-base text-slate-600 dark:text-gray-300">Loading PDF...</Text>
+            </View>
+          )}
+        </View>
+
+        {/* ElevenLabs Chat Split Screen */}
+        {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
+          <View className="flex-1" style={{ borderTopWidth: 2, borderTopColor: isDark ? '#374151' : '#e5e7eb' }}>
+            <ElevenLabsChat
+              signedUrl={chatSignedUrl}
+              documentId={String(docId)}
+              token={token || ''}
+              onClose={handleCloseChatSplit}
+            />
           </View>
         )}
-
-        {/* Loading overlay */}
-        {loading && (
-          <View className="absolute inset-0 items-center justify-center bg-white dark:bg-gray-900">
-            <ActivityIndicator size="large" color={colors.common.primary} />
-            <Text className="mt-3 text-base text-slate-600 dark:text-gray-300">Loading PDF...</Text>
-          </View>
-        )}
-      </View>
+      </KeyboardAvoidingView>
 
       {/* Talk to Dr.G / Analyze Report Button */}
       {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
@@ -211,13 +264,15 @@ export default function Reports() {
                 <Feather name="video" size={22} color="white" />
                 <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Talk With Dr.G'}</Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity
-                className="flex-row items-center justify-center rounded-lg bg-[#daa521] px-4 py-4 shadow-md active:opacity-80"
+              <TouchableOpacity
+                className="flex-row items-center justify-center rounded-full px-6 py-3 shadow-md active:opacity-80"
+                style={{ backgroundColor: colors.common.primary }}
+                disabled={loadingChat}
                 onPress={handleChatWithDrG}
               >
                 <Ionicons name="chatbubbles-outline" size={22} color="white" />
                 <Text className="ml-2 text-lg font-bold text-white">Chat With Dr.G</Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
