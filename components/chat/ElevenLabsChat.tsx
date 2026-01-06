@@ -27,6 +27,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const [inputText, setInputText] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const flashListRef = useRef<any>(null);
   const reportContextRef = useRef<string | null>(null);
@@ -108,6 +109,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
           if (data.type === 'agent_response') {
             const agentText = data.agent_response_event?.agent_response;
             if (agentText) {
+              setIsWaitingForResponse(false);
               addMessage('agent', agentText);
             }
           }
@@ -150,6 +152,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
 
     const messageToSend = inputText.trim();
     addMessage('user', messageToSend);
+    setIsWaitingForResponse(true);
 
     // Send user message to WebSocket
     const userMessage = {
@@ -177,6 +180,33 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
         >
           {message.text}
         </Text>
+      </View>
+    </View>
+  );
+
+  const renderTypingIndicator = () => (
+    <View className="mb-3 items-start">
+      <View
+        className="rounded-2xl border px-4 py-3"
+        style={{
+          backgroundColor: isDark ? colors.dark.cardBackground : '#f3f4f6',
+          borderColor: isDark ? colors.dark.border : '#e5e7eb',
+        }}
+      >
+        <View className="flex-row items-center">
+          <View
+            className="mr-1.5 h-2 w-2 rounded-full"
+            style={{ backgroundColor: isDark ? '#6b7280' : '#9ca3af', opacity: 0.6 }}
+          />
+          <View
+            className="mr-1.5 h-2 w-2 rounded-full"
+            style={{ backgroundColor: isDark ? '#6b7280' : '#9ca3af', opacity: 0.8 }}
+          />
+          <View
+            className="h-2 w-2 rounded-full"
+            style={{ backgroundColor: isDark ? '#6b7280' : '#9ca3af', opacity: 1 }}
+          />
+        </View>
       </View>
     </View>
   );
@@ -226,6 +256,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
               </View>
             ) : null
           }
+          ListFooterComponent={isWaitingForResponse ? renderTypingIndicator() : null}
         />
       </View>
 
