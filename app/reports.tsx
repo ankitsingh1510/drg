@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   KeyboardAvoidingView,
+  PanResponder,
   Platform,
   StyleSheet,
   Text,
@@ -49,6 +51,9 @@ export default function Reports() {
   });
   const [chatSignedUrl, setChatSignedUrl] = useState<string | null>(null);
   const [loadingChat, setLoadingChat] = useState(false);
+  const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
+  const containerHeight = useRef(0);
+  const panY = useRef(new Animated.Value(0)).current;
 
   const handleChatWithDrG = async () => {
     if (loadingChat) return;
@@ -146,7 +151,35 @@ export default function Reports() {
   const handleCloseChatSplit = () => {
     setChatSignedUrl(null);
     setShowInteraction({ isVisible: false, mode: 'chat' });
+    setPdfHeight(50); // Reset to 50/50 split
   };
+
+  // Create PanResponder for draggable splitter
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        panY.setOffset(panY._value);
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (containerHeight.current > 0) {
+          const deltaPercentage = (gestureState.dy / containerHeight.current) * 100;
+          const newPdfHeight = pdfHeight + deltaPercentage;
+
+          // Enforce 10% minimum for both sections (25% to 75%)
+          if (newPdfHeight >= 25 && newPdfHeight <= 75) {
+            setPdfHeight(newPdfHeight);
+            panY.setValue(0);
+          }
+        }
+      },
+      onPanResponderRelease: () => {
+        panY.flattenOffset();
+        panY.setValue(0);
+      },
+    })
+  ).current;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
@@ -168,6 +201,9 @@ export default function Reports() {
         className="flex-1"
         style={{ flexDirection: 'column' }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        onLayout={event => {
+          containerHeight.current = event.nativeEvent.layout.height;
+        }}
       >
         {/* PDF Viewer */}
         <View
@@ -234,9 +270,36 @@ export default function Reports() {
           )}
         </View>
 
+        {/* Draggable Splitter */}
+        {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
+          <View
+            {...panResponder.panHandlers}
+            style={{
+              height: 16,
+              backgroundColor: isDark ? '#374151' : '#e5e7eb',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <View
+              style={{
+                width: 60,
+                height: 5,
+                backgroundColor: isDark ? '#6b7280' : '#9ca3af',
+                borderRadius: 3,
+              }}
+            />
+          </View>
+        )}
+
         {/* ElevenLabs Chat Split Screen */}
         {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
-          <View className="flex-1" style={{ borderTopWidth: 2, borderTopColor: isDark ? '#374151' : '#e5e7eb' }}>
+          <View
+            style={{
+              height: `${100 - pdfHeight}%`,
+              borderTopWidth: 0,
+            }}
+          >
             <ElevenLabsChat
               signedUrl={chatSignedUrl}
               documentId={String(docId)}
