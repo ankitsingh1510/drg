@@ -38,8 +38,20 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   useEffect(() => {
     initializeChat();
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
+      const ws = wsRef.current;
+      if (ws) {
+        // Detach event handlers to prevent events after unmount
+        ws.onopen = null;
+        ws.onmessage = null;
+        ws.onerror = null;
+        ws.onclose = null;
+
+        // Only close if socket is still open or connecting
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
+
+        wsRef.current = null;
       }
       cleanupVoice();
     };
