@@ -25,7 +25,13 @@ export default function ProfileTextField({
       </Text>
       {isReadOnly ? (
         <View className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800/50">
-          <Text className="text-base text-gray-800 dark:text-gray-100">{value || 'NA'}</Text>
+          <Text
+            className={
+              value ? 'text-base text-gray-800 dark:text-gray-100' : 'text-base text-gray-400 dark:text-gray-500'
+            }
+          >
+            {value || 'NA'}
+          </Text>
         </View>
       ) : (
         <TextInput
