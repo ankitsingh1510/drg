@@ -17,7 +17,6 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
 import { colors } from '@/constants/colors';
@@ -25,6 +24,7 @@ import { useAuth } from '@/context/AuthContext';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { ingestionStore } from '@/stores/ingestionStore';
+import { toast } from '@/util/toast';
 
 export default function Reports() {
   const { token } = useAuth();
@@ -102,11 +102,7 @@ export default function Reports() {
   }, [accession_id]);
 
   const handleIngestReport = async () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Ingesting Report. This may take some time...',
-      visibilityTime: 2000,
-    });
+    toast.success('Ingesting Report. This may take some time...', undefined, 2000);
 
     setIngesting(true);
     setButtonTitle('Ingesting Report...');
@@ -127,11 +123,7 @@ export default function Reports() {
       setDocId(res.data.documentId);
       setIngesting(false);
       setButtonTitle('');
-      Toast.show({
-        type: 'success',
-        text1: res.message,
-        visibilityTime: 3000,
-      });
+      toast.success(res.message, undefined, 3000);
     } catch (error) {
       console.log('Error while ingesting report:', error);
       ingestionStore.clear(accession_id);
