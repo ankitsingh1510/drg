@@ -235,6 +235,11 @@ const Profile = () => {
         const isMfaEnabled = mfaEnabledField?.value === '1' || mfaEnabledField?.value === 1;
         isChecked = isMfaEnabled;
       }
+      if (field.name === 'emailMfa') {
+        const mfaEnabledField = formFields.find(f => f.name === 'isMfaEnabled');
+        const isMfaEnabled = mfaEnabledField?.value === '1' || mfaEnabledField?.value === 1;
+        if (!isMfaEnabled) return null;
+      }
       return (
         <ProfileCheckboxField
           key={field.name}
