@@ -317,10 +317,10 @@ export default function Reports() {
           style={{ backgroundColor: isDark ? colors.dark.cardBackground : colors.light.background }}
         >
           {docId ? (
-            <View className="flex-row items-center justify-center gap-4">
+            <View className="flex-row items-center justify-center gap-5">
               <TouchableOpacity
                 disabled={ingesting}
-                className="xshadow-md flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
+                className="xshadow-md flex-row items-center justify-center rounded-full px-3 py-3 active:opacity-80"
                 style={{ backgroundColor: colors.common.primary }}
                 onPress={handleTalkToDrG}
               >
@@ -328,7 +328,7 @@ export default function Reports() {
                 <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Talk With Dr.G'}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-row items-center justify-center rounded-full px-6 py-3 shadow-md active:opacity-80"
+                className="flex-row items-center justify-center rounded-full px-3 py-3 shadow-md active:opacity-80"
                 style={{ backgroundColor: colors.common.primary }}
                 disabled={loadingChat}
                 onPress={handleChatWithDrG}
