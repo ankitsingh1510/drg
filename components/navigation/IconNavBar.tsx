@@ -18,7 +18,15 @@ export default function IconNavBar() {
   };
 
   const goLogout = () => {
-    logout();
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', style: 'destructive', onPress: logout },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
