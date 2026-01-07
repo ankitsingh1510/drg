@@ -17,6 +17,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
 import { colors } from '@/constants/colors';
