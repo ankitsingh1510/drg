@@ -260,7 +260,12 @@ const Profile = () => {
   const groupFieldsByDisplayGroup = () => {
     const groups: { [key: string]: ProfileField[] } = {};
     formFields.forEach(field => {
-      if (field.visible && field.displayGroup !== 'Account Details') {
+      if (
+        field.visible &&
+        field.displayGroup !== 'Account Details' &&
+        field.name !== 'organization' &&
+        field.name !== 'userType'
+      ) {
         if (!groups[field.displayGroup]) {
           groups[field.displayGroup] = [];
         }
@@ -284,7 +289,7 @@ const Profile = () => {
   if (isLoading && !profileData) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900">
-        <ActivityIndicator size="large" color={colors.common.info} />
+        <ActivityIndicator size="large" color={colors.common.primary} />
       </SafeAreaView>
     );
   }
