@@ -37,6 +37,7 @@ const Profile = () => {
   const [showReloginModal, setShowReloginModal] = useState(false);
   const [mfaChanged, setMfaChanged] = useState(false);
   const [eSignatureUsername, setESignatureUsername] = useState('');
+  const [eSignatureError, setESignatureError] = useState('');
 
   useEffect(() => {
     loadProfile();
@@ -131,9 +132,9 @@ const Profile = () => {
       });
 
       if (response?.statusCode !== 200 && response?.statusCode !== 201) {
-        const errorMessage = response?.message || 'Failed to update profile';
-        toast.error('Error', errorMessage);
+        const errorMessage = (response?.message || 'Failed to update profile').replace(/\n/g, ' ').trim();
         setFormFields([...originalFormFields]);
+        setESignatureError(errorMessage);
         setShowESignatureModal(true);
         setIsLoading(false);
         return;
@@ -142,6 +143,7 @@ const Profile = () => {
       toast.success('Profile Updated', response?.data?.msg || 'Your profile has been updated successfully');
       setIsEditing(false);
       setESignatureUsername('');
+      setESignatureError('');
       if (mfaChanged) {
         setIsLoading(false);
         setTimeout(() => {
@@ -291,7 +293,7 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <View className="mb-4 flex-row items-center justify-between px-5 pb-2">
+      <View className="mb-2 flex-row items-center justify-between px-5 pb-2">
         <View className="flex-row items-center gap-4">
           <TouchableOpacity
             onPress={() => router.back()}
@@ -332,9 +334,11 @@ const Profile = () => {
       <ESignatureModal
         visible={showESignatureModal}
         username={eSignatureUsername}
+        errorMessage={eSignatureError}
         onCancel={() => {
           setFormFields([...originalFormFields]);
           setShowESignatureModal(false);
+          setESignatureError('');
         }}
         onConfirm={handleESignatureSubmit}
       />
