@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { useColorScheme } from 'nativewind';
@@ -28,19 +29,51 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const flashListRef = useRef<any>(null);
   const reportContextRef = useRef<string | null>(null);
+  const isListeningRef = useRef(false);
 
   useEffect(() => {
     initializeChat();
-
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      cleanupVoice();
     };
   }, [signedUrl]);
+
+  // Speech recognition event listeners
+  useSpeechRecognitionEvent('start', () => {
+    isListeningRef.current = true;
+    setIsListening(true);
+  });
+
+  useSpeechRecognitionEvent('end', () => {
+    isListeningRef.current = false;
+    setIsListening(false);
+  });
+
+  useSpeechRecognitionEvent('result', event => {
+    if (event.results && event.results.length > 0 && isListeningRef.current) {
+      const transcript = event.results[0]?.transcript;
+      if (transcript) {
+        setInputText(transcript);
+      }
+    }
+  });
+
+  useSpeechRecognitionEvent('error', event => {
+    console.error('Speech error:', event.error, event.message);
+    isListeningRef.current = false;
+    setIsListening(false);
+
+    if (event.error !== 'no-speech' && event.error !== 'aborted') {
+      Alert.alert('Voice Error', event.message || 'An error occurred during speech recognition.');
+    }
+  });
 
   const initializeChat = async () => {
     try {
@@ -101,7 +134,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
       ws.onmessage = event => {
         try {
           const data = JSON.parse(event.data);
-          console.log('Received:', data.type);
+          // console.log('Received:', data.type);
           // if (data.type === 'agent_chat_response_part') {
           //   const agentTextPart = data;
           //   console.log('Agent text part received:', agentTextPart);
@@ -151,17 +184,71 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
     }
 
     const messageToSend = inputText.trim();
+
+    if (isListeningRef.current) {
+      ExpoSpeechRecognitionModule.stop();
+      isListeningRef.current = false;
+      setIsListening(false);
+    }
+
+    setInputText('');
+
     addMessage('user', messageToSend);
     setIsWaitingForResponse(true);
 
-    // Send user message to WebSocket
     const userMessage = {
       type: 'user_message',
       text: messageToSend,
     };
 
     wsRef.current.send(JSON.stringify(userMessage));
-    setInputText('');
+  };
+
+  const cleanupVoice = async () => {
+    try {
+      if (isListeningRef.current) {
+        ExpoSpeechRecognitionModule.abort();
+        isListeningRef.current = false;
+        setIsListening(false);
+      }
+    } catch (e) {
+      console.error('Error cleaning up voice:', e);
+    }
+  };
+
+  const toggleVoiceRecognition = async () => {
+    if (isListeningRef.current) {
+      try {
+        ExpoSpeechRecognitionModule.stop();
+        isListeningRef.current = false;
+        setIsListening(false);
+      } catch (e) {
+        console.error('Error stopping voice:', e);
+      }
+    } else {
+      try {
+        const isAvailable = ExpoSpeechRecognitionModule.isRecognitionAvailable();
+        if (!isAvailable) {
+          Alert.alert('Voice Not Available', 'Speech recognition is not available on this device.');
+          return;
+        }
+
+        const permissionResult = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+        if (!permissionResult.granted) {
+          Alert.alert('Permission Required', 'Microphone permission is required for voice recognition.');
+          return;
+        }
+
+        ExpoSpeechRecognitionModule.start({
+          lang: 'en-US',
+          interimResults: true,
+          continuous: false,
+        });
+      } catch (e) {
+        console.error('Error starting voice:', e);
+        Alert.alert('Voice Error', 'Could not start voice recognition. Please check your microphone permissions.');
+      }
+    }
   };
 
   const renderMessage = ({ item: message }: { item: Message }) => (
@@ -282,9 +369,37 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
           placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
           multiline
           maxLength={500}
-          editable={isConnected}
+          editable={isConnected && !isListening}
           onSubmitEditing={sendMessage}
         />
+
+        {/* Mic Button */}
+        <TouchableOpacity
+          className="mr-2 h-11 w-11 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: isListening ? '#ef4444' : isDark ? colors.dark.border : '#e5e7eb',
+            opacity: !isConnected ? 0.5 : 1,
+          }}
+          onPress={toggleVoiceRecognition}
+          disabled={!isConnected}
+        >
+          {isListening ? (
+            <View className="items-center justify-center">
+              <Ionicons name="mic" size={24} color="#ffffff" />
+              <View
+                className="absolute h-11 w-11 rounded-full"
+                style={{
+                  backgroundColor: '#ef4444',
+                  opacity: 0.3,
+                }}
+              />
+            </View>
+          ) : (
+            <Ionicons name="mic-outline" size={24} color={isDark ? colors.dark.text : colors.light.text} />
+          )}
+        </TouchableOpacity>
+
+        {/* Send Button */}
         <TouchableOpacity
           className="h-11 w-11 items-center justify-center rounded-full"
           style={{
