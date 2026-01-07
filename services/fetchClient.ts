@@ -24,6 +24,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    if (!headers['Timezone']) {
+      headers['Timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+
     const response = await fetch(finalURL, {
       ...options,
       headers,
