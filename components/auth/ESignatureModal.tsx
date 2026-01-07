@@ -1,57 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useColorScheme } from 'nativewind';
+import Toast from 'react-native-toast-message';
 import { toast } from '@/util/toast';
 
 interface ESignatureModalProps {
   visible: boolean;
   username: string;
+  errorMessage?: string;
   onCancel: () => void;
   onConfirm: (password: string, changeReasonDetail: string) => void;
 }
 
-export default function ESignatureModal({ visible, username, onCancel, onConfirm }: ESignatureModalProps) {
+export default function ESignatureModal({
+  visible,
+  username,
+  errorMessage,
+  onCancel,
+  onConfirm,
+}: ESignatureModalProps) {
   const { colorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
   const [password, setPassword] = useState('');
-  const [changeReasonDetail, setChangeReasonDetail] = useState('');
+  const changeReasonDetail = 'Profile Update';
+
+  useEffect(() => {
+    if (visible && errorMessage) {
+      toast.error('Error', errorMessage);
+    }
+  }, [visible, errorMessage]);
 
   const isValid = () => {
-    return username.trim() !== '' && password.trim() !== '' && changeReasonDetail.trim().length >= 6;
+    // return username.trim() !== '' && password.trim() !== '' && changeReasonDetail.trim().length >= 6;
+    return password.trim() !== '';
   };
 
   const handleConfirm = () => {
-    if (!username || !password || !changeReasonDetail) {
-      toast.error('Required Fields', 'Please fill all eSignature fields');
-      return;
-    }
+    // if (!username || !password || !changeReasonDetail) {
+    //   toast.error('Required Fields', 'Please fill all eSignature fields');
+    //   return;
+    // }
 
-    if (changeReasonDetail.length < 6) {
-      toast.error('Invalid Input', 'Reason must be at least 6 characters long');
+    // if (changeReasonDetail.length < 6) {
+    //   toast.error('Invalid Input', 'Reason must be at least 6 characters long');
+    //   return;
+    // }
+    if (password.trim() === '') {
+      toast.error('Invalid Input', 'Password cannot be empty');
       return;
     }
 
     onConfirm(password, changeReasonDetail);
     setPassword('');
-    setChangeReasonDetail('');
   };
 
   const handleCancel = () => {
     setPassword('');
-    setChangeReasonDetail('');
     onCancel();
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleCancel}>
       <Pressable className="flex-1 items-center justify-center bg-black/50" onPress={handleCancel}>
-        <Pressable className="mx-5 w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
+        <Pressable className="mx-5 w-[92%] max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
           <Text className="text-semibold mb-4 text-gray-600 dark:text-gray-400">
             Please provide your credentials to confirm this profile update
           </Text>
 
-          <View className="mb-4">
+          {/* <View className="mb-4">
             <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
               Username <Text className="text-red-500">*</Text>
             </Text>
@@ -63,7 +80,7 @@ export default function ESignatureModal({ visible, username, onCancel, onConfirm
               autoCapitalize="none"
               editable={false}
             />
-          </View>
+          </View> */}
 
           <View className="mb-4">
             <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -79,7 +96,7 @@ export default function ESignatureModal({ visible, username, onCancel, onConfirm
             />
           </View>
 
-          <View className="mb-6">
+          {/* <View className="mb-6">
             <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
               Reason for Change <Text className="text-red-500">*</Text>
               <Text className="text-xs text-gray-500"> (min. 6 characters)</Text>
@@ -94,7 +111,7 @@ export default function ESignatureModal({ visible, username, onCancel, onConfirm
               placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
               textAlignVertical="top"
             />
-          </View>
+          </View> */}
 
           <View className="flex-row gap-3">
             <TouchableOpacity
@@ -121,6 +138,7 @@ export default function ESignatureModal({ visible, username, onCancel, onConfirm
           </View>
         </Pressable>
       </Pressable>
+      <Toast />
     </Modal>
   );
 }

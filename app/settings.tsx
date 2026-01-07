@@ -24,7 +24,7 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
+      className="mx-5 mt-2 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
