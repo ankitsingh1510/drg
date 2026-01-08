@@ -13,7 +13,8 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
-import messaging, { firebase } from '@react-native-firebase/messaging';
+import { getApp, initializeApp } from '@react-native-firebase/app';
+import messaging, { getAPNSToken, getToken, onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -23,43 +24,49 @@ import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
+import { setFcmToken, storage } from '@/stores/mmkv';
 import '../global.css';
 
-if (!firebase.apps.length) {
-  const firebaseConfig =
-    Platform.OS === 'ios'
-      ? {
-          apiKey: 'AIzaSyDmE-a7z1JvgLVYUL-GqMP6sxyov8RPhJw',
-          projectId: 'drg-1cellai',
-          storageBucket: 'drg-1cellai.firebasestorage.app',
-          appId: '1:76441068366:ios:25c21577c643932d40f41f',
-          messagingSenderId: '76441068366',
-          databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
-        }
-      : {
-          apiKey: 'AIzaSyC9wdZtL6ptjuM7u-i4graAUUVoZzyCbQY',
-          projectId: 'drg-1cellai',
-          storageBucket: 'drg-1cellai.firebasestorage.app',
-          appId: '1:76441068366:android:b8d9d2488fba725840f41f',
-          databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
-        };
-  firebase.initializeApp(firebaseConfig);
+const firebaseConfig =
+  Platform.OS === 'ios'
+    ? {
+        apiKey: 'AIzaSyDmE-a7z1JvgLVYUL-GqMP6sxyov8RPhJw',
+        projectId: 'drg-1cellai',
+        storageBucket: 'drg-1cellai.firebasestorage.app',
+        appId: '1:76441068366:ios:25c21577c643932d40f41f',
+        messagingSenderId: '76441068366',
+        databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
+      }
+    : {
+        apiKey: 'AIzaSyC9wdZtL6ptjuM7u-i4graAUUVoZzyCbQY',
+        projectId: 'drg-1cellai',
+        storageBucket: 'drg-1cellai.firebasestorage.app',
+        appId: '1:76441068366:android:b8d9d2488fba725840f41f',
+        databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
+      };
+
+let app;
+
+try {
+  app = getApp();
+} catch (e) {
+  app = initializeApp(firebaseConfig);
 }
 
 async function getFcmToken() {
   try {
-    await messaging().registerDeviceForRemoteMessages();
+    const messagingInstance = messaging();
 
     if (Platform.OS === 'ios') {
-      const apnsToken = await messaging().getAPNSToken();
+      const apnsToken = await getAPNSToken(messagingInstance);
       if (!apnsToken) {
         // If APNs isn't ready, wait 2 seconds and try once more
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
-    // 3. Get the actual FCM token
-    const token = await messaging().getToken();
+    // Get the actual FCM token
+    const token = await getToken(messagingInstance);
     console.log('FCM Token:', token);
     return token;
   } catch (error) {
@@ -93,7 +100,6 @@ async function registerForPushNotificationsAsync() {
   }
 
   if (Device.isDevice) {
-    console.log('genuine device');
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -113,23 +119,25 @@ async function registerForPushNotificationsAsync() {
       handleRegistrationError(`${e}`);
     }
   } else {
-    console.log('not genuine device');
     handleRegistrationError('Must use physical device for push notifications');
   }
 }
 
 export default function RootLayout() {
   startNetworkLogging();
-  const [fcmToken, setFcmToken] = useState('');
-
   useEffect(() => {
     registerForPushNotificationsAsync()
-      .then(token => setFcmToken(token ?? ''))
-      .catch((error: any) => setFcmToken(`${error}`));
+      .then(token => {
+        const tokenStr = token ?? '';
+        setFcmToken(tokenStr);
+      })
+      .catch((error: any) => {
+        const errorStr = `${error}`;
+        console.error('Error during push notification registration:', errorStr);
+      });
 
     const responseListener = Notifications.addNotificationResponseReceivedListener(async response => {
       const notificationPayload: any = JSON.parse(response.notification.request.content.data.payload as any);
-      console.log('Notification response received with payload:', notificationPayload);
       if (notificationPayload && notificationPayload?.type == 'ingestion' && notificationPayload?.status == 'success') {
         const { accession_id, documentId, full_report_path, patientName } = notificationPayload;
         const signedUrl = await storageAPI.getSignedUrl(full_report_path);
@@ -146,7 +154,7 @@ export default function RootLayout() {
       }
     });
 
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
+    const unsubscribe = onMessage(messaging(), async remoteMessage => {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: remoteMessage.notification?.title,
@@ -165,9 +173,9 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    return messaging().onTokenRefresh(newToken => {
+    return onTokenRefresh(messaging(), newToken => {
       console.log('FCM token refreshed:', newToken);
-      // send to backend
+      setFcmToken(newToken);
     });
   }, []);
 

@@ -1,4 +1,4 @@
-import { storage } from '@/stores/mmkv';
+import { getFcmToken, storage } from '@/stores/mmkv';
 import { apiFetch } from './fetchClient';
 
 class RagAPI {
@@ -28,11 +28,13 @@ class RagAPI {
   async ingestReport(accession_id: string) {
     try {
       console.log(accession_id);
-      // const token = await AsyncStorage.getItem('token');
       const token = storage.getString('token') ?? null;
+      const fcmToken = getFcmToken() ?? null;
       const formData = new FormData();
-      formData.append('isBlocking', 'true');
       formData.append('accession_id', accession_id);
+      if (fcmToken) {
+        formData.append('fcmKey', fcmToken);
+      }
       const response = await apiFetch(`${this.baseUrl}/api/v1/drg/rag`, {
         method: 'POST',
         body: formData,
