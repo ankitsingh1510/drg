@@ -47,5 +47,31 @@ class RagAPI {
       throw error;
     }
   }
+
+  async fetchReportResult(params: { documentId: string; authorization: string }) {
+    try {
+      const { documentId, authorization } = params;
+      const url = new URL(`${this.baseUrl}/api/v1/drg/rag`);
+      url.searchParams.append('question', encodeURIComponent('Fetch report raw vectors'));
+      url.searchParams.append('documentId', documentId);
+      url.searchParams.append('rawVector', 'true');
+      url.searchParams.append('topK', '100');
+      url.searchParams.append('validateQuestion', 'false');
+      url.searchParams.append('scope', 'general');
+
+      const response = await apiFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Fetch Results Error:', error);
+      throw error;
+    }
+  }
 }
 export const ragAPI = new RagAPI();
