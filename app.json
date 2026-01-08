@@ -13,6 +13,7 @@
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "This app needs speech recognition access to enable voice input for Dr.G",
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to communicate with Dr.G",
         "NSCameraUsageDescription": "This app needs access to your camera for video calls",
         "ITSAppUsesNonExemptEncryption": false
@@ -46,6 +47,7 @@
     "plugins": [
       "@config-plugins/react-native-blob-util",
       "@config-plugins/react-native-pdf",
+      "expo-speech-recognition",
       "expo-router",
       "expo-notifications",
       [

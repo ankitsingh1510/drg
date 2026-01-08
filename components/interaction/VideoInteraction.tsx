@@ -195,7 +195,7 @@ export default function VideoInteraction({
             source={{
               uri:
                 process.env.EXPO_PUBLIC_CHAT_URL +
-                `?documentId=${documentId}&authorization=${encodeURIComponent(token)}`,
+                `/drg/interaction/?documentId=${documentId}&authorization=${encodeURIComponent(token)}`,
             }}
             style={{ flex: 1, backgroundColor: 'white' }}
             onLoadStart={() => setLoading(true)}

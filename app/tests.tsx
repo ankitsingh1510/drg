@@ -11,6 +11,7 @@ type TestData = {
   fileName: string;
   title: string;
   summary: string;
+  image: string;
 };
 
 export default function TestsScreen() {
