@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "76441068366",
+    "project_id": "drg-1cellai",
+    "storage_bucket": "drg-1cellai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76441068366:android:b8d9d2488fba725840f41f",
+        "android_client_info": {
+          "package_name": "com.onecellai.drg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9wdZtL6ptjuM7u-i4graAUUVoZzyCbQY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -14,6 +14,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import messaging, { onMessage } from '@react-native-firebase/messaging';
+import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,7 +25,8 @@ import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
-import { ingestionStore } from '@/stores/ingestionStore';
+import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
+import { IngestionStatus } from '@/types/types';
 import { toast } from '@/util/toast';
 
 export default function Reports() {
@@ -32,17 +35,18 @@ export default function Reports() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
-  let { pdfUrl, patientName, documentId, accession_id, showIngestOption } = useLocalSearchParams<{
+  let { pdfUrl, patientName, documentId, accession_id, ingestionStatus } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
     documentId: string;
     accession_id: string;
-    showIngestOption: string;
+    ingestionStatus: IngestionStatus;
   }>();
+  const addIngestionId = useSetAtom(addIngestionIdAtom);
+  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
-  const [ingesting, setIngesting] = useState(false);
-  const [buttonTitle, setButtonTitle] = useState('');
+  const [currentIngestionStatus, setCurrentIngestionStatus] = useState<IngestionStatus | undefined>(ingestionStatus);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [showInteraction, setShowInteraction] = useState<{ isVisible: boolean; mode: 'video' | 'chat' }>({
@@ -55,6 +59,31 @@ export default function Reports() {
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging(), async remoteMessage => {
+      try {
+        const notificationPayload: any = JSON.parse(remoteMessage.data?.payload as any);
+
+        if (notificationPayload && notificationPayload?.type === 'ingestion') {
+          const { accession_id: msgAccessionId, status } = notificationPayload;
+
+          if (msgAccessionId && String(msgAccessionId) === String(accession_id)) {
+            if (status === 'success') {
+              setCurrentIngestionStatus('ingested');
+            } else if (status === 'failed') {
+              setCurrentIngestionStatus('failed');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error handling FCM message in reports screen:', error);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [accession_id, removeIngestionId]);
   const handleChatWithDrG = async () => {
     if (loadingChat) return;
     try {
@@ -64,7 +93,7 @@ export default function Reports() {
       setShowInteraction({ isVisible: true, mode: 'chat' });
     } catch (error) {
       console.error('Error getting signed URL:', error);
-      Toast.show({
+      toast.show({
         type: 'error',
         text1: 'Failed to connect to chat',
         text2: 'Please try again',
@@ -79,56 +108,19 @@ export default function Reports() {
     setShowInteraction({ isVisible: true, mode: 'video' });
   };
 
-  useEffect(() => {
-    const saved = ingestionStore.get(accession_id);
-    if (!saved) return;
-    const MAX_INGEST_TIME = 5 * 60 * 1000; // Edge case handling: 5 minutes
-
-    if (saved.status === 'INGESTING' && Date.now() - saved.startedAt > MAX_INGEST_TIME) {
-      ingestionStore.clear(accession_id);
-      setIngesting(false);
-      setButtonTitle('');
-      return;
-    }
-    if (saved.status === 'INGESTING') {
-      setIngesting(true);
-      setButtonTitle('Ingesting Report...');
-    }
-    if (saved.status === 'COMPLETED' && saved.documentId) {
-      setDocId(saved.documentId);
-      setIngesting(false);
-      setButtonTitle('');
-    }
-  }, [accession_id]);
-
   const handleIngestReport = async () => {
-    toast.success('Ingesting Report. This may take some time...', undefined, 2000);
-
-    setIngesting(true);
-    setButtonTitle('Ingesting Report...');
-
-    ingestionStore.set(accession_id, {
-      status: 'INGESTING',
-      startedAt: Date.now(),
-    });
+    toast.success('Analyzing Report. This may take some time...', undefined, 2000);
+    addIngestionId(Number(accession_id));
+    setCurrentIngestionStatus('ingesting');
 
     try {
       const res = await ragAPI.ingestReport(accession_id);
 
-      ingestionStore.set(accession_id, {
-        status: 'COMPLETED',
-        documentId: res.data.documentId,
-        startedAt: Date.now(),
-      });
-      setDocId(res.data.documentId);
-      setIngesting(false);
-      setButtonTitle('');
       toast.success(res.message, undefined, 3000);
     } catch (error) {
-      console.log('Error while ingesting report:', error);
-      ingestionStore.clear(accession_id);
-      setIngesting(false);
-      setButtonTitle('');
+      console.log('Error while analyzing report:', error);
+      removeIngestionId(Number(accession_id));
+      setCurrentIngestionStatus('failed');
     }
   };
 
@@ -228,7 +220,7 @@ export default function Reports() {
             onError={error => {
               console.error('PDF error:', error);
               setLoading(false);
-              Toast.show({
+              toast.show({
                 type: 'error',
                 text1: 'Failed to load PDF',
                 text2: 'Please try again',
@@ -303,21 +295,20 @@ export default function Reports() {
       </KeyboardAvoidingView>
 
       {/* Talk to Dr.G / Analyze Report Button */}
-      {!showInteraction.isVisible && (showIngestOption === 'true' || docId) && (
+      {!showInteraction.isVisible && (
         <View
           className="items-center border-t border-gray-200 px-4 py-2 dark:border-gray-700"
           style={{ backgroundColor: isDark ? colors.dark.cardBackground : colors.light.background }}
         >
-          {docId ? (
+          {currentIngestionStatus === 'ingested' && (
             <View className="flex-row items-center justify-center gap-5">
               <TouchableOpacity
-                disabled={ingesting}
                 className="xshadow-md flex-row items-center justify-center rounded-full px-3 py-3 active:opacity-80"
                 style={{ backgroundColor: colors.common.primary }}
                 onPress={handleTalkToDrG}
               >
                 <Feather name="video" size={22} color="white" />
-                <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Talk With Dr.G'}</Text>
+                <Text className="ml-2 text-lg font-bold text-white">Talk With Dr.G</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex-row items-center justify-center rounded-full px-3 py-3 shadow-md active:opacity-80"
@@ -329,29 +320,30 @@ export default function Reports() {
                 <Text className="ml-2 text-lg font-bold text-white">Chat With Dr.G</Text>
               </TouchableOpacity>
             </View>
-          ) : (
+          )}
+          {currentIngestionStatus === 'ingesting' && (
             <TouchableOpacity
-              disabled={ingesting}
+              disabled={true}
+              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
+              style={{ backgroundColor: colors.common.primary }}
+            >
+              <MaterialIcons name="analytics" size={22} color="white" />
+              <Text className="ml-2 text-lg font-bold text-white">{'Analyzing...'}</Text>
+            </TouchableOpacity>
+          )}
+          {(currentIngestionStatus === 'failed' || !currentIngestionStatus) && (
+            <TouchableOpacity
               className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
               style={{ backgroundColor: colors.common.primary }}
               onPress={handleIngestReport}
             >
               <MaterialIcons name="analytics" size={22} color="white" />
-              <Text className="ml-2 text-lg font-bold text-white">{buttonTitle || 'Ingest Report'}</Text>
+              <Text className="ml-2 text-lg font-bold text-white">{'Analyze Report'}</Text>
             </TouchableOpacity>
           )}
         </View>
       )}
 
-      {/* Ingesting Overlay */}
-      {/* <Modal transparent visible={ingesting} animationType="fade">
-        <View className="flex-1 items-center justify-center bg-black/50">
-          <View className="w-3/4 max-w-sm items-center rounded-lg bg-white p-6 shadow-lg">
-            <ActivityIndicator size="large" color="#daa521" />
-            <Text className="mt-4 text-lg font-semibold text-gray-700">Ingesting...</Text>
-          </View>
-        </View>
-      </Modal> */}
       {/* Floating Interaction Box */}
       {showInteraction.isVisible && (
         <InteractionBox
