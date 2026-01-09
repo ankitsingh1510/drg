@@ -7,5 +7,5 @@ export const setFcmToken = (token: string) => {
 };
 
 export const getFcmToken = (): string | null => {
-  return storage.getString('fcmToken');
+  return storage.getString('fcmToken') ?? null;
 };
