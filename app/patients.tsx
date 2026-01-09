@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
@@ -10,7 +10,7 @@ import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
-import { getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
+import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {

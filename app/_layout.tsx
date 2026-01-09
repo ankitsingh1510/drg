@@ -26,7 +26,7 @@ import NetworkChecker from '@/hooks/NetworkChecker';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
 import { removeIngestionIdAtom } from '@/stores/ingestion';
-import { setFcmToken, storage } from '@/stores/mmkv';
+import { setFcmToken } from '@/stores/mmkv';
 import '../global.css';
 
 const firebaseConfig =
@@ -47,12 +47,10 @@ const firebaseConfig =
         databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
       };
 
-let app;
-
 try {
-  app = getApp();
+  getApp();
 } catch (e) {
-  app = initializeApp(firebaseConfig);
+  initializeApp(firebaseConfig);
 }
 
 async function getFcmToken() {
@@ -87,7 +85,11 @@ Notifications.setNotificationHandler({
 });
 
 function handleRegistrationError(errorMessage: string) {
-  alert(errorMessage);
+  Toast.show({
+    type: 'error',
+    text1: 'Notification Error',
+    text2: errorMessage,
+  });
   throw new Error(errorMessage);
 }
 
