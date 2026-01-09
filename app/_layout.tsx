@@ -32,19 +32,19 @@ import '../global.css';
 const firebaseConfig =
   Platform.OS === 'ios'
     ? {
-        apiKey: 'AIzaSyDmE-a7z1JvgLVYUL-GqMP6sxyov8RPhJw',
-        projectId: 'drg-1cellai',
-        storageBucket: 'drg-1cellai.firebasestorage.app',
-        appId: '1:76441068366:ios:25c21577c643932d40f41f',
-        messagingSenderId: '76441068366',
-        databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
+        apiKey: process.env.EXPO_PUBLIC_FIREBASE_IOS_API_KEY,
+        projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        appId: process.env.EXPO_PUBLIC_FIREBASE_IOS_APP_ID,
+        messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_IOS_MESSAGING_SENDER_ID,
+        databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
       }
     : {
-        apiKey: 'AIzaSyC9wdZtL6ptjuM7u-i4graAUUVoZzyCbQY',
-        projectId: 'drg-1cellai',
-        storageBucket: 'drg-1cellai.firebasestorage.app',
-        appId: '1:76441068366:android:b8d9d2488fba725840f41f',
-        databaseURL: 'https://drg-1cellai-default-rtdb.asia-southeast1.firebasedatabase.app',
+        apiKey: process.env.EXPO_PUBLIC_FIREBASE_ANDROID_API_KEY,
+        projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        appId: process.env.EXPO_PUBLIC_FIREBASE_ANDROID_APP_ID,
+        databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
       };
 
 try {
