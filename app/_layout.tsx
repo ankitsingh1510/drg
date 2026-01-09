@@ -15,6 +15,7 @@ import {
 } from '@expo-google-fonts/poppins';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { getAPNSToken, getToken, onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
+import { useSetAtom } from 'jotai';
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -24,6 +25,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
+import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken, storage } from '@/stores/mmkv';
 import '../global.css';
 
@@ -125,6 +127,8 @@ async function registerForPushNotificationsAsync() {
 
 export default function RootLayout() {
   startNetworkLogging();
+  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
+
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then(token => {
@@ -155,6 +159,11 @@ export default function RootLayout() {
     });
 
     const unsubscribe = onMessage(messaging(), async remoteMessage => {
+      const notificationPayload: any = JSON.parse(remoteMessage.data.payload as any);
+      if (notificationPayload && notificationPayload?.type == 'ingestion') {
+        const { accession_id } = notificationPayload;
+        removeIngestionId(Number(accession_id));
+      }
       await Notifications.scheduleNotificationAsync({
         content: {
           title: remoteMessage.notification?.title,
