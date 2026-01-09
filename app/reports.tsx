@@ -19,7 +19,6 @@ import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
 import { colors } from '@/constants/colors';
@@ -94,7 +93,7 @@ export default function Reports() {
       setShowInteraction({ isVisible: true, mode: 'chat' });
     } catch (error) {
       console.error('Error getting signed URL:', error);
-      Toast.show({
+      toast.show({
         type: 'error',
         text1: 'Failed to connect to chat',
         text2: 'Please try again',
