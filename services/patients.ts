@@ -13,6 +13,7 @@ export interface Patient {
   assayName: string;
   documentId?: string;
   ingested_file_path?: string | null;
+  drg_ingestion_status: string | null;
   sampleBarcode: string;
   full_report_path: string;
   summary_report_path: string | null;
@@ -171,6 +172,9 @@ class PatientsAPI {
               },
               {
                 field: 'ingested_file_path',
+              },
+              {
+                field: 'drg_ingestion_status',
               },
               {
                 field: 'physician_name',
