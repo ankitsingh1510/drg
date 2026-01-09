@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
@@ -9,6 +10,8 @@ import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
+import { getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
+import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
   const logout = useLogout();
@@ -16,6 +19,7 @@ export default function Patients() {
   const router = useRouter();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -39,7 +43,6 @@ export default function Patients() {
           workflowStatusFilter: filterValue,
         });
         setTotalCount(response.totalCount);
-
         if (append) {
           setPatients(prev => [...prev, ...(response.data || [])]);
           setPage(pageNum);
@@ -114,9 +117,24 @@ export default function Patients() {
         const documentId = patient.hasOwnProperty('documentId') ? patient.documentId : null;
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
         const ingested_file_path = patient.hasOwnProperty('ingested_file_path') ? patient.ingested_file_path : null;
-        let showIngestOption = 'false';
-        if (ingested_file_path !== patient.full_report_path || !documentId) {
-          showIngestOption = 'true';
+        let ingestionStatus = null;
+
+        const reportIngestionStatus: IngestionStatus = patient.hasOwnProperty('drg_ingestion_status')
+          ? (patient.drg_ingestion_status as IngestionStatus)
+          : null;
+
+        const samePath = ingested_file_path === patient.full_report_path;
+        if (samePath) {
+          if (reportIngestionStatus === 'ingested') {
+            ingestionStatus = 'ingested';
+            removeIngestionId(patient.accession_id);
+          } else if (reportIngestionStatus === 'ingesting') {
+            ingestionStatus = 'ingesting';
+          } else if (reportIngestionStatus === 'failed') {
+            removeIngestionId(patient.accession_id);
+          }
+        } else if (!samePath && reportIngestionStatus === 'ingesting') {
+          ingestionStatus = 'ingesting';
         }
 
         router.push({
@@ -126,7 +144,7 @@ export default function Patients() {
             patientName: patient.patientName,
             documentId: documentId,
             accession_id: patient.accession_id,
-            showIngestOption,
+            ingestionStatus,
           },
         });
       } catch (error) {
@@ -165,8 +183,13 @@ export default function Patients() {
         return true;
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      if (usersStudyList.length > 0 && !loading && !refreshing) {
+        fetchPatients(1, filter, query);
+      }
+
       return () => sub.remove();
-    }, [])
+    }, [usersStudyList, loading, refreshing, filter, query, fetchPatients])
   );
 
   return (
