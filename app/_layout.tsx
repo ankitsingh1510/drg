@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { Platform, Text } from 'react-native';
-import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
@@ -50,7 +49,9 @@ const firebaseConfig =
 try {
   getApp();
 } catch (e) {
-  initializeApp(firebaseConfig);
+  if (Device.isDevice) {
+    initializeApp(firebaseConfig);
+  }
 }
 
 async function getFcmToken() {
@@ -94,6 +95,10 @@ function handleRegistrationError(errorMessage: string) {
 }
 
 async function registerForPushNotificationsAsync() {
+  if (!Device.isDevice) {
+    console.log('Push notifications skipped (emulator)');
+    return;
+  }
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
@@ -132,6 +137,10 @@ export default function RootLayout() {
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
 
   useEffect(() => {
+    if (!Device.isDevice) {
+      console.log('Push notifications skipped (emulator)');
+      return;
+    }
     registerForPushNotificationsAsync()
       .then(token => {
         const tokenStr = token ?? '';
@@ -184,6 +193,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    if (!Device.isDevice) {
+      console.log('Push notifications skipped (emulator)');
+      return;
+    }
     return onTokenRefresh(messaging(), newToken => {
       console.log('FCM token refreshed:', newToken);
       setFcmToken(newToken);
@@ -199,11 +212,11 @@ export default function RootLayout() {
   });
   if (!loaded) return null;
 
-  if (Text.defaultProps == null) Text.defaultProps = {};
-  Text.defaultProps.style = { fontFamily: 'Poppins_400Regular' };
+  if ((Text as any).defaultProps == null) (Text as any).defaultProps = {};
+  (Text as any).defaultProps.style = { fontFamily: 'Poppins_400Regular' };
 
-  if (TextInput.defaultProps == null) TextInput.defaultProps = {};
-  TextInput.defaultProps.style = { fontFamily: 'Poppins_400Regular' };
+  if ((TextInput as any).defaultProps == null) (TextInput as any).defaultProps = {};
+  (TextInput as any).defaultProps.style = { fontFamily: 'Poppins_400Regular' };
 
   return (
     <SafeAreaProvider>
