@@ -98,7 +98,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
           documentId,
           authorization: decodeURIComponent(token),
         });
-        console.log('Fetched report result:', res.answer?.text);
+        // console.log('Fetched report result:', res.answer?.text);
         reportContextRef.current = res.answer?.text || null;
       }
 

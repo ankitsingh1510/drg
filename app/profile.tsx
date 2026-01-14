@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
@@ -257,12 +257,29 @@ const Profile = () => {
     return null;
   };
 
+  const renderIcon = (sectionName: string) => {
+    const iconColor = isDarkMode ? colors.dark.text : colors.light.text;
+    switch (sectionName) {
+      case 'Primary Details':
+        return <User size={20} color={iconColor} />;
+      case 'Address':
+        return <MapPin size={20} color={iconColor} />;
+      case 'Contact Details':
+        return <Phone size={20} color={iconColor} />;
+      case 'Secure Your Account with 2FA':
+        return <Lock size={20} color={iconColor} />;
+      default:
+        return null;
+    }
+  };
+
   const groupFieldsByDisplayGroup = () => {
     const groups: { [key: string]: ProfileField[] } = {};
     formFields.forEach(field => {
       if (
         field.visible &&
         field.displayGroup !== 'Account Details' &&
+        field.displayGroup !== 'Secure Your Account with 2FA' &&
         field.name !== 'organization' &&
         field.name !== 'userType'
       ) {
@@ -302,7 +319,7 @@ const Profile = () => {
         <View className="flex-row items-center gap-4">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="rounded-full p-2 active:bg-gray-200 dark:active:bg-gray-700"
+            className="rounded-full border border-gray-300 p-2 active:bg-gray-200 dark:border-gray-600 dark:active:bg-gray-700"
           >
             <ArrowLeft size={24} color={isDarkMode ? colors.dark.text : colors.light.text} />
           </TouchableOpacity>
@@ -320,7 +337,10 @@ const Profile = () => {
 
         {Object.entries(groupedFields).map(([groupName, fields]) => (
           <View key={groupName} className="mb-6 rounded-xl bg-white p-6 shadow-md dark:bg-gray-800">
-            <Text className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100">{groupName}</Text>
+            <View className="mb-4 flex-row items-center gap-3">
+              {renderIcon(groupName)}
+              <Text className="flex-1 text-lg font-semibold text-gray-800 dark:text-gray-100">{groupName}</Text>
+            </View>
             {fields.map(field => renderField(field))}
           </View>
         ))}
