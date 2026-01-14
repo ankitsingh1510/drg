@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   PanResponder,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -259,19 +260,23 @@ export default function Reports() {
 
         {/* ElevenLabs Chat Split Screen */}
         {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
-          <View
+          <KeyboardAvoidingView
             style={{
-              height: `${100 - pdfHeight}%`,
+              flex: 1,
               borderTopWidth: 0,
             }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
           >
-            <ElevenLabsChat
-              signedUrl={chatSignedUrl}
-              documentId={String(docId)}
-              token={token || ''}
-              onClose={handleCloseChatSplit}
-            />
-          </View>
+            <ScrollView style={{ flex: 1 }} scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
+              <ElevenLabsChat
+                signedUrl={chatSignedUrl}
+                documentId={String(docId)}
+                token={token || ''}
+                onClose={handleCloseChatSplit}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
         )}
       </KeyboardAvoidingView>
 
