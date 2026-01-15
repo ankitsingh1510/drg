@@ -185,7 +185,7 @@ export default function Reports() {
       <KeyboardAvoidingView
         className="flex-1"
         style={{ flexDirection: 'column' }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         onLayout={event => {
           containerHeight.current = event.nativeEvent.layout.height;
         }}
