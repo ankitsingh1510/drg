@@ -166,6 +166,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
       ws.onerror = error => {
         console.error('WebSocket error:', error);
         setIsConnecting(false);
+        onClose();
       };
 
       ws.onclose = () => {
