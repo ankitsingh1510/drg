@@ -119,7 +119,7 @@ android {
     signingConfigs {
         release {
             if (localPropertiesFile.exists() && signingProperties['storeFile']) {
-                storeFile file(signingProperties['storeFile'])
+                storeFile rootProject.file(signingProperties['storeFile'])
                 storePassword signingProperties['storePassword']
                 keyAlias signingProperties['keyAlias']
                 keyPassword signingProperties['keyPassword']
