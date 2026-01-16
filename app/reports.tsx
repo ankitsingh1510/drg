@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { isDevice } from 'expo-device';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -60,6 +61,10 @@ export default function Reports() {
   const panY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (!isDevice) {
+      console.log('Push notifications skipped (emulator)');
+      return;
+    }
     const unsubscribe = onMessage(messaging(), async remoteMessage => {
       try {
         const notificationPayload: any = JSON.parse(remoteMessage.data?.payload as any);
@@ -93,12 +98,7 @@ export default function Reports() {
       setShowInteraction({ isVisible: true, mode: 'chat' });
     } catch (error) {
       console.error('Error getting signed URL:', error);
-      toast.show({
-        type: 'error',
-        text1: 'Failed to connect to chat',
-        text2: 'Please try again',
-        visibilityTime: 3000,
-      });
+      toast.error('Failed to connect to chat', 'Please try again', 3000);
     } finally {
       setLoadingChat(false);
     }
@@ -144,7 +144,8 @@ export default function Reports() {
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
-        panY.setOffset(panY._value);
+        panY.setOffset(0);
+        panY.setValue(0);
       },
       onPanResponderMove: (_, gestureState) => {
         if (containerHeight.current > 0) {
@@ -184,28 +185,13 @@ export default function Reports() {
       <KeyboardAvoidingView
         className="flex-1"
         style={{ flexDirection: 'column' }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         onLayout={event => {
           containerHeight.current = event.nativeEvent.layout.height;
         }}
       >
         {/* PDF Viewer */}
-        <View
-          className="relative flex-1"
-          style={[
-            {
-              backgroundColor: 'gray',
-              marginHorizontal: 5,
-              borderRadius: 5,
-              padding: 10,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            },
-          ]}
-        >
+        <View className="relative flex-1" style={styles.pdfView}>
           <Pdf
             trustAllCerts={false}
             source={{ uri: pdfUrl, cache: true, expiration: 60 }}
@@ -220,12 +206,7 @@ export default function Reports() {
             onError={error => {
               console.error('PDF error:', error);
               setLoading(false);
-              toast.show({
-                type: 'error',
-                text1: 'Failed to load PDF',
-                text2: 'Please try again',
-                visibilityTime: 3000,
-              });
+              toast.error('Failed to load PDF.', 'Please try again.', 3000);
             }}
             onLoadProgress={percent => {}}
             enablePaging={true}
@@ -362,5 +343,16 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     backgroundColor: '#f5f5f5',
+  },
+  pdfView: {
+    backgroundColor: 'gray',
+    marginHorizontal: 5,
+    borderRadius: 5,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
