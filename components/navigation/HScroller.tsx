@@ -13,13 +13,13 @@ export default function HScroller() {
   const data = [
     {
       url: 'https://nandiraju.github.io/drg/',
-      image: require('@/assets/menu_images/slider1.png'),
+      image: require('@/assets/menu_images/slider1_v2.png'),
       external: true,
       route: '/test',
     },
     {
       url: 'https://apps.apple.com/app/6747797336',
-      image: require('@/assets/menu_images/slider2.png'),
+      image: require('@/assets/menu_images/slider2_v2.png'),
       external: true,
       route: '/test',
     },
