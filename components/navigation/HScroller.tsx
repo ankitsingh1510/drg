@@ -13,25 +13,25 @@ export default function HScroller() {
   const data = [
     {
       url: 'https://nandiraju.github.io/drg/',
-      image: require('@/assets/menu_images/slider1_v2.png'),
+      image: require('@/assets/menu_images/slider1_v2.webp'),
       external: true,
       route: '/test',
     },
     {
       url: 'https://apps.apple.com/app/6747797336',
-      image: require('@/assets/menu_images/slider2_v2.png'),
+      image: require('@/assets/menu_images/slider2_v2.webp'),
       external: true,
       route: '/test',
     },
     {
       url: 'https://1cell.ai/in/poles2026/',
-      image: require('@/assets/menu_images/slider3.png'),
+      image: require('@/assets/menu_images/slider3.webp'),
       external: true,
       route: '/test',
     },
     {
       url: 'https://www.youtube.com/@1CellAi/videos',
-      image: require('@/assets/menu_images/slider4.png'),
+      image: require('@/assets/menu_images/slider4.webp'),
       external: true,
       route: '/test',
     },
