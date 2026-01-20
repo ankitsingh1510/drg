@@ -27,7 +27,6 @@ class RagAPI {
 
   async ingestReport(accession_id: string) {
     try {
-      console.log(accession_id);
       const token = storage.getString('token') ?? null;
       const fcmToken = getFcmToken() ?? null;
       const formData = new FormData();

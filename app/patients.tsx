@@ -24,7 +24,7 @@ export default function Patients() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState('All');
+  const [filter, setFilter] = useState('Released');
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -184,12 +184,8 @@ export default function Patients() {
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      if (usersStudyList.length > 0 && !loading && !refreshing) {
-        fetchPatients(1, filter, query);
-      }
-
       return () => sub.remove();
-    }, [usersStudyList, loading, refreshing, filter, query, fetchPatients])
+    }, [])
   );
 
   return (
