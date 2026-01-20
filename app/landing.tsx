@@ -137,7 +137,11 @@ export default function LandingScreen() {
           <TipOfTheDay />
           <View className="mt-2 h-1"></View>
           <View className="flex-1 items-center justify-center px-6">
-            <Image source={require('@/assets/dr1.png')} resizeMode="contain" className="h-[150px] w-full rounded-3xl" />
+            <Image
+              source={require('@/assets/dr1.webp')}
+              resizeMode="contain"
+              className="h-[150px] w-full rounded-3xl"
+            />
           </View>
         </View>
       </ScrollView>
