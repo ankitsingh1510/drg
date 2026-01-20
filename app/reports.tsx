@@ -124,11 +124,12 @@ export default function Reports() {
         const notificationPayload: any = JSON.parse(remoteMessage.data?.payload as any);
 
         if (notificationPayload && notificationPayload?.type === 'ingestion') {
-          const { accession_id: msgAccessionId, status } = notificationPayload;
+          const { accession_id: msgAccessionId, status, documentId } = notificationPayload;
 
           if (msgAccessionId && String(msgAccessionId) === String(accession_id)) {
             if (status === 'success') {
               setCurrentIngestionStatus('ingested');
+              setDocId(documentId);
             } else if (status === 'failed') {
               setCurrentIngestionStatus('failed');
             }
@@ -142,7 +143,7 @@ export default function Reports() {
     return () => {
       unsubscribe();
     };
-  }, [accession_id, removeIngestionId]);
+  }, [accession_id, removeIngestionId, setDocId]);
   const handleChatWithDrG = async () => {
     if (loadingChat) return;
     try {
