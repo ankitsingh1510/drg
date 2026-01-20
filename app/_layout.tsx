@@ -13,7 +13,7 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { getApp, initializeApp } from '@react-native-firebase/app';
-import messaging, { getAPNSToken, getToken, onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
+import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
 import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
@@ -54,83 +54,14 @@ try {
   }
 }
 
-async function getFcmToken() {
-  try {
-    const messagingInstance = messaging();
-
-    if (Platform.OS === 'ios') {
-      const apnsToken = await getAPNSToken(messagingInstance);
-      if (!apnsToken) {
-        // If APNs isn't ready, wait 2 seconds and try once more
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-
-    // Get the actual FCM token
-    const token = await getToken(messagingInstance);
-    console.log('FCM Token:', token);
-    return token;
-  } catch (error) {
-    console.error('Error fetching FCM token:', error);
-    throw error;
-  }
-}
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
     shouldSetBadge: true,
-    shouldShowBanner: true, // for iOS 14+
-    shouldShowList: true, // for iOS 14+
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
-
-function handleRegistrationError(errorMessage: string) {
-  Toast.show({
-    type: 'error',
-    text1: 'Notification Error',
-    text2: errorMessage,
-  });
-  throw new Error(errorMessage);
-}
-
-async function registerForPushNotificationsAsync() {
-  if (!Device.isDevice) {
-    console.log('Push notifications skipped (emulator)');
-    return;
-  }
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      handleRegistrationError('Permission not granted to get push token for push notification!');
-      return;
-    }
-
-    try {
-      const pushTokenString = await getFcmToken();
-      console.log('Push notification token:', pushTokenString);
-      return pushTokenString;
-    } catch (e: unknown) {
-      handleRegistrationError(`${e}`);
-    }
-  } else {
-    handleRegistrationError('Must use physical device for push notifications');
-  }
-}
 
 export default function RootLayout() {
   startNetworkLogging();
@@ -141,15 +72,6 @@ export default function RootLayout() {
       console.log('Push notifications skipped (emulator)');
       return;
     }
-    registerForPushNotificationsAsync()
-      .then(token => {
-        const tokenStr = token ?? '';
-        setFcmToken(tokenStr);
-      })
-      .catch((error: any) => {
-        const errorStr = `${error}`;
-        console.error('Error during push notification registration:', errorStr);
-      });
 
     const responseListener = Notifications.addNotificationResponseReceivedListener(async response => {
       const notificationPayload: any = JSON.parse(response.notification.request.content.data.payload as any);
@@ -163,7 +85,7 @@ export default function RootLayout() {
             patientName: patientName,
             documentId: documentId,
             accession_id: accession_id,
-            showIngestOption: 'false',
+            ingestionStatus: 'ingested',
           },
         });
       }
