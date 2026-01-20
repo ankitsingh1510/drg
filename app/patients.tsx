@@ -184,12 +184,8 @@ export default function Patients() {
       };
       const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      if (usersStudyList.length > 0 && !loading && !refreshing) {
-        fetchPatients(1, filter, query);
-      }
-
       return () => sub.remove();
-    }, [usersStudyList, loading, refreshing, filter, query, fetchPatients])
+    }, [])
   );
 
   return (
