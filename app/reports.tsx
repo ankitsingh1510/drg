@@ -10,11 +10,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as Device from 'expo-device';
 import { isDevice } from 'expo-device';
+import * as Notifications from 'expo-notifications';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { getAPNSToken, getToken } from '@react-native-firebase/messaging';
 import messaging, { onMessage } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
@@ -22,13 +25,63 @@ import Pdf from 'react-native-pdf';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
+import { NotificationPermissionModal } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
+import { storageAPI } from '@/services/storage';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
+import { setFcmToken } from '@/stores/mmkv';
 import { IngestionStatus } from '@/types/types';
 import { toast } from '@/util/toast';
+
+async function getFcmToken() {
+  try {
+    const messagingInstance = messaging();
+
+    if (Platform.OS === 'ios') {
+      const apnsToken = await getAPNSToken(messagingInstance);
+      if (!apnsToken) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+    const token = await getToken(messagingInstance);
+    return token;
+  } catch (error) {
+    console.error('Error fetching FCM token:', error);
+    throw error;
+  }
+}
+
+async function registerForPushNotificationsAsync() {
+  if (!Device.isDevice) {
+    console.log('Push notifications skipped (emulator)');
+    return;
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      return false;
+    }
+
+    try {
+      const pushTokenString = await getFcmToken();
+      setFcmToken(pushTokenString ?? '');
+      return true;
+    } catch (e: unknown) {
+      console.error('Error getting FCM token:', e);
+      return false;
+    }
+  }
+  return false;
+}
 
 export default function Reports() {
   const { token } = useAuth();
@@ -55,6 +108,7 @@ export default function Reports() {
     mode: 'video',
   });
   const [chatSignedUrl, setChatSignedUrl] = useState<string | null>(null);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
   const containerHeight = useRef(0);
@@ -109,6 +163,18 @@ export default function Reports() {
   };
 
   const handleIngestReport = async () => {
+    // Check notification permissions and show modal if not granted
+    if (Device.isDevice) {
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status !== 'granted') {
+        setShowNotificationModal(true);
+        return;
+      }
+    }
+    await proceedWithIngestion();
+  };
+
+  const proceedWithIngestion = async () => {
     toast.success('Analyzing Report. This may take some time...', undefined, 2000);
     addIngestionId(Number(accession_id));
     setCurrentIngestionStatus('ingesting');
@@ -121,6 +187,15 @@ export default function Reports() {
       console.log('Error while analyzing report:', error);
       removeIngestionId(Number(accession_id));
       setCurrentIngestionStatus('failed');
+    }
+  };
+
+  const handleCloseNotificationModal = async (performAction: boolean) => {
+    setShowNotificationModal(false);
+
+    if (performAction) {
+      await registerForPushNotificationsAsync();
+      await proceedWithIngestion();
     }
   };
 
@@ -334,6 +409,8 @@ export default function Reports() {
           mode={showInteraction.mode}
         />
       )}
+
+      <NotificationPermissionModal visible={showNotificationModal} onClose={handleCloseNotificationModal} />
     </SafeAreaView>
   );
 }
