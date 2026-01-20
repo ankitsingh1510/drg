@@ -15,6 +15,7 @@ import {
   ProfileTextField,
 } from '@/components/profile';
 import { colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { usersAPI } from '@/services/users';
 import type { EnumOption, ProfileField, UserProfileData } from '@/types/users';
@@ -22,6 +23,7 @@ import { toast } from '@/util/toast';
 
 const Profile = () => {
   const router = useRouter();
+  const { user } = useAuth();
 
   const { theme } = useThemeSync();
   const isDarkMode = theme === 'dark';
@@ -113,7 +115,7 @@ const Profile = () => {
   const proceedToESignature = () => {
     const emailField = formFields.find(f => f.name === 'email');
     const emailValue = emailField?.value?.toString() || '';
-    setESignatureUsername(emailValue);
+    setESignatureUsername(user?.username);
     setOriginalFormFields([...formFields]);
     setShowESignatureModal(true);
   };

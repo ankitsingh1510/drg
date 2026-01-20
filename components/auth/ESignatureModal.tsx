@@ -63,7 +63,7 @@ export default function ESignatureModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleCancel}>
       <Pressable className="flex-1 items-center justify-center bg-black/50" onPress={handleCancel}>
-        <Pressable className="mx-5 w-[92%] max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
+        <Pressable className="mx-5 -mt-[50] w-[92%] max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
           <Text className="text-semibold mb-4 text-gray-600 dark:text-gray-400">
             Please provide your credentials to confirm this profile update
           </Text>
