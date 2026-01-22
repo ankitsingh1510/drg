@@ -93,6 +93,7 @@ const Settings = () => {
                 true: colors.common.info,
               }}
               thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
+              style={{ alignSelf: 'center' }}
             />
           }
         />
