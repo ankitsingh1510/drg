@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -317,59 +326,66 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <View className="mb-2 flex-row items-center justify-between px-5 pb-2">
-        <View className="flex-row items-center gap-4">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="rounded-full border border-gray-300 p-2 active:bg-gray-200 dark:border-gray-600 dark:active:bg-gray-700"
-          >
-            <ArrowLeft size={24} color={isDarkMode ? colors.dark.text : colors.light.text} />
-          </TouchableOpacity>
-          <Text className="text-xl font-semibold text-gray-800 dark:text-gray-100">My Profile</Text>
-        </View>
-        <IconNavBar />
-      </View>
-
-      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
-        <ProfileHeader
-          firstName={name}
-          lastName={lname}
-          organizationName={profileData?.orgMapping.organizationName || ''}
-        />
-
-        {Object.entries(groupedFields).map(([groupName, fields]) => (
-          <View key={groupName} className="mb-6 rounded-xl bg-white p-6 shadow-md dark:bg-gray-800">
-            <View className="mb-4 flex-row items-center gap-3">
-              {renderIcon(groupName)}
-              <Text className="flex-1 text-lg font-semibold text-gray-800 dark:text-gray-100">{groupName}</Text>
-            </View>
-            {fields.map(field => renderField(field))}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
+          <View className="flex-row items-center gap-4">
+            <Pressable
+              hitSlop={10}
+              onPress={() => router.back()}
+              className="rounded-full border border-gray-300 p-2 active:bg-gray-200 dark:border-gray-600 dark:active:bg-gray-700"
+            >
+              <ArrowLeft size={24} color={isDarkMode ? colors.dark.text : colors.light.text} />
+            </Pressable>
+            <Text className="text-xl font-semibold text-gray-800 dark:text-gray-100">My Profile</Text>
           </View>
-        ))}
+          <IconNavBar />
+        </View>
 
-        {/* Buttons: Edit Profile, Save, Cancel */}
-        <ProfileActionButtons
-          isEditing={isEditing}
-          isLoading={isLoading}
-          isDarkMode={isDarkMode}
-          onEdit={handleEdit}
-          onSave={handleSave}
-          onCancel={handleCancel}
+        <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ProfileHeader
+            firstName={name}
+            lastName={lname}
+            organizationName={profileData?.orgMapping.organizationName || ''}
+          />
+
+          {Object.entries(groupedFields).map(([groupName, fields]) => (
+            <View key={groupName} className="mb-6 rounded-xl bg-white p-6 shadow-md dark:bg-gray-800">
+              <View className="mb-4 flex-row items-center gap-3">
+                {renderIcon(groupName)}
+                <Text className="flex-1 text-lg font-semibold text-gray-800 dark:text-gray-100">{groupName}</Text>
+              </View>
+              {fields.map(field => renderField(field))}
+            </View>
+          ))}
+
+          {/* Buttons: Edit Profile, Save, Cancel */}
+          <ProfileActionButtons
+            isEditing={isEditing}
+            isLoading={isLoading}
+            isDarkMode={isDarkMode}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+          <View className="h-6" />
+        </ScrollView>
+        <ESignatureModal
+          visible={showESignatureModal}
+          username={eSignatureUsername}
+          errorMessage={eSignatureError}
+          onCancel={() => {
+            setFormFields([...originalFormFields]);
+            setShowESignatureModal(false);
+            setESignatureError('');
+          }}
+          onConfirm={handleESignatureSubmit}
         />
-        <View className="h-6" />
-      </ScrollView>
-      <ESignatureModal
-        visible={showESignatureModal}
-        username={eSignatureUsername}
-        errorMessage={eSignatureError}
-        onCancel={() => {
-          setFormFields([...originalFormFields]);
-          setShowESignatureModal(false);
-          setESignatureError('');
-        }}
-        onConfirm={handleESignatureSubmit}
-      />
-      <MfaChangeWarningModal visible={showReloginModal} onContinue={handleRelogin} />
+        <MfaChangeWarningModal visible={showReloginModal} onContinue={handleRelogin} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
