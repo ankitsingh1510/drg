@@ -13,21 +13,11 @@ interface PatientHeaderProps {
   user: User | null;
   totalCount: number;
   query: string;
-  filter: string;
   onSearch: (text: string) => void;
-  onFilterPress: () => void;
   onLogout: () => void;
 }
 
-export function PatientHeader({
-  user,
-  totalCount,
-  query,
-  filter,
-  onSearch,
-  onFilterPress,
-  onLogout,
-}: PatientHeaderProps) {
+export function PatientHeader({ user, totalCount, query, onSearch, onLogout }: PatientHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -68,28 +58,7 @@ export function PatientHeader({
             placeholder="Search by patient name"
             placeholderTextColor={isDark ? colors.dark.textTertiary : colors.light.textSecondary}
           />
-          <TouchableOpacity
-            className="rounded-lg border border-blue-200 bg-white px-4 py-3 dark:border-gray-600 dark:bg-gray-700"
-            onPress={onFilterPress}
-          >
-            <Text className="text-sm font-medium text-blue-700 dark:text-blue-400">Filter ▾</Text>
-          </TouchableOpacity>
         </View>
-
-        {(filter !== 'All' || query.trim()) && (
-          <View className="mt-2 flex-row items-center space-x-4">
-            {filter !== 'All' && (
-              <Text className="text-sm text-slate-600 dark:text-gray-400">
-                Filter: <Text className="font-medium">{filter}</Text>
-              </Text>
-            )}
-            {query.trim() && (
-              <Text className="text-sm text-slate-600 dark:text-gray-400">
-                Search: <Text className="font-medium">"{query}"</Text>
-              </Text>
-            )}
-          </View>
-        )}
       </View>
 
       {showMenu && (
