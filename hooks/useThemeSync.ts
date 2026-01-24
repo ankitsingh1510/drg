@@ -6,12 +6,7 @@ import { saveTheme, themeAtom } from '@/stores/theme';
 
 export function useThemeSync() {
   const [theme, setThemeState] = useAtom(themeAtom);
-  const { setColorScheme } = useColorScheme();
-
-  useEffect(() => {
-    // Apply the theme to nativewind
-    setColorScheme(theme);
-  }, [theme]);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   // Custom setter that also saves to storage
   const setTheme = (newTheme: 'light' | 'dark') => {
@@ -24,5 +19,11 @@ export function useThemeSync() {
     setTheme(newTheme);
   };
 
-  return { theme, setTheme, toggleTheme };
+  return {
+    theme,
+    setTheme,
+    toggleTheme,
+    colorScheme,
+    setColorScheme,
+  };
 }

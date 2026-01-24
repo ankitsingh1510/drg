@@ -1,7 +1,6 @@
-// IconNavBar.js
 import React from 'react';
 import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import { Home, LogOut } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { colors } from '@/constants/colors';
@@ -9,9 +8,12 @@ import { useLogout } from '@/context/AuthContext';
 
 export default function IconNavBar() {
   const router = useRouter();
+  const pathname = usePathname();
   const logout = useLogout();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+
+  const isHome = pathname === '/landing' || pathname === '/';
 
   const goHome = () => {
     router.push('/landing');
@@ -31,11 +33,13 @@ export default function IconNavBar() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={goHome} style={styles.iconButton}>
-        <View style={[styles.iconContainer, { backgroundColor: colors.common.accent }]}>
-          <Home pointerEvents="none" size={25} strokeWidth={1} color={'white'} />
-        </View>
-      </TouchableOpacity>
+      {!isHome && (
+        <TouchableOpacity onPress={goHome} style={styles.iconButton}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.common.accent }]}>
+            <Home pointerEvents="none" size={25} strokeWidth={1} color={'white'} />
+          </View>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity onPress={goLogout} style={styles.iconButton}>
         <View style={[styles.iconContainer, { backgroundColor: colors.common.accent }]}>

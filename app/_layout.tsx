@@ -1,6 +1,5 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import { Platform, Text } from 'react-native';
+import React, { useEffect } from 'react';
+import { Appearance, Platform, Text, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
@@ -15,7 +14,7 @@ import {
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
-import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -125,7 +124,17 @@ export default function RootLayout() {
     });
   }, []);
 
-  const { theme } = useThemeSync();
+  const { theme, colorScheme, setColorScheme } = useThemeSync();
+
+  useEffect(() => {
+    if (theme !== colorScheme) {
+      const timer = setTimeout(() => {
+        setColorScheme(theme);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [theme, colorScheme, setColorScheme]);
+
   const [loaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -134,23 +143,23 @@ export default function RootLayout() {
   });
   if (!loaded) return null;
 
-  if ((Text as any).defaultProps == null) (Text as any).defaultProps = {};
-  (Text as any).defaultProps.style = { fontFamily: 'Poppins_400Regular' };
-
-  if ((TextInput as any).defaultProps == null) (TextInput as any).defaultProps = {};
-  (TextInput as any).defaultProps.style = { fontFamily: 'Poppins_400Regular' };
-
   return (
     <SafeAreaProvider>
-      <GestureHandlerRootView className="flex-1 bg-black">
-        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-        <AuthProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-          <Toast position="bottom" />
-          <NetworkChecker />
-          {__DEV__ && <NetworkLoggers />}
-        </AuthProvider>
-      </GestureHandlerRootView>
+      <AuthProvider>
+        <GestureHandlerRootView className="flex-1">
+          <View className={`flex-1 ${theme === 'dark' ? 'dark' : ''} bg-[#FDF5E6] dark:bg-gray-900`}>
+            <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+            <Stack screenOptions={STACK_OPTIONS} />
+            <Toast position="bottom" />
+            <NetworkChecker />
+            {__DEV__ && <NetworkLoggers />}
+          </View>
+        </GestureHandlerRootView>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }
+
+const STACK_OPTIONS = {
+  headerShown: false,
+};

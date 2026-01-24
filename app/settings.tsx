@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { ChevronRight, HelpCircle, Moon, Sun, Trash2, User } from 'lucide-react-native';
@@ -27,7 +27,8 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      className="mx-5 mt-2 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
+      style={styles.card}
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
@@ -134,7 +135,8 @@ const Settings = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <View className="mb-2 items-end pb-2 pr-8">
+      <View className="mb-4 flex-row items-center justify-between px-6 pb-2">
+        <Text className="text-2xl font-bold text-gray-900 dark:text-white">Settings</Text>
         <IconNavBar />
       </View>
 
@@ -157,3 +159,13 @@ const Settings = () => {
 };
 
 export default Settings;
+
+const styles = StyleSheet.create({
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+});

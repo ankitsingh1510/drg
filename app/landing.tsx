@@ -9,6 +9,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
+import IconNavBar from '@/components/navigation/IconNavBar';
 import { SimpleButton } from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
@@ -36,7 +37,6 @@ export default function LandingScreen() {
         heading: 'Order Tests',
         color: '#5C7AC6',
         sub: '1Cell.Ai Tests and Panels',
-        // onPress: () => openInBrowser(process.env.EXPO_PUBLIC_ORDER_TESTS_URL || ''),
         onPress: () => router.push('/tests' as any),
       },
       {
@@ -96,14 +96,22 @@ export default function LandingScreen() {
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            Welcome, {user?.name} {user?.lname}
-          </Text>
-          <View className="mb-6 flex-row items-center pl-6">
-            <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
-            <Text className="ml-2 text-xl text-gray-500 dark:text-gray-400">{date}</Text>
+          <View className="mr-6 flex-row items-center justify-between">
+            <View>
+              <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                Hello,
+                {/* <Text className="font-semibold text-blue-600 dark:text-blue-400"> */} {user?.name} {user?.lname}
+                {/* </Text> */}
+              </Text>
+              <View className="mb-6 flex-row items-center pl-6">
+                <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
+                <Text className="ml-2 text-xl text-gray-500 dark:text-gray-400">{date}</Text>
+              </View>
+            </View>
+            <View className="mt-4">
+              <IconNavBar />
+            </View>
           </View>
-
           <HScroller />
           <View className="mt-6 h-3"></View>
           <HeadingDivider hideRightIcon iconName="albums-outline" title="Clinical Workspace" />
