@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { Activity, AlertCircle, Calendar, CheckCircle2, Clock, Dna, Hash, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { colors } from '@/constants/colors';
 import { type Patient } from '@/services/patients';
@@ -10,43 +11,65 @@ interface PatientRowProps {
 }
 
 export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps) => {
-  const [open, setOpen] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const formattedDate = useMemo(() => {
+  const dateInfo = useMemo(() => {
     try {
       const date = new Date(patient.analysisCompletionDate);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
+      const formatted = date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+        year: 'numeric',
       });
+
+      const today = new Date();
+      const diffTime = Math.abs(today.getTime() - date.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const daysAgo = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
+
+      return { formatted, daysAgo };
     } catch {
-      return patient.analysisCompletionDate;
+      return { formatted: patient.analysisCompletionDate, daysAgo: '' };
     }
   }, [patient.analysisCompletionDate]);
 
-  const statusStyles = useMemo(() => {
+  const statusConfig = useMemo(() => {
     const status = patient.workflowStatus.toLowerCase();
     switch (status) {
       case 'released':
-        return { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' };
+        return {
+          text: '#10b981',
+          bg: isDark ? '#064e3b' : '#ecfdf5',
+          icon: <CheckCircle2 size={14} color="#10b981" />,
+        };
       case 'failed':
-        return { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' };
+        return {
+          text: '#ef4444',
+          bg: isDark ? '#450a0a' : '#fef2f2',
+          icon: <AlertCircle size={14} color="#ef4444" />,
+        };
       case 'success':
-        return { text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' };
+        return {
+          text: '#3b82f6',
+          bg: isDark ? '#172554' : '#eff6ff',
+          icon: <Activity size={14} color="#3b82f6" />,
+        };
       case 'in queue':
-        return { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' };
-      case 'curation completed':
-        return { text: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200' };
+        return {
+          text: '#f59e0b',
+          bg: isDark ? '#451a03' : '#fffbeb',
+          icon: <Clock size={14} color="#f59e0b" />,
+        };
       default:
-        return { text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200' };
+        return {
+          text: '#6b7280',
+          bg: isDark ? '#1f2937' : '#f3f4f6',
+          icon: <Activity size={14} color="#6b7280" />,
+        };
     }
-  }, [patient.workflowStatus]);
+  }, [patient.workflowStatus, isDark]);
 
   const handleViewReport = async () => {
     setLoadingReport(true);
@@ -59,9 +82,8 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
 
   return (
     <View
-      className="mb-3 bg-white dark:bg-gray-800"
+      className="relative mx-4 mb-2 mt-8 rounded-[32px] bg-white dark:bg-gray-800"
       style={{
-        borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -69,72 +91,104 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
         elevation: 3,
       }}
     >
-      <View className="p-4">
-        <View className="mb-3 flex-row items-start justify-between">
-          <View className="mr-3 flex-1">
-            <Text className="text-lg font-semibold text-slate-900 dark:text-gray-100">{patient.patientName}</Text>
-            <Text className="mt-1 text-sm text-slate-500 dark:text-gray-400">Sample: {patient.sampleBarcode}</Text>
-            <Text className="text-sm text-slate-500 dark:text-gray-400">Assay: {patient.assayName}</Text>
-            <Text className="text-sm text-slate-500 dark:text-gray-400">Date: {formattedDate}</Text>
-          </View>
-          <View className={`rounded-lg border px-3 py-1.5 ${statusStyles.bg} ${statusStyles.border}`}>
-            <Text className={`text-xs font-medium ${statusStyles.text}`}>{patient.workflowStatus}</Text>
-          </View>
-        </View>
-
-        <View className="flex-row items-center justify-between">
-          <Text className="flex-1 text-sm text-slate-600 dark:text-gray-400" numberOfLines={1} ellipsizeMode="tail">
-            {patient.physicianName} • {patient.facility}
+      {/* Floating Centered Status Badge */}
+      <View className="absolute -top-3 left-0 right-0 z-10 items-center">
+        <View
+          style={{
+            backgroundColor: statusConfig.bg,
+            borderWidth: 1,
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+          }}
+          className="flex-row items-center gap-2 rounded-full px-4 py-1.5 shadow-sm shadow-black/10"
+        >
+          {statusConfig.icon}
+          <Text
+            style={{ color: statusConfig.text }}
+            className="text-center text-[10px] font-bold uppercase tracking-widest"
+          >
+            {patient.workflowStatus}
           </Text>
-          <View className="flex-row gap-2">
-            <TouchableOpacity
-              className="rounded-lg px-3 py-1.5"
-              style={{ backgroundColor: colors.common.primary }}
-              onPress={() => setOpen(!open)}
-            >
-              <Text className="text-sm font-medium text-white">{open ? 'Close' : 'Details'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="rounded-lg px-3 py-1.5"
-              style={{ backgroundColor: colors.common.accent }}
-              onPress={handleViewReport}
-              disabled={loadingReport}
-            >
-              <Text className="text-sm font-medium text-white">{loadingReport ? 'Loading...' : 'View Report'}</Text>
-            </TouchableOpacity>
+        </View>
+      </View>
+
+      <View className="p-6 pt-8">
+        {/* Patient Identity Section */}
+        <View className="mb-5">
+          <Text className="text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            {patient.patientName}
+          </Text>
+          <View className="mt-1 items-center">
+            <Text className="text-xs font-bold uppercase tracking-widest text-blue-500">{patient.assayName}</Text>
+            <Text className="mt-1 text-xs font-semibold text-gray-400">
+              {dateInfo.formatted} • {dateInfo.daysAgo}
+            </Text>
           </View>
         </View>
 
-        {open && (
-          <View className="mt-3 border-t border-blue-50 pt-3 dark:border-gray-700">
-            <View className="space-y-2">
-              <View className="flex-row justify-between">
-                <Text className="text-xs text-slate-500 dark:text-gray-400">Accession #</Text>
-                <Text className="text-sm text-slate-700 dark:text-gray-300">{patient.accession_number}</Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-xs text-slate-500 dark:text-gray-400">Age</Text>
-                <Text className="text-sm text-slate-700 dark:text-gray-300">{patient.age}</Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-xs text-slate-500 dark:text-gray-400">Gender</Text>
-                <Text className="text-sm text-slate-700 dark:text-gray-300">{patient.gender}</Text>
-              </View>
-              <View className="flex-row justify-between">
-                <Text className="text-xs text-slate-500 dark:text-gray-400">Disease</Text>
-                <Text className="ml-2 flex-1 text-right text-sm text-slate-700 dark:text-gray-300" numberOfLines={2}>
-                  {patient.diseaseName}
-                </Text>
-              </View>
-              {patient.additionalPhysician && (
-                <View className="flex-row justify-between">
-                  <Text className="text-xs text-slate-500 dark:text-gray-400">Additional Physician</Text>
-                  <Text className="text-sm text-slate-700 dark:text-gray-300">{patient.additionalPhysician}</Text>
-                </View>
-              )}
+        {/* Info Grid 2x2 - Tightened Scale */}
+        <View className="mb-6 flex-row flex-wrap justify-between gap-y-6 rounded-2xl bg-gray-50/50 p-4 dark:bg-gray-900/30">
+          {/* Accession - Left */}
+          <View className="w-[48%]">
+            <View className="mb-1.5 flex-row items-center gap-2">
+              <Hash size={14} color="#9ca3af" strokeWidth={2.5} />
+              <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Accession</Text>
             </View>
+            <Text className="text-base font-extrabold text-gray-800 dark:text-gray-200">
+              #{patient.accession_number}
+            </Text>
           </View>
-        )}
+
+          {/* Age - Right */}
+          <View className="w-[48%] items-end">
+            <View className="mb-1.5 flex-row items-center gap-2">
+              <Calendar size={14} color="#9ca3af" strokeWidth={2.5} />
+              <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Age</Text>
+            </View>
+            <Text className="text-base font-extrabold text-gray-800 dark:text-gray-200">{patient.age} Years</Text>
+          </View>
+
+          {/* Gender - Left */}
+          <View className="w-[48%]">
+            <View className="mb-1.5 flex-row items-center gap-2">
+              <User size={14} color="#9ca3af" strokeWidth={2.5} />
+              <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Gender</Text>
+            </View>
+            <Text className="text-base font-extrabold text-gray-800 dark:text-gray-200">{patient.gender}</Text>
+          </View>
+
+          {/* Type - Right */}
+          <View className="w-[48%] items-end">
+            <View className="mb-1.5 flex-row items-center gap-2">
+              <Dna size={14} color="#9ca3af" strokeWidth={2.5} />
+              <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Type</Text>
+            </View>
+            <Text numberOfLines={1} className="text-right text-base font-extrabold text-gray-800 dark:text-gray-200">
+              {patient.diseaseName || 'N/A'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Secondary Info */}
+        <View className="mb-6 flex-row items-center gap-3 px-1">
+          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20">
+            <User size={20} color="#3b82f6" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-sm font-bold text-gray-800 dark:text-gray-100">{patient.physicianName}</Text>
+            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">{patient.facility}</Text>
+          </View>
+        </View>
+
+        {/* Action Button */}
+        <TouchableOpacity
+          onPress={handleViewReport}
+          disabled={loadingReport}
+          activeOpacity={0.8}
+          className="h-14 flex-row items-center justify-center gap-3 rounded-full bg-blue-600 shadow-lg shadow-blue-300 dark:shadow-none"
+        >
+          <Text className="text-base font-bold text-white">{loadingReport ? 'Opening...' : 'View Full Report'}</Text>
+          {!loadingReport && <Activity size={18} color="white" />}
+        </TouchableOpacity>
       </View>
     </View>
   );

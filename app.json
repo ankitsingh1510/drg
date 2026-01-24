@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/DrG-logo.png",
     "scheme": "drg",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "buildNumber": "2",

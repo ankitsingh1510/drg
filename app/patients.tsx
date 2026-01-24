@@ -189,7 +189,7 @@ export default function Patients() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <PatientHeader
         user={user}
         totalCount={totalCount}
@@ -206,10 +206,10 @@ export default function Patients() {
           renderItem={renderPatient}
           keyExtractor={(item: Patient, index: number) => `${item.sampleBarcode}-${index}`}
           contentContainerStyle={{
-            padding: 16,
-            backgroundColor: isDark ? colors.dark.background : colors.light.background,
+            paddingTop: 10,
+            paddingBottom: 40,
           }}
-          estimatedItemSize={180}
+          estimatedItemSize={220}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -226,9 +226,11 @@ export default function Patients() {
         />
 
         {loading && !refreshing && (
-          <View className="absolute inset-0 items-center justify-center bg-gray-50/80 dark:bg-gray-900/80">
+          <View className="absolute inset-0 items-center justify-center bg-[#FDF5E6]/90 dark:bg-gray-900/90">
             <ActivityIndicator size="large" color={colors.common.primary} />
-            <Text className="mt-2 text-lg text-slate-600 dark:text-gray-300">Loading Orders...</Text>
+            <Text className="mt-4 text-base font-bold tracking-tight text-gray-500 dark:text-gray-400">
+              Loading Orders...
+            </Text>
           </View>
         )}
       </View>

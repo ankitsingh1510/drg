@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { Dimensions, TouchableOpacity, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { router } from 'expo-router';
@@ -13,13 +13,13 @@ const CarouselItem = memo(({ item, width, cardWidth, onPress }: any) => (
       <ExpoImage
         source={item.image}
         contentFit="cover"
-        style={{ width: cardWidth, height: 180 }}
-        className="rounded-2xl"
+        style={{ width: cardWidth, height: 180, borderRadius: 16 }}
         transition={300}
       />
     </TouchableOpacity>
   </View>
 ));
+CarouselItem.displayName = 'CarouselItem';
 
 export default function HScroller() {
   const listRef = useRef<any>(null);
@@ -51,18 +51,6 @@ export default function HScroller() {
       route: '/test',
     },
   ];
-
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     const nextIndex = (currentIndex + 1) % data.length;
-  //     listRef.current?.scrollToIndex({
-  //       index: nextIndex,
-  //       animated: true,
-  //     });
-  //   }, 3000);
-
-  //   return () => clearInterval(timer);
-  // }, [currentIndex, data.length]);
 
   const onScrollEnd = useCallback((event: any) => {
     const position = event.nativeEvent.contentOffset.x;

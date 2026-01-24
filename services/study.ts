@@ -21,27 +21,6 @@ class StudyAPI {
     });
   }
 
-  async getStudyList2(studyId: number) {
-    try {
-      let reqParams = {
-        query: `query getStudyList2($studyId:Int,$includeMeta: Boolean, $paginationParams: JSON) {getStudyList(studyId : $studyId, includeMeta: $includeMeta, paginationParams: $paginationParams)}`,
-        variables: {
-          studyId: studyId,
-          includeMeta: false,
-          paginationParams: {
-            studyId,
-            fields: ['studyId', 'studyIdentifier', 'shortName', 'longName', 'description', 'studyTitle', 'studyStatus'],
-          },
-        },
-      };
-      let response = await this.getGQLResponse(reqParams);
-      return response.data.getStudyList.data;
-    } catch (error) {
-      console.error('Error fetching study list:', error);
-      throw error;
-    }
-  }
-
   async getStudyList() {
     let reqParams = {
       query: `query getStudies($paginationParams: JSON, $includeMeta: Boolean, $includeDeleted: Boolean,  $studyStatus: String ) {getStudyList(paginationParams:$paginationParams, includeMeta: $includeMeta, includeDeleted: $includeDeleted, studyStatus: $studyStatus)}`,

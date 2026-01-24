@@ -251,7 +251,6 @@ export default function Reports() {
         className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
       >
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
-          {/* <Text className="text-base font-semibold text-[#daa521]">←</Text> */}
           <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
@@ -367,45 +366,59 @@ export default function Reports() {
           style={{ backgroundColor: isDark ? colors.dark.cardBackground : colors.light.background }}
         >
           {currentIngestionStatus === 'ingested' && (
-            <View className="flex-row items-center justify-center gap-5">
-              <TouchableOpacity
-                className="xshadow-md flex-row items-center justify-center rounded-full px-3 py-3 active:opacity-80"
-                style={{ backgroundColor: colors.common.primary }}
-                onPress={handleTalkToDrG}
-              >
-                <Feather name="video" size={22} color="white" />
-                <Text className="ml-2 text-lg font-bold text-white">Talk With Dr.G</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="flex-row items-center justify-center rounded-full px-3 py-3 shadow-md active:opacity-80"
-                style={{ backgroundColor: colors.common.primary }}
-                disabled={loadingChat}
-                onPress={handleChatWithDrG}
-              >
-                <Ionicons name="chatbubbles-outline" size={22} color="white" />
-                <Text className="ml-2 text-lg font-bold text-white">Chat With Dr.G</Text>
-              </TouchableOpacity>
+            <View className="flex-row items-center justify-center gap-4 py-2">
+              <ReAnimated.View entering={FadeInUp.delay(500).duration(800).springify()}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="flex-row items-center justify-center rounded-full bg-blue-600 px-6 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
+                  onPress={handleTalkToDrG}
+                >
+                  <Feather name="video" size={20} color="white" strokeWidth={2.5} />
+                  <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
+                </TouchableOpacity>
+              </ReAnimated.View>
+
+              <ReAnimated.View entering={FadeInUp.delay(650).duration(800).springify()}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  disabled={loadingChat}
+                  className="flex-row items-center justify-center rounded-full bg-indigo-600 px-6 py-4 shadow-lg shadow-indigo-300 dark:shadow-none"
+                  onPress={handleChatWithDrG}
+                >
+                  <Ionicons name="chatbubbles" size={20} color="white" />
+                  <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Chat</Text>
+                </TouchableOpacity>
+              </ReAnimated.View>
             </View>
           )}
+
           {currentIngestionStatus === 'ingesting' && (
-            <TouchableOpacity
-              disabled={true}
-              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
-              style={{ backgroundColor: colors.common.primary }}
-            >
-              <MaterialIcons name="analytics" size={22} color="white" />
-              <Text className="ml-2 text-lg font-bold text-white">{'Analyzing...'}</Text>
-            </TouchableOpacity>
+            <ReAnimated.View entering={FadeInUp.duration(600).springify()} className="py-2">
+              <TouchableOpacity
+                disabled={true}
+                className="flex-row items-center justify-center rounded-full bg-slate-100 px-10 py-4 dark:bg-slate-800"
+              >
+                <ActivityIndicator size="small" color={isDark ? '#fff' : colors.common.primary} />
+                <Text className="ml-3 text-base font-extrabold uppercase tracking-tight text-slate-500 dark:text-slate-400">
+                  Analyzing Report
+                </Text>
+              </TouchableOpacity>
+            </ReAnimated.View>
           )}
+
           {(currentIngestionStatus === 'failed' || !currentIngestionStatus) && (
-            <TouchableOpacity
-              className="xshadow-md min-w-[200px] flex-row items-center justify-center rounded-full px-6 py-3 active:opacity-80"
-              style={{ backgroundColor: colors.common.primary }}
-              onPress={handleIngestReport}
-            >
-              <MaterialIcons name="analytics" size={22} color="white" />
-              <Text className="ml-2 text-lg font-bold text-white">{'Analyze Report'}</Text>
-            </TouchableOpacity>
+            <ReAnimated.View entering={FadeInUp.delay(400).duration(600).springify()} className="py-2">
+              <TouchableOpacity
+                activeOpacity={0.8}
+                className="flex-row items-center justify-center rounded-full bg-blue-600 px-10 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
+                onPress={handleIngestReport}
+              >
+                <MaterialIcons name="analytics" size={22} color="white" />
+                <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">
+                  Analyze Report
+                </Text>
+              </TouchableOpacity>
+            </ReAnimated.View>
           )}
         </ReAnimated.View>
       )}
