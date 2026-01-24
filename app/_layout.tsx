@@ -45,11 +45,15 @@ const firebaseConfig =
         databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
       };
 
-try {
-  getApp();
-} catch (e) {
-  if (Device.isDevice) {
-    initializeApp(firebaseConfig);
+const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
+
+if (isFirebaseEnabled) {
+  try {
+    getApp();
+  } catch (e) {
+    if (Device.isDevice) {
+      initializeApp(firebaseConfig);
+    }
   }
 }
 
@@ -67,8 +71,8 @@ export default function RootLayout() {
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
 
   useEffect(() => {
-    if (!Device.isDevice) {
-      console.log('Push notifications skipped (emulator)');
+    if (!Device.isDevice || !isFirebaseEnabled) {
+      console.log('Push notifications skipped (emulator or Firebase disabled)');
       return;
     }
 
@@ -114,8 +118,8 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (!Device.isDevice) {
-      console.log('Push notifications skipped (emulator)');
+    if (!Device.isDevice || !isFirebaseEnabled) {
+      console.log('Push notifications skipped (emulator or Firebase disabled)');
       return;
     }
     return onTokenRefresh(messaging(), newToken => {
