@@ -56,8 +56,10 @@ async function getFcmToken() {
 }
 
 async function registerForPushNotificationsAsync() {
-  if (!Device.isDevice) {
-    console.log('Push notifications skipped (emulator)');
+  const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
+
+  if (!Device.isDevice || !isFirebaseEnabled) {
+    console.log('Push notifications skipped (emulator or Firebase disabled)');
     return;
   }
 

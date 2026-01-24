@@ -28,10 +28,11 @@ class RagAPI {
   async ingestReport(accession_id: string) {
     try {
       const token = storage.getString('token') ?? null;
-      const fcmToken = getFcmToken() ?? null;
+      const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
+      const fcmToken = isFirebaseEnabled ? (getFcmToken() ?? null) : null;
       const formData = new FormData();
       formData.append('accession_id', accession_id);
-      if (fcmToken) {
+      if (fcmToken && isFirebaseEnabled) {
         formData.append('fcmKey', fcmToken);
       }
       const response = await apiFetch(`${this.baseUrl}/api/v1/drg/rag`, {
