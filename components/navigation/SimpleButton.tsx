@@ -15,36 +15,38 @@ interface SimpleButtonProps {
   iconContainerColor?: string;
 }
 
-export default function SimpleButton({
-  icon: Icon,
-  heading,
-  subheading,
-  onPress,
-  iconColor = 'white',
-  iconSize = 40,
-  containerColor = colors.light.cardBackground,
-  iconContainerColor = colors.common.accent,
-}: SimpleButtonProps) {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+export const SimpleButton = React.memo(
+  ({
+    icon: Icon,
+    heading,
+    subheading,
+    onPress,
+    iconColor = 'white',
+    iconSize = 40,
+    containerColor = colors.light.cardBackground,
+    iconContainerColor = colors.common.accent,
+  }: SimpleButtonProps) => {
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
-  return (
-    <TouchableOpacity
-      activeOpacity={1}
-      style={[styles.container, { backgroundColor: isDark ? colors.dark.cardBackground : containerColor }]}
-      onPress={onPress}
-    >
-      <View style={[styles.iconContainer, { backgroundColor: iconContainerColor }]}>
-        <Icon color={iconColor} size={iconSize} strokeWidth={1.7} />
-      </View>
+    return (
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[styles.container, { backgroundColor: isDark ? colors.dark.cardBackground : containerColor }]}
+        onPress={onPress}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: iconContainerColor }]}>
+          <Icon color={iconColor} size={iconSize} strokeWidth={1.7} />
+        </View>
 
-      <Text style={[styles.heading, { color: isDark ? colors.dark.text : colors.light.text }]}>{heading}</Text>
-      <Text style={[styles.subheading, { color: isDark ? colors.dark.textSecondary : colors.light.textTertiary }]}>
-        {subheading}
-      </Text>
-    </TouchableOpacity>
-  );
-}
+        <Text style={[styles.heading, { color: isDark ? colors.dark.text : colors.light.text }]}>{heading}</Text>
+        <Text style={[styles.subheading, { color: isDark ? colors.dark.textSecondary : colors.light.textTertiary }]}>
+          {subheading}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -56,7 +58,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    width: '46%',
   },
   iconContainer: {
     borderRadius: 50, // RN can't use '50%'

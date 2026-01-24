@@ -1,12 +1,15 @@
 import React from 'react';
 import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
-import { ChevronRight, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import { useAtom } from 'jotai';
+import { ChevronRight, HelpCircle, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
+import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 
 type SettingCardProps = {
   icon: React.ReactNode;
@@ -61,6 +64,74 @@ const Settings = () => {
     router.push('/profile' as any);
   };
 
+  const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
+
+  const resetOnboarding = () => {
+    Alert.alert('Reset Onboarding', 'This will show the onboarding screens again. Continue?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Reset',
+        onPress: () => {
+          setHasSeenOnboarding(false);
+          router.replace('/onboarding');
+        },
+      },
+    ]);
+  };
+
+  const settingsData: SettingCardProps[] = [
+    {
+      icon: <User size={24} color={colors.common.info} />,
+      title: 'My Profile',
+      subtitle: 'View and edit your profile',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-900/30',
+      btn: <ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />,
+      onPress: goToProfile,
+    },
+    {
+      icon: isDarkMode ? (
+        <Moon size={24} color={colors.common.info} />
+      ) : (
+        <Sun size={24} color={colors.common.warning} />
+      ),
+      title: isDarkMode ? 'Dark Mode' : 'Light Mode',
+      subtitle: isDarkMode ? 'Dark theme is active' : 'Light theme is active',
+      iconBgColor: isDarkMode ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100',
+      btn: (
+        <Switch
+          value={isDarkMode}
+          onValueChange={toggleTheme}
+          trackColor={{
+            false: colors.light.border,
+            true: colors.common.info,
+          }}
+          thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
+        />
+      ),
+    },
+    {
+      icon: <Trash2 size={20} color="#dc2626" />,
+      title: 'Delete Account',
+      subtitle: 'Permanently remove all data',
+      iconBgColor: 'bg-red-100 dark:bg-red-900/30',
+      btn: (
+        <TouchableOpacity
+          onPress={confirmDeleteAccount}
+          className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
+        >
+          <Text className="text-sm font-semibold text-white">Delete</Text>
+        </TouchableOpacity>
+      ),
+    },
+    {
+      icon: <HelpCircle size={24} color={colors.common.primary} />,
+      title: 'Show Onboarding',
+      subtitle: 'Review the app features',
+      iconBgColor: 'bg-amber-100 dark:bg-amber-900/30',
+      onPress: resetOnboarding,
+    },
+  ];
+
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <View className="mb-2 items-end pb-2 pr-8">
@@ -68,49 +139,16 @@ const Settings = () => {
       </View>
 
       <ScrollView className="mt-4 flex-1" showsVerticalScrollIndicator={false}>
-        <SettingCard
-          icon={<User size={24} color={colors.common.info} />}
-          title="My Profile"
-          subtitle="View and edit your profile"
-          iconBgColor="bg-blue-100 dark:bg-blue-900/30"
-          btn={<ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />}
-          onPress={goToProfile}
-        />
-
-        <SettingCard
-          icon={
-            isDarkMode ? <Moon size={24} color={colors.common.info} /> : <Sun size={24} color={colors.common.warning} />
-          }
-          title={isDarkMode ? 'Dark Mode' : 'Light Mode'}
-          subtitle={isDarkMode ? 'Dark theme is active' : 'Light theme is active'}
-          iconBgColor={isDarkMode ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100'}
-          btn={
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleTheme}
-              trackColor={{
-                false: colors.light.border,
-                true: colors.common.info,
-              }}
-              thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
-            />
-          }
-        />
-
-        <SettingCard
-          icon={<Trash2 size={20} color="#dc2626" />}
-          title="Delete Account"
-          subtitle="Permanently remove all data"
-          iconBgColor="bg-red-100 dark:bg-red-900/30"
-          btn={
-            <TouchableOpacity
-              onPress={confirmDeleteAccount}
-              className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
-            >
-              <Text className="text-sm font-semibold text-white">Delete</Text>
-            </TouchableOpacity>
-          }
-        />
+        {settingsData.map((item, index) => (
+          <Animated.View
+            key={index}
+            entering={FadeInUp.delay(index * 150)
+              .duration(600)
+              .springify()}
+          >
+            <SettingCard {...item} />
+          </Animated.View>
+        ))}
 
         <View className="h-6" />
       </ScrollView>

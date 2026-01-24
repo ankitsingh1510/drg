@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { EmptyState } from '@/components/patient';
@@ -36,12 +37,15 @@ export default function TestsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <View className="mb-4 flex-row items-center justify-between px-5">
+      <Animated.View
+        entering={FadeInUp.duration(600).springify()}
+        className="mb-4 flex-row items-center justify-between px-5"
+      >
         <View className="flex-1">
           <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
         </View>
         <IconNavBar />
-      </View>
+      </Animated.View>
       {loading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.common.primary} />
@@ -51,7 +55,15 @@ export default function TestsScreen() {
           className="px-4 pb-2"
           data={data}
           keyExtractor={item => item.fileName}
-          renderItem={({ item }) => <OncoCard item={item} />}
+          renderItem={({ item, index }) => (
+            <Animated.View
+              entering={FadeInUp.delay(index * 100)
+                .duration(600)
+                .springify()}
+            >
+              <OncoCard item={item} />
+            </Animated.View>
+          )}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => <EmptyState type="no-tests" />}
         />

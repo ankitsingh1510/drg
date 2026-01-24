@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { colors } from '@/constants/colors';
@@ -9,15 +9,15 @@ interface PatientRowProps {
   onViewReport: (patient: Patient) => Promise<void>;
 }
 
-export function PatientRow({ patient, onViewReport }: PatientRowProps) {
+export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps) => {
   const [open, setOpen] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const formatDate = (dateString: string) => {
+  const formattedDate = useMemo(() => {
     try {
-      const date = new Date(dateString);
+      const date = new Date(patient.analysisCompletionDate);
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -26,9 +26,27 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
         minute: '2-digit',
       });
     } catch {
-      return dateString;
+      return patient.analysisCompletionDate;
     }
-  };
+  }, [patient.analysisCompletionDate]);
+
+  const statusStyles = useMemo(() => {
+    const status = patient.workflowStatus.toLowerCase();
+    switch (status) {
+      case 'released':
+        return { text: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' };
+      case 'failed':
+        return { text: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' };
+      case 'success':
+        return { text: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' };
+      case 'in queue':
+        return { text: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' };
+      case 'curation completed':
+        return { text: 'text-purple-700', bg: 'bg-purple-50', border: 'border-purple-200' };
+      default:
+        return { text: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-200' };
+    }
+  }, [patient.workflowStatus]);
 
   const handleViewReport = async () => {
     setLoadingReport(true);
@@ -36,23 +54,6 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
       await onViewReport(patient);
     } finally {
       setLoadingReport(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'released':
-        return 'text-green-700 bg-green-50 border-green-200';
-      case 'failed':
-        return 'text-red-700 bg-red-50 border-red-200';
-      case 'success':
-        return 'text-blue-700 bg-blue-50 border-blue-200';
-      case 'in queue':
-        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      case 'curation completed':
-        return 'text-purple-700 bg-purple-50 border-purple-200';
-      default:
-        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
   };
 
@@ -74,16 +75,10 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
             <Text className="text-lg font-semibold text-slate-900 dark:text-gray-100">{patient.patientName}</Text>
             <Text className="mt-1 text-sm text-slate-500 dark:text-gray-400">Sample: {patient.sampleBarcode}</Text>
             <Text className="text-sm text-slate-500 dark:text-gray-400">Assay: {patient.assayName}</Text>
-            <Text className="text-sm text-slate-500 dark:text-gray-400">
-              Date: {formatDate(patient.analysisCompletionDate)}
-            </Text>
+            <Text className="text-sm text-slate-500 dark:text-gray-400">Date: {formattedDate}</Text>
           </View>
-          <View
-            className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${getStatusColor(patient.workflowStatus)}`}
-          >
-            <Text className={`text-xs font-medium ${getStatusColor(patient.workflowStatus).split(' ')[0]}`}>
-              {patient.workflowStatus}
-            </Text>
+          <View className={`rounded-lg border px-3 py-1.5 ${statusStyles.bg} ${statusStyles.border}`}>
+            <Text className={`text-xs font-medium ${statusStyles.text}`}>{patient.workflowStatus}</Text>
           </View>
         </View>
 
@@ -143,4 +138,4 @@ export function PatientRow({ patient, onViewReport }: PatientRowProps) {
       </View>
     </View>
   );
-}
+});

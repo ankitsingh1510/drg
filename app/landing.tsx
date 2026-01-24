@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Alert, BackHandler, Image, ScrollView, Text, View } from 'react-native';
+import { Alert, BackHandler, ScrollView, Text, View } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { CalendarDays, ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
-import SimpleButton from '@/components/navigation/SimpleButton';
+import { SimpleButton } from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
 import { formatDate } from '@/util/helpers';
@@ -108,14 +110,21 @@ export default function LandingScreen() {
 
           <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
             {clinicalButtons.map((item, idx) => (
-              <SimpleButton
+              <Animated.View
                 key={idx}
-                icon={item.icon}
-                heading={item.heading}
-                iconContainerColor={item.color}
-                subheading={item.sub}
-                onPress={item.onPress}
-              />
+                className="w-[46%]"
+                entering={FadeInUp.delay(idx * 100)
+                  .duration(600)
+                  .springify()}
+              >
+                <SimpleButton
+                  icon={item.icon}
+                  heading={item.heading}
+                  iconContainerColor={item.color}
+                  subheading={item.sub}
+                  onPress={item.onPress}
+                />
+              </Animated.View>
             ))}
           </View>
           <View className="mt-2 h-1"></View>
@@ -123,24 +132,33 @@ export default function LandingScreen() {
 
           <View className="mb-8 flex-row flex-wrap justify-evenly gap-5 p-5">
             {educationButtons.map((item, idx) => (
-              <SimpleButton
+              <Animated.View
                 key={idx}
-                icon={item.icon}
-                heading={item.heading}
-                iconContainerColor={item.color}
-                subheading={item.sub}
-                onPress={item.onPress}
-              />
+                className="w-[46%]"
+                entering={FadeInUp.delay((clinicalButtons.length + idx) * 100)
+                  .duration(600)
+                  .springify()}
+              >
+                <SimpleButton
+                  icon={item.icon}
+                  heading={item.heading}
+                  iconContainerColor={item.color}
+                  subheading={item.sub}
+                  onPress={item.onPress}
+                />
+              </Animated.View>
             ))}
           </View>
           <HeadingDivider hideRightIcon iconName="bulb-outline" title="Tip of the day" />
           <TipOfTheDay />
           <View className="mt-2 h-1"></View>
           <View className="flex-1 items-center justify-center px-6">
-            <Image
+            <ExpoImage
               source={require('@/assets/dr1.webp')}
-              resizeMode="contain"
-              className="h-[150px] w-full rounded-3xl"
+              contentFit="contain"
+              style={{ height: 150, width: '100%' }}
+              className="rounded-3xl"
+              transition={300}
             />
           </View>
         </View>

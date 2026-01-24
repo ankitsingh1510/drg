@@ -22,6 +22,7 @@ import messaging, { onMessage } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
+import ReAnimated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
 import InteractionBox from '@/components/interaction/Interactions';
@@ -245,7 +246,10 @@ export default function Reports() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : colors.light.background }}>
       {/* Header */}
-      <View className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+      <ReAnimated.View
+        entering={FadeInUp.duration(600).springify()}
+        className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+      >
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
           {/* <Text className="text-base font-semibold text-[#daa521]">←</Text> */}
           <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
@@ -255,7 +259,7 @@ export default function Reports() {
             {patientName}
           </Text>
         </View>
-      </View>
+      </ReAnimated.View>
 
       {/* Main Content Area - Split or Full */}
       <KeyboardAvoidingView
@@ -267,7 +271,11 @@ export default function Reports() {
         }}
       >
         {/* PDF Viewer */}
-        <View className="relative flex-1" style={styles.pdfView}>
+        <ReAnimated.View
+          entering={FadeInUp.delay(200).duration(600).springify()}
+          className="relative flex-1"
+          style={styles.pdfView}
+        >
           <Pdf
             trustAllCerts={false}
             source={{ uri: pdfUrl, cache: true, expiration: 60 }}
@@ -309,7 +317,7 @@ export default function Reports() {
               <Text className="mt-3 text-base text-slate-600 dark:text-gray-300">Loading PDF...</Text>
             </View>
           )}
-        </View>
+        </ReAnimated.View>
 
         {/* Draggable Splitter */}
         {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
@@ -353,7 +361,8 @@ export default function Reports() {
 
       {/* Talk to Dr.G / Analyze Report Button */}
       {!showInteraction.isVisible && (
-        <View
+        <ReAnimated.View
+          entering={FadeInUp.delay(400).duration(600).springify()}
           className="items-center border-t border-gray-200 px-4 py-2 dark:border-gray-700"
           style={{ backgroundColor: isDark ? colors.dark.cardBackground : colors.light.background }}
         >
@@ -398,7 +407,7 @@ export default function Reports() {
               <Text className="ml-2 text-lg font-bold text-white">{'Analyze Report'}</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </ReAnimated.View>
       )}
 
       {/* Floating Interaction Box */}
