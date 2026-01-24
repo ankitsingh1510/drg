@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/DrG-logo.png",
     "scheme": "drg",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "buildNumber": "2",
@@ -80,7 +80,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": false
     },
     "extra": {
       "router": {},

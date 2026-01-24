@@ -209,6 +209,7 @@ export default function Patients() {
             padding: 16,
             backgroundColor: isDark ? colors.dark.background : colors.light.background,
           }}
+          estimatedItemSize={180}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
