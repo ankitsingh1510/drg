@@ -79,3 +79,8 @@ DerivedData/
 
 # App examples/temp
 app-example
+# iOS build artifacts
+ios/**/*.ipa
+
+# Android build artifacts
+android/**/*.apk
