@@ -2,21 +2,22 @@
   "expo": {
     "name": "drg",
     "slug": "drg",
-    "version": "1.1.4",
+    "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/images/DrG-logo.png",
     "scheme": "drg",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "NSSpeechRecognitionUsageDescription": "This app needs speech recognition access to enable voice input for Dr.G",
-        "NSMicrophoneUsageDescription": "This app needs access to your microphone to communicate with Dr.G",
-        "NSCameraUsageDescription": "This app needs access to your camera for video calls",
-        "ITSAppUsesNonExemptEncryption": false
+        "NSSpeechRecognitionUsageDescription": "This app uses speech recognition to enable voice input when you choose to interact with Dr.G.",
+        "NSMicrophoneUsageDescription": "This app requires access to your microphone to capture your voice for voice interactions with Dr.G.",
+        "NSCameraUsageDescription": "This app requires access to your camera for video calls and capturing images when you choose to do so.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your photo library only when you choose to upload images or documents such as medical records or reports.",
+        "NSPhotoLibraryAddUsageDescription": "This app requires access to your photo library to save medical reports and images."
       },
       "bundleIdentifier": "ai.onecell.drg",
       "appleTeamId": "W2K6NCXTGV"

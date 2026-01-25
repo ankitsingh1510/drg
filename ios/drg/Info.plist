@@ -54,11 +54,15 @@
       <true/>
     </dict>
     <key>NSCameraUsageDescription</key>
-    <string>This app needs access to your camera for video calls</string>
+    <string>This app requires access to your camera for video calls and capturing images when you choose to do so.</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>This app needs access to your microphone to communicate with Dr.G</string>
+    <string>This app requires access to your microphone to capture your voice for voice interactions with Dr.G.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>This app requires access to your photo library to save medical reports and images.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app accesses your photo library only when you choose to upload images or documents such as medical records or reports.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
-    <string>This app needs speech recognition access to enable voice input for Dr.G</string>
+    <string>This app uses speech recognition to enable voice input when you choose to interact with Dr.G.</string>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
