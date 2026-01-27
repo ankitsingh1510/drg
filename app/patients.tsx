@@ -5,7 +5,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
+import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
@@ -15,7 +15,7 @@ import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
   const logout = useLogout();
-  const { user, usersStudyList } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -24,61 +24,54 @@ export default function Patients() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState('Released');
-  const [showFilterModal, setShowFilterModal] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const insets = useSafeAreaInsets();
 
-  const fetchPatients = useCallback(
-    async (pageNum: number, filterValue: string, searchQuery: string, append = false) => {
-      try {
-        const response = await patientsAPI.fetchTestsDetails({
-          studyFilter: usersStudyList,
-          page: pageNum,
-          count: 10,
-          searchQuery: searchQuery,
-          workflowStatusFilter: filterValue,
-        });
-        setTotalCount(response.totalCount);
-        if (append) {
-          setPatients(prev => [...prev, ...(response.data || [])]);
-          setPage(pageNum);
-        } else {
-          setPatients(response.data || []);
-          setPage(pageNum);
-        }
-
-        setHasMore((response.data || []).length === 10);
-      } catch (error: any) {
-        if (!append) {
-          setPatients([]);
-        }
-        console.error('Error fetching patients:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
-        Alert.alert('Error', errorMessage);
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-        setLoadingMore(false);
+  const fetchPatients = useCallback(async (pageNum: number, searchQuery: string, append = false) => {
+    try {
+      const response = await patientsAPI.fetchTestsDetails({
+        page: pageNum,
+        count: 10,
+        searchQuery: searchQuery,
+      });
+      setTotalCount(response.totalCount);
+      if (append) {
+        setPatients(prev => [...prev, ...(response.data || [])]);
+        setPage(pageNum);
+      } else {
+        setPatients(response.data || []);
+        setPage(pageNum);
       }
-    },
-    [usersStudyList]
-  );
+
+      setHasMore((response.data || []).length === 10);
+    } catch (error: any) {
+      if (!append) {
+        setPatients([]);
+      }
+      console.error('Error fetching patients:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+      setLoadingMore(false);
+    }
+  }, []);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPatients(1, filter, query);
-  }, [filter, query, fetchPatients]);
+    fetchPatients(1, query);
+  }, [query, fetchPatients]);
 
   const handleLoadMore = useCallback(() => {
     if (!loadingMore && hasMore && !loading && !refreshing) {
       setLoadingMore(true);
-      fetchPatients(page + 1, filter, query, true);
+      fetchPatients(page + 1, query, true);
     }
-  }, [page, filter, query, loadingMore, hasMore, loading, refreshing, fetchPatients]);
+  }, [page, query, loadingMore, hasMore, loading, refreshing, fetchPatients]);
 
   const handleSearch = useCallback((text: string) => {
     setQuery(text);
@@ -87,24 +80,12 @@ export default function Patients() {
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (usersStudyList.length > 0) {
-        setLoading(true);
-        fetchPatients(1, filter, query);
-      }
+      setLoading(true);
+      fetchPatients(1, query);
     }, 500); // Increased to 500ms for better UX
 
     return () => clearTimeout(timeoutId);
-  }, [query, filter]); // Runs on mount and when query/filter changes
-
-  const handleFilterChange = useCallback(
-    (newFilter: string) => {
-      setFilter(newFilter);
-      setShowFilterModal(false);
-      setLoading(true);
-      fetchPatients(1, newFilter, query);
-    },
-    [query, fetchPatients]
-  );
+  }, [query]); // Runs on mount and when query changes
 
   const handleViewReport = useCallback(
     async (patient: Patient) => {
@@ -171,11 +152,6 @@ export default function Patients() {
     return <EmptyState type="no-patients" />;
   }, [loading]);
 
-  // Early returns for different states
-  if (usersStudyList.length === 0 && !loading) {
-    return <EmptyState type="no-studies" onLogout={logout} />;
-  }
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -190,15 +166,7 @@ export default function Patients() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader
-        user={user}
-        totalCount={totalCount}
-        query={query}
-        filter={filter}
-        onSearch={handleSearch}
-        onFilterPress={() => setShowFilterModal(true)}
-        onLogout={logout}
-      />
+      <PatientHeader user={user} totalCount={totalCount} query={query} onSearch={handleSearch} onLogout={logout} />
 
       <View className="flex-1">
         <FlashList
@@ -234,13 +202,6 @@ export default function Patients() {
           </View>
         )}
       </View>
-
-      <FilterModal
-        visible={showFilterModal}
-        currentFilter={filter}
-        onClose={() => setShowFilterModal(false)}
-        onFilterChange={handleFilterChange}
-      />
     </SafeAreaView>
   );
 }

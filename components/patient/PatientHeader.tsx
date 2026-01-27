@@ -12,21 +12,11 @@ interface PatientHeaderProps {
   user: User | null;
   totalCount: number;
   query: string;
-  filter: string;
   onSearch: (text: string) => void;
-  onFilterPress: () => void;
   onLogout: () => void;
 }
 
-export function PatientHeader({
-  user,
-  totalCount,
-  query,
-  filter,
-  onSearch,
-  onFilterPress,
-  onLogout,
-}: PatientHeaderProps) {
+export function PatientHeader({ user, totalCount, query, onSearch, onLogout }: PatientHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -63,43 +53,7 @@ export function PatientHeader({
             placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
           />
         </View>
-        <TouchableOpacity
-          onPress={onFilterPress}
-          activeOpacity={0.7}
-          className={`h-12 w-12 items-center justify-center rounded-full border shadow-sm ${
-            filter !== 'All'
-              ? 'border-blue-500 bg-blue-500'
-              : 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
-          }`}
-        >
-          <Text
-            style={{ fontSize: 20 }}
-            className={filter !== 'All' ? 'text-white' : 'text-gray-600 dark:text-gray-300'}
-          >
-            {filter !== 'All' ? '✓' : '≡'}
-          </Text>
-        </TouchableOpacity>
       </View>
-
-      {/* active filters chips */}
-      {(filter !== 'All' || query.trim()) && (
-        <View className="mt-4 flex-row flex-wrap gap-2">
-          {filter !== 'All' && (
-            <View className="rounded-full bg-blue-50 px-3 py-1 dark:bg-blue-900/30">
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Status: {filter}
-              </Text>
-            </View>
-          )}
-          {query.trim() && (
-            <View className="rounded-full bg-gray-100 px-3 py-1 dark:bg-gray-800">
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                "{query}"
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
     </View>
   );
 }
