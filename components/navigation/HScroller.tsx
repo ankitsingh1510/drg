@@ -1,10 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, TouchableOpacity, View } from 'react-native';
+import { memo, useCallback, useRef, useState } from 'react';
+import { Dimensions, TouchableOpacity, View } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
 
 const { width: screenWidth } = Dimensions.get('window');
+
+const CarouselItem = memo(({ item, width, cardWidth, onPress }: any) => (
+  <View style={{ width }} className="px-4">
+    <TouchableOpacity onPress={() => onPress(item)} activeOpacity={0.9} className="shadow-md">
+      <ExpoImage
+        source={item.image}
+        contentFit="cover"
+        style={{ width: cardWidth, height: 180, borderRadius: 16 }}
+        transition={300}
+      />
+    </TouchableOpacity>
+  </View>
+));
+CarouselItem.displayName = 'CarouselItem';
 
 export default function HScroller() {
   const listRef = useRef<any>(null);
@@ -37,31 +52,24 @@ export default function HScroller() {
     },
   ];
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % data.length;
-      listRef.current?.scrollToIndex({
-        index: nextIndex,
-        animated: true,
-      });
-    }, 3000); // this is to change slide every 3 seconds
-
-    return () => clearInterval(timer);
-  }, [currentIndex, data.length]);
-
-  const onScrollEnd = (event: any) => {
+  const onScrollEnd = useCallback((event: any) => {
     const position = event.nativeEvent.contentOffset.x;
     const index = Math.round(position / screenWidth);
     setCurrentIndex(index);
-  };
+  }, []);
 
-  const handleItemPress = item => {
+  const handleItemPress = useCallback((item: any) => {
     if (item.external) {
       WebBrowser.openBrowserAsync(item.url);
       return;
     }
     router.push(item.route);
-  };
+  }, []);
+
+  const renderItem = useCallback(
+    ({ item }: any) => <CarouselItem item={item} width={screenWidth} cardWidth={cardWidth} onPress={handleItemPress} />,
+    [cardWidth, handleItemPress]
+  );
 
   return (
     <View className="-mb-3">
@@ -70,21 +78,11 @@ export default function HScroller() {
         data={data}
         horizontal
         pagingEnabled
+        estimatedItemSize={screenWidth}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
         onMomentumScrollEnd={onScrollEnd}
-        renderItem={({ item }) => (
-          <View style={{ width: screenWidth }} className="px-4">
-            <TouchableOpacity onPress={() => handleItemPress(item)} activeOpacity={0.9} className="shadow-md">
-              <Image
-                source={item.image}
-                resizeMode="cover"
-                style={{ width: cardWidth, height: 180 }}
-                className="rounded-2xl"
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+        renderItem={renderItem}
       />
 
       <View className="mt-4 flex-row items-center justify-center gap-2">

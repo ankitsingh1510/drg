@@ -21,45 +21,48 @@ export default function ProfileActionButtons({
 }: ProfileActionButtonsProps) {
   if (!isEditing) {
     return (
-      <View className="mb-6 flex-row gap-3">
+      <View className="mb-6 items-center">
         <TouchableOpacity
           onPress={onEdit}
-          className="flex-1 flex-row items-center justify-center gap-2 rounded-lg bg-blue-500 py-3 active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700"
+          activeOpacity={0.8}
+          className="h-12 flex-row items-center justify-center gap-2 rounded-full bg-blue-500 px-10 shadow-sm active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700"
         >
-          <Edit2 size={20} color="#ffffff" />
-          <Text className="font-semibold text-white">Edit Profile</Text>
+          <Edit2 size={18} color="#ffffff" strokeWidth={2.5} />
+          <Text className="text-base font-bold text-white">Edit Profile</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="mb-6 flex-row gap-3">
+    <View className="mb-6 flex-row justify-center gap-4">
       <TouchableOpacity
         onPress={onCancel}
         disabled={isLoading}
-        className="flex-1 flex-row items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white py-3 active:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:active:bg-gray-600"
+        activeOpacity={0.7}
+        className="h-12 max-w-[160px] flex-1 flex-row items-center justify-center gap-2 rounded-full border border-gray-200 bg-white shadow-sm active:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:active:bg-gray-700"
       >
         {isLoading ? (
           <ActivityIndicator size="small" color={isDarkMode ? '#e5e7eb' : '#374151'} />
         ) : (
           <>
-            <X size={20} color={isDarkMode ? '#e5e7eb' : '#374151'} />
-            <Text className="font-semibold text-gray-700 dark:text-gray-200">Cancel</Text>
+            <X size={18} color={isDarkMode ? '#e5e7eb' : '#374151'} strokeWidth={2.5} />
+            <Text className="text-base font-bold text-gray-700 dark:text-gray-200">Cancel</Text>
           </>
         )}
       </TouchableOpacity>
       <TouchableOpacity
         onPress={onSave}
         disabled={isLoading}
-        className="flex-1 flex-row items-center justify-center gap-2 rounded-lg bg-blue-500 py-3 active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700"
+        activeOpacity={0.8}
+        className="h-12 max-w-[160px] flex-1 flex-row items-center justify-center gap-2 rounded-full bg-blue-500 shadow-sm active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700"
       >
         {isLoading ? (
           <ActivityIndicator size="small" color="#ffffff" />
         ) : (
           <>
-            <Save size={20} color="#ffffff" />
-            <Text className="font-semibold text-white">Save</Text>
+            <Save size={18} color="#ffffff" strokeWidth={2.5} />
+            <Text className="text-base font-bold text-white">Save</Text>
           </>
         )}
       </TouchableOpacity>
