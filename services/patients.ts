@@ -36,6 +36,7 @@ export interface Patient {
   patientName: string;
   reportFinalizedDate: string;
   full_report_html_path: string;
+  analysisCompletionDate: string;
   _totalCount: number;
 }
 

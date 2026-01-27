@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
-  Text,
+  StyleSheet, Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
+import { ArrowLeft, Building, Calendar, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
@@ -30,10 +30,25 @@ import { usersAPI } from '@/services/users';
 import type { EnumOption, ProfileField, UserProfileData } from '@/types/users';
 import { toast } from '@/util/toast';
 
+const fieldIconMap: { [key: string]: any } = {
+  name: User,
+  lname: User,
+  email: Mail,
+  mobile: Phone,
+  phone: Phone,
+  address: MapPin,
+  town: MapPin,
+  state: Globe,
+  country: Globe,
+  zip: Hash,
+  organization: Building,
+  userType: User,
+  dob: Calendar,
+};
+
 const Profile = () => {
   const router = useRouter();
   const { user } = useAuth();
-
   const { theme } = useThemeSync();
   const isDarkMode = theme === 'dark';
 
@@ -61,7 +76,6 @@ const Profile = () => {
       if (response?.data) {
         setProfileData(response.data);
         setFormFields(response.data.fields);
-        // Stored original MFA state
         const mfaField = response.data.fields.find(f => f.name === 'isMfaEnabled');
         setOriginalMfaEnabled(mfaField?.value?.toString() || '');
       }
@@ -73,24 +87,16 @@ const Profile = () => {
     }
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
+  const handleEdit = () => setIsEditing(true);
   const handleCancel = () => {
-    if (profileData) {
-      setFormFields([...profileData.fields]);
-    }
+    if (profileData) setFormFields([...profileData.fields]);
     setIsEditing(false);
   };
 
   const validateRequiredFields = (): boolean => {
     const emptyRequiredFields = formFields.filter(field => {
       if (!field.required || !field.visible) return false;
-
-      if (typeof field.value === 'object' && field.value !== null) {
-        return false;
-      }
+      if (typeof field.value === 'object' && field.value !== null) return false;
       return !field.value || field.value.toString().trim() === '';
     });
 
@@ -103,28 +109,21 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    if (!validateRequiredFields()) {
-      return;
-    }
-    // Check if MFA was changed
+    if (!validateRequiredFields()) return;
     const currentMfaField = formFields.find(f => f.name === 'isMfaEnabled');
     const currentMfaValue = currentMfaField?.value?.toString() || '';
     const isMfaChanged = originalMfaEnabled !== currentMfaValue;
     setMfaChanged(isMfaChanged);
 
-    // If MFA changed, show relogin warning first
     if (isMfaChanged) {
       setShowReloginModal(true);
     } else {
-      // Otherwise, proceed directly to eSignature modal
       proceedToESignature();
     }
   };
 
   const proceedToESignature = () => {
-    const emailField = formFields.find(f => f.name === 'email');
-    const emailValue = emailField?.value?.toString() || '';
-    setESignatureUsername(user?.username);
+    setESignatureUsername(user?.username || '');
     setOriginalFormFields([...formFields]);
     setShowESignatureModal(true);
   };
@@ -157,9 +156,7 @@ const Profile = () => {
       setESignatureError('');
       if (mfaChanged) {
         setIsLoading(false);
-        setTimeout(() => {
-          router.replace('/login?logout=true' as any);
-        }, 500);
+        setTimeout(() => router.replace('/login?logout=true' as any), 500);
       } else {
         await loadProfile();
       }
@@ -180,16 +177,12 @@ const Profile = () => {
 
   const updateFieldValue = (fieldName: string, value: any) => {
     setFormFields(prev => {
-      // When isMfaEnabled or emailMfa changes, sync both fields
       if (fieldName === 'isMfaEnabled' || fieldName === 'emailMfa') {
         return prev.map(field => {
-          if (field.name === 'isMfaEnabled' || field.name === 'emailMfa') {
-            return { ...field, value };
-          }
+          if (field.name === 'isMfaEnabled' || field.name === 'emailMfa') return { ...field, value };
           return field;
         });
       }
-      // For other fields, update only that field
       return prev.map(field => (field.name === fieldName ? { ...field, value } : field));
     });
   };
@@ -205,6 +198,7 @@ const Profile = () => {
     if (!field.visible) return null;
     const isReadOnly = field.readOnly || !isEditing;
     const fieldValue = getFieldValue(field);
+    const FieldIcon = fieldIconMap[field.name];
 
     if (['text', 'alpha', 'email'].includes(field.widgetType)) {
       return (
@@ -214,6 +208,7 @@ const Profile = () => {
           value={fieldValue}
           isReadOnly={isReadOnly}
           isDarkMode={isDarkMode}
+          icon={FieldIcon}
           onChangeText={text => updateFieldValue(field.name, text)}
         />
       );
@@ -227,6 +222,7 @@ const Profile = () => {
             value={fieldValue}
             isReadOnly={isReadOnly}
             isDarkMode={isDarkMode}
+            innerIcon={FieldIcon}
             onPress={() => setShowDropdown(field.name)}
           />
           <FieldDropdownModal
@@ -241,17 +237,11 @@ const Profile = () => {
     }
 
     if (field.widgetType === 'checkbox') {
-      // For emailMfa, show it as ON if isMfaEnabled is ON
       let isChecked = field.value === '1' || field.value === 1;
       if (field.name === 'emailMfa') {
         const mfaEnabledField = formFields.find(f => f.name === 'isMfaEnabled');
-        const isMfaEnabled = mfaEnabledField?.value === '1' || mfaEnabledField?.value === 1;
-        isChecked = isMfaEnabled;
-      }
-      if (field.name === 'emailMfa') {
-        const mfaEnabledField = formFields.find(f => f.name === 'isMfaEnabled');
-        const isMfaEnabled = mfaEnabledField?.value === '1' || mfaEnabledField?.value === 1;
-        if (!isMfaEnabled) return null;
+        isChecked = mfaEnabledField?.value === '1' || mfaEnabledField?.value === 1;
+        if (!isChecked) return null;
       }
       return (
         <ProfileCheckboxField
@@ -264,24 +254,43 @@ const Profile = () => {
         />
       );
     }
-
     return null;
   };
 
-  const renderIcon = (sectionName: string) => {
-    const iconColor = isDarkMode ? colors.dark.text : colors.light.text;
+  const renderSectionHeader = (sectionName: string) => {
+    let icon;
+    let lightBg;
+
     switch (sectionName) {
       case 'Primary Details':
-        return <User size={20} color={iconColor} />;
+        icon = <User size={18} color="#3b82f6" />;
+        lightBg = isDarkMode ? 'rgba(59, 130, 246, 0.15)' : '#eff6ff';
+        break;
       case 'Address':
-        return <MapPin size={20} color={iconColor} />;
+        icon = <MapPin size={18} color="#10b981" />;
+        lightBg = isDarkMode ? 'rgba(16, 185, 129, 0.15)' : '#ecfdf5';
+        break;
       case 'Contact Details':
-        return <Phone size={20} color={iconColor} />;
+        icon = <Phone size={18} color="#f59e0b" />;
+        lightBg = isDarkMode ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb';
+        break;
       case 'Secure Your Account with 2FA':
-        return <Lock size={20} color={iconColor} />;
+        icon = <Lock size={18} color="#8b5cf6" />;
+        lightBg = isDarkMode ? 'rgba(139, 92, 246, 0.15)' : '#f5f3ff';
+        break;
       default:
-        return null;
+        icon = <User size={18} color="#6b7280" />;
+        lightBg = isDarkMode ? 'rgba(107, 114, 128, 0.15)' : '#f3f4f6';
     }
+
+    return (
+      <View className="mb-6 flex-row items-center gap-3">
+        <View style={{ backgroundColor: lightBg }} className="h-10 w-10 items-center justify-center rounded-2xl">
+          {icon}
+        </View>
+        <Text className="flex-1 text-lg font-bold tracking-tight text-gray-800 dark:text-gray-100">{sectionName}</Text>
+      </View>
+    );
   };
 
   const groupFieldsByDisplayGroup = () => {
@@ -294,24 +303,20 @@ const Profile = () => {
         field.name !== 'organization' &&
         field.name !== 'userType'
       ) {
-        if (!groups[field.displayGroup]) {
-          groups[field.displayGroup] = [];
-        }
+        if (!groups[field.displayGroup]) groups[field.displayGroup] = [];
         groups[field.displayGroup].push(field);
       }
     });
-    Object.keys(groups).forEach(key => {
-      groups[key].sort((a, b) => a.displayOrder - b.displayOrder);
-    });
+    Object.keys(groups).forEach(key => groups[key].sort((a, b) => a.displayOrder - b.displayOrder));
     return groups;
   };
 
   const getName = () => {
     const nameField = formFields.find(f => f.name === 'name');
     const lnameField = formFields.find(f => f.name === 'lname');
-    const name = getFieldValue(nameField || ({} as ProfileField));
-    const lname = getFieldValue(lnameField || ({} as ProfileField));
-    return { name, lname };
+    const nameStr = getFieldValue(nameField || ({} as ProfileField));
+    const lnameStr = getFieldValue(lnameField || ({} as ProfileField));
+    return { name: nameStr, lname: lnameStr };
   };
 
   if (isLoading && !profileData) {
@@ -321,7 +326,8 @@ const Profile = () => {
       </SafeAreaView>
     );
   }
-  const { name, lname } = getName();
+
+  const { name: fName, lname: lName } = getName();
   const groupedFields = groupFieldsByDisplayGroup();
 
   return (
@@ -336,34 +342,31 @@ const Profile = () => {
             <Pressable
               hitSlop={10}
               onPress={() => router.back()}
-              className="rounded-full border border-gray-300 p-2 active:bg-gray-200 dark:border-gray-600 dark:active:bg-gray-700"
+              activeOpacity={0.7}
+            className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
             >
-              <ArrowLeft size={24} color={isDarkMode ? colors.dark.text : colors.light.text} />
+              <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
             </Pressable>
-            <Text className="text-xl font-semibold text-gray-800 dark:text-gray-100">My Profile</Text>
+            <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
           </View>
           <IconNavBar />
         </View>
 
         <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <ProfileHeader
-            firstName={name}
-            lastName={lname}
+            firstName={fName}
+            lastName={lName}
             organizationName={profileData?.orgMapping.organizationName || ''}
           />
 
-          {Object.entries(groupedFields).map(([groupName, fields]) => (
-            <View key={groupName} className="mb-6 rounded-xl bg-white p-6 shadow-md dark:bg-gray-800">
-              <View className="mb-4 flex-row items-center gap-3">
-                {renderIcon(groupName)}
-                <Text className="flex-1 text-lg font-semibold text-gray-800 dark:text-gray-100">{groupName}</Text>
-              </View>
-              {fields.map(field => renderField(field))}
-            </View>
-          ))}
+        {Object.entries(groupedFields).map(([groupName, fields]) => (
+          <View key={groupName} style={styles.card} className="mb-6 rounded-3xl bg-white p-6 dark:bg-gray-800">
+            {renderSectionHeader(groupName)}
+            <View className="space-y-4">{fields.map(field => renderField(field))}</View>
+          </View>
+        ))}
 
-          {/* Buttons: Edit Profile, Save, Cancel */}
-          <ProfileActionButtons
+            <ProfileActionButtons
             isEditing={isEditing}
             isLoading={isLoading}
             isDarkMode={isDarkMode}
@@ -371,7 +374,7 @@ const Profile = () => {
             onSave={handleSave}
             onCancel={handleCancel}
           />
-          <View className="h-6" />
+          <View className="h-10" />
         </ScrollView>
         <ESignatureModal
           visible={showESignatureModal}
@@ -391,3 +394,13 @@ const Profile = () => {
 };
 
 export default Profile;
+
+const styles = StyleSheet.create({
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+});
