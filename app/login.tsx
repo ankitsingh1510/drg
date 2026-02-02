@@ -82,6 +82,12 @@ export default function LoginScreen() {
       if (response && response.token) {
         const token = response.token;
         const tokenPayload = decryptToken(token);
+        const isDrgUser = tokenPayload.assignedApplications.some(app => app.name.toLowerCase() === 'drg');
+        if (!isDrgUser) {
+          setIsLoading(false);
+          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
+          return;
+        }
         if (!tokenPayload) {
           throw new Error('Invalid token received');
         }

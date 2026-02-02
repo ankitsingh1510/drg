@@ -21,6 +21,7 @@ export default function ESignatureModal({
 }: ESignatureModalProps) {
   const { colorScheme } = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
+  const [showPassword, setShowPassword] = useState(false);
 
   const [password, setPassword] = useState('');
   const changeReasonDetail = 'Profile Update';
@@ -57,6 +58,7 @@ export default function ESignatureModal({
 
   const handleCancel = () => {
     setPassword('');
+    setShowPassword(false);
     onCancel();
   };
 
@@ -67,7 +69,6 @@ export default function ESignatureModal({
           <Text className="text-semibold mb-4 text-gray-600 dark:text-gray-400">
             Please provide your credentials to confirm this profile update
           </Text>
-
           {/* <View className="mb-4">
             <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
               Username <Text className="text-red-500">*</Text>
@@ -86,14 +87,30 @@ export default function ESignatureModal({
             <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
               Password <Text className="text-red-500">*</Text>
             </Text>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter password"
-              secureTextEntry
-              className="rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-              placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
-            />
+
+            <View className="relative">
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Enter password"
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="password"
+                importantForAutofill="yes"
+                className="rounded-lg border border-gray-300 bg-white px-4 py-3 pr-12 text-base text-gray-800 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              />
+
+              <Pressable
+                hitSlop={12}
+                onPress={() => setShowPassword(prev => !prev)}
+                className="absolute right-3 top-1/2 h-10 w-10 -translate-y-1/2 items-center justify-center"
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              >
+                <Text className="text-lg">{showPassword ? '🙈' : '👁️'}</Text>
+              </Pressable>
+            </View>
           </View>
 
           {/* <View className="mb-6">
@@ -112,7 +129,6 @@ export default function ESignatureModal({
               textAlignVertical="top"
             />
           </View> */}
-
           <View className="flex-row gap-3">
             <TouchableOpacity
               onPress={handleCancel}
