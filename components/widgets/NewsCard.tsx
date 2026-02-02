@@ -117,7 +117,6 @@ const NewsCard = ({ count }: NewsCardProps) => {
           paddingTop: 30,
           paddingBottom: 60,
         }}
-        estimatedItemSize={400}
         keyExtractor={(item: any, index: number) => item.id?.toString() || index.toString()}
         renderItem={renderItem}
       />
