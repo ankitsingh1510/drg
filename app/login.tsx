@@ -85,7 +85,7 @@ export default function LoginScreen() {
         const isDrgUser = tokenPayload.assignedApplications.some(app => app.name.toLowerCase() === 'drg');
         if (!isDrgUser) {
           setIsLoading(false);
-          Alert.alert('Access Denied', 'You do not have access to the DrG application.');
+          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
           return;
         }
         if (!tokenPayload) {
