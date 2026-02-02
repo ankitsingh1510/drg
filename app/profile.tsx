@@ -5,7 +5,8 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet, Text,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -342,8 +343,7 @@ const Profile = () => {
             <Pressable
               hitSlop={10}
               onPress={() => router.back()}
-              activeOpacity={0.7}
-            className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
+              className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
             >
               <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
             </Pressable>
@@ -359,14 +359,14 @@ const Profile = () => {
             organizationName={profileData?.orgMapping.organizationName || ''}
           />
 
-        {Object.entries(groupedFields).map(([groupName, fields]) => (
-          <View key={groupName} style={styles.card} className="mb-6 rounded-3xl bg-white p-6 dark:bg-gray-800">
-            {renderSectionHeader(groupName)}
-            <View className="space-y-4">{fields.map(field => renderField(field))}</View>
-          </View>
-        ))}
+          {Object.entries(groupedFields).map(([groupName, fields]) => (
+            <View key={groupName} style={styles.card} className="mb-6 rounded-3xl bg-white p-6 dark:bg-gray-800">
+              {renderSectionHeader(groupName)}
+              <View className="space-y-4">{fields.map(field => renderField(field))}</View>
+            </View>
+          ))}
 
-            <ProfileActionButtons
+          <ProfileActionButtons
             isEditing={isEditing}
             isLoading={isLoading}
             isDarkMode={isDarkMode}

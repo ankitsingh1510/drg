@@ -209,7 +209,6 @@ export default function Patients() {
             paddingTop: 10,
             paddingBottom: 40,
           }}
-          estimatedItemSize={220}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
