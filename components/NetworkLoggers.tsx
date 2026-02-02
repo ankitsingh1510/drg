@@ -1,11 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import NetworkLogger from 'react-native-network-logger';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const NetworkLoggers = () => {
   const [visible, setVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const openLogger = useCallback(() => setVisible(true), []);
   const closeLogger = useCallback(() => setVisible(false), []);
@@ -26,21 +29,21 @@ const NetworkLoggers = () => {
       )}
 
       <Modal animationType="slide" visible={visible} presentationStyle="fullScreen" onRequestClose={closeLogger}>
-        <View className="flex-1 bg-white">
+        <View className="flex-1 bg-white dark:bg-gray-900">
           <View
             style={{
               paddingTop: insets.top + 8,
             }}
-            className="flex-row items-center justify-between border-b border-gray-200 px-5 pb-3"
+            className="flex-row items-center justify-between border-b border-gray-200 px-5 pb-3 dark:border-gray-700"
           >
-            <Text className="text-base font-semibold">Network Logs</Text>
+            <Text className="text-base font-semibold text-gray-900 dark:text-white">Network Logs</Text>
             <Pressable onPress={closeLogger}>
               <Text className="font-semibold text-red-600">Close</Text>
             </Pressable>
           </View>
 
           <View className="flex-1">
-            <NetworkLogger />
+            <NetworkLogger theme={isDark ? 'dark' : 'light'} />
           </View>
 
           <SafeAreaView edges={['bottom']} />
