@@ -70,7 +70,7 @@ def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBu
 
 // Load signing config from local.properties
 def signingProperties = new Properties()
-def localPropertiesFile = rootProject.file('../local.properties')
+def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     signingProperties.load(new FileInputStream(localPropertiesFile))
 }
@@ -118,11 +118,16 @@ android {
     }
     signingConfigs {
         release {
-            if (localPropertiesFile.exists() && signingProperties['storeFile']) {
-                storeFile rootProject.file(signingProperties['storeFile'])
-                storePassword signingProperties['storePassword']
-                keyAlias signingProperties['keyAlias']
-                keyPassword signingProperties['keyPassword']
+            def keystorePath = signingProperties.getProperty('storeFile')
+            def keystorePassword = signingProperties.getProperty('storePassword')
+            def keystoreKeyAlias = signingProperties.getProperty('keyAlias')
+            def keystoreKeyPassword = signingProperties.getProperty('keyPassword')
+            
+            if (keystorePath && keystorePassword && keystoreKeyAlias && keystoreKeyPassword) {
+                storeFile rootProject.file(keystorePath)
+                storePassword keystorePassword
+                keyAlias keystoreKeyAlias
+                keyPassword keystoreKeyPassword
             }
         }
     }
