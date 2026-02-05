@@ -366,14 +366,14 @@ const Profile = () => {
             </View>
           ))}
 
-          <ProfileActionButtons
+          {/* <ProfileActionButtons
             isEditing={isEditing}
             isLoading={isLoading}
             isDarkMode={isDarkMode}
             onEdit={handleEdit}
             onSave={handleSave}
             onCancel={handleCancel}
-          />
+          /> */}
           <View className="h-10" />
         </ScrollView>
         <ESignatureModal
