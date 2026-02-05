@@ -47,12 +47,16 @@ const firebaseConfig =
 
 const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
 
-if (isFirebaseEnabled) {
+if (isFirebaseEnabled && Device.isDevice) {
   try {
     getApp();
+    console.log('Firebase app already initialized');
   } catch (e) {
-    if (Device.isDevice) {
+    try {
       initializeApp(firebaseConfig);
+      console.log('Firebase app initialized successfully');
+    } catch (initError) {
+      console.error('Failed to initialize Firebase:', initError);
     }
   }
 }
@@ -156,7 +160,7 @@ export default function RootLayout() {
             <Stack screenOptions={STACK_OPTIONS} />
             <Toast position="bottom" />
             <NetworkChecker />
-            {__DEV__ && <NetworkLoggers />}
+            {<NetworkLoggers />}
           </View>
         </GestureHandlerRootView>
       </AuthProvider>
