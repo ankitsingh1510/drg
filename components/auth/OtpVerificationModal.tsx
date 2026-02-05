@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useColorScheme } from 'nativewind';
 import { usersAPI } from '@/services/users';
 import { toast } from '@/util/toast';
 
@@ -20,8 +19,6 @@ export default function OtpVerificationModal({
   setIsLoading,
 }: OtpVerificationModalProps) {
   const [otp, setOtp] = useState('');
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
 
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== 6) {

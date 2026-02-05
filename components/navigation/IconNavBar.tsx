@@ -2,7 +2,6 @@ import React from 'react';
 import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { Home, LogOut } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
 import { colors } from '@/constants/colors';
 import { useLogout } from '@/context/AuthContext';
 
@@ -10,8 +9,6 @@ export default function IconNavBar() {
   const router = useRouter();
   const pathname = usePathname();
   const logout = useLogout();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
 
   const isHome = pathname === '/landing' || pathname === '/';
 
@@ -55,14 +52,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    // padding: 10,
   },
-  iconButton: {
-    // padding: 12,
-  },
+  iconButton: {},
   iconContainer: {
     borderRadius: 50,
     padding: 8,
-    // marginBottom: 12,
   },
 });
