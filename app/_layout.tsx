@@ -160,7 +160,7 @@ export default function RootLayout() {
             <Stack screenOptions={STACK_OPTIONS} />
             <Toast position="bottom" />
             <NetworkChecker />
-            {<NetworkLoggers />}
+            {__DEV__ && <NetworkLoggers />}
           </View>
         </GestureHandlerRootView>
       </AuthProvider>
