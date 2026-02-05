@@ -1,3 +1,4 @@
+import * as Notifications from 'expo-notifications';
 import { getFcmToken, storage } from '@/stores/mmkv';
 import { apiFetch } from './fetchClient';
 
@@ -31,8 +32,9 @@ class RagAPI {
       const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
       const fcmToken = isFirebaseEnabled ? (getFcmToken() ?? null) : null;
       const formData = new FormData();
+      const { status } = await Notifications.getPermissionsAsync();
       formData.append('accession_id', accession_id);
-      if (fcmToken && isFirebaseEnabled) {
+      if (fcmToken && isFirebaseEnabled && status === 'granted') {
         formData.append('fcmKey', fcmToken);
       }
       const response = await apiFetch(`${this.baseUrl}/api/v1/drg/rag`, {
