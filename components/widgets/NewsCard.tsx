@@ -4,7 +4,6 @@ import { Image as ExpoImage } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
 import { useAtomValue } from 'jotai';
-import { useColorScheme } from 'nativewind';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { colors } from '@/constants/colors';
 import { imagesAtom, newsAtom } from '@/stores/ApiData';
@@ -83,8 +82,6 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
 const NewsCard = ({ count }: NewsCardProps) => {
   const news = useAtomValue(newsAtom);
   const images = useAtomValue(imagesAtom);
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
 
   const handleClick = useCallback((url: string) => {
     WebBrowser.openBrowserAsync(url);
@@ -117,7 +114,6 @@ const NewsCard = ({ count }: NewsCardProps) => {
           paddingTop: 30,
           paddingBottom: 60,
         }}
-        estimatedItemSize={400}
         keyExtractor={(item: any, index: number) => item.id?.toString() || index.toString()}
         renderItem={renderItem}
       />

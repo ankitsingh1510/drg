@@ -78,7 +78,6 @@ export default function HScroller() {
         data={data}
         horizontal
         pagingEnabled
-        estimatedItemSize={screenWidth}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, index) => index.toString()}
         onMomentumScrollEnd={onScrollEnd}
