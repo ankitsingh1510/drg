@@ -11,9 +11,9 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#0f172a]">
+      <View className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900">
         <ActivityIndicator size="large" color={colors.common.primary} />
-        <Text className="mt-2 text-lg text-slate-400">Loading</Text>
+        <Text className="mt-2 text-lg text-slate-600 dark:text-gray-300">Loading</Text>
       </View>
     );
   }
