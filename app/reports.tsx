@@ -17,7 +17,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { getAPNSToken, getToken } from '@react-native-firebase/messaging';
 import messaging, { onMessage } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
@@ -29,9 +28,9 @@ import InteractionBox from '@/components/interaction/Interactions';
 import { NotificationPermissionModal } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { configAPI } from '@/services/config';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
-import { storageAPI } from '@/services/storage';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
 import { IngestionStatus } from '@/types/types';
@@ -39,51 +38,79 @@ import { toast } from '@/util/toast';
 
 async function getFcmToken() {
   try {
+    const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
+    if (!isFirebaseEnabled) {
+      console.log('Firebase is not enabled');
+      return null;
+    }
+
     const messagingInstance = messaging();
 
     if (Platform.OS === 'ios') {
-      const apnsToken = await getAPNSToken(messagingInstance);
+      const authStatus = await messagingInstance.requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (!enabled) {
+        console.log('Push notification permission not granted');
+        return null;
+      }
+
+      await messagingInstance.registerDeviceForRemoteMessages();
+      let apnsToken = await messagingInstance.getAPNSToken();
+      let retries = 0;
+      while (!apnsToken && retries < 5) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        apnsToken = await messagingInstance.getAPNSToken();
+        retries++;
+      }
+
       if (!apnsToken) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.error('Failed to get APNs token after retries');
+        return null;
       }
     }
-    const token = await getToken(messagingInstance);
+
+    const token = await messagingInstance.getToken();
+    setFcmToken(token);
+    console.log('FCM Token:', token);
     return token;
   } catch (error) {
     console.error('Error fetching FCM token:', error);
-    throw error;
+    return null;
   }
 }
-
 async function registerForPushNotificationsAsync() {
-  const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
+  const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true';
 
   if (!Device.isDevice || !isFirebaseEnabled) {
     console.log('Push notifications skipped (emulator or Firebase disabled)');
     return;
   }
 
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      return false;
-    }
-
-    try {
-      const pushTokenString = await getFcmToken();
-      setFcmToken(pushTokenString ?? '');
-      return true;
-    } catch (e: unknown) {
-      console.error('Error getting FCM token:', e);
-      return false;
-    }
+  const permission = await Notifications.getPermissionsAsync();
+  const { status, canAskAgain } = permission;
+  console.log('Current notification permission status:', status);
+  if (status === 'granted') {
+    console.log('Notification permission already granted');
+    return;
   }
-  return false;
+
+  if (status === 'undetermined' && canAskAgain) {
+    const { status: newStatus } = await Notifications.requestPermissionsAsync();
+    if (newStatus === 'granted') {
+      await getFcmToken();
+    }
+    return;
+  }
+
+  if (status === 'denied' && !canAskAgain) {
+    toast.info('Notifications blocked — open settings');
+    return;
+  }
+
+  return;
 }
 
 export default function Reports() {
@@ -92,6 +119,7 @@ export default function Reports() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
   let { pdfUrl, patientName, documentId, accession_id, ingestionStatus } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
@@ -114,12 +142,28 @@ export default function Reports() {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
+  const [showVideoAvatar, setShowVideoAvatar] = useState(true);
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!isDevice) {
-      console.log('Push notifications skipped (emulator)');
+    Notifications.getPermissionsAsync().then(({ status }) => {
+      console.log('Notification permission status on reports load:', status);
+      if (isFirebaseEnabled && Device.isDevice && status === 'granted') {
+        getFcmToken();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    configAPI.getConfig().then(config => {
+      setShowVideoAvatar(config.showVideoAvatar);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!Device.isDevice || !isFirebaseEnabled) {
+      console.log('Push notifications skipped (emulator or Firebase disabled)');
       return;
     }
     const unsubscribe = onMessage(messaging(), async remoteMessage => {
@@ -171,6 +215,7 @@ export default function Reports() {
     if (Device.isDevice) {
       const { status } = await Notifications.getPermissionsAsync();
       if (status !== 'granted') {
+        console.log('Notification permission not granted');
         setShowNotificationModal(true);
         return;
       }
@@ -185,7 +230,6 @@ export default function Reports() {
 
     try {
       const res = await ragAPI.ingestReport(accession_id);
-
       toast.success(res.message, undefined, 3000);
     } catch (error) {
       console.log('Error while analyzing report:', error);
@@ -369,16 +413,18 @@ export default function Reports() {
         >
           {currentIngestionStatus === 'ingested' && (
             <View className="flex-row items-center justify-center gap-4 py-2">
-              <ReAnimated.View entering={FadeInUp.delay(500).duration(800).springify()}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="flex-row items-center justify-center rounded-full bg-blue-600 px-6 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
-                  onPress={handleTalkToDrG}
-                >
-                  <Feather name="video" size={20} color="white" strokeWidth={2.5} />
-                  <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
-                </TouchableOpacity>
-              </ReAnimated.View>
+              {showVideoAvatar && (
+                <ReAnimated.View entering={FadeInUp.delay(500).duration(800).springify()}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="flex-row items-center justify-center rounded-full bg-blue-600 px-6 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
+                    onPress={handleTalkToDrG}
+                  >
+                    <Feather name="video" size={20} color="white" strokeWidth={2.5} />
+                    <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
+                  </TouchableOpacity>
+                </ReAnimated.View>
+              )}
 
               <ReAnimated.View entering={FadeInUp.delay(650).duration(800).springify()}>
                 <TouchableOpacity

@@ -17,19 +17,23 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
 
   const dateInfo = useMemo(() => {
     try {
-      const date = new Date(patient.analysisCompletionDate);
-      const formatted = date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-
       const today = new Date();
-      const diffTime = Math.abs(today.getTime() - date.getTime());
+      today.setHours(0, 0, 0, 0);
+      const date = new Date(patient.analysisCompletionDate);
+      date.setHours(0, 0, 0, 0);
+
+      const diffTime = today.getTime() - date.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       const daysAgo = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
 
-      return { formatted, daysAgo };
+      return {
+        formatted: date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        }),
+        daysAgo,
+      };
     } catch {
       return { formatted: patient.analysisCompletionDate, daysAgo: '' };
     }
