@@ -1,10 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { useColorScheme } from 'nativewind';
 import NetworkLogger from 'react-native-network-logger';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const NetworkLoggers = () => {
   const [visible, setVisible] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const openLogger = useCallback(() => setVisible(true), []);
   const closeLogger = useCallback(() => setVisible(false), []);
@@ -15,29 +19,35 @@ const NetworkLoggers = () => {
         <Pressable
           onPress={openLogger}
           style={{
-            position: 'absolute',
-            bottom: 100,
-            right: 40,
-            zIndex: 999,
+            bottom: insets.bottom + 24,
+            right: 24,
           }}
-          className="rounded-full bg-red-600 px-4 py-2"
+          className="absolute z-50 rounded-full bg-red-600 px-4 py-2"
         >
           <Text className="font-semibold text-white">LOGS</Text>
         </Pressable>
       )}
 
       <Modal animationType="slide" visible={visible} presentationStyle="fullScreen" onRequestClose={closeLogger}>
-        <SafeAreaView className="flex-1 bg-white">
-          <View className="flex-row items-center justify-between border-b border-gray-200 px-5 py-5">
-            <Text className="text-base font-semibold">Network Logs</Text>
+        <View className="flex-1 bg-white dark:bg-gray-900">
+          <View
+            style={{
+              paddingTop: insets.top + 8,
+            }}
+            className="flex-row items-center justify-between border-b border-gray-200 px-5 pb-3 dark:border-gray-700"
+          >
+            <Text className="text-base font-semibold text-gray-900 dark:text-white">Network Logs</Text>
             <Pressable onPress={closeLogger}>
               <Text className="font-semibold text-red-600">Close</Text>
             </Pressable>
           </View>
+
           <View className="flex-1">
-            <NetworkLogger />
+            <NetworkLogger theme={isDark ? 'dark' : 'light'} />
           </View>
-        </SafeAreaView>
+
+          <SafeAreaView edges={['bottom']} />
+        </View>
       </Modal>
     </>
   );

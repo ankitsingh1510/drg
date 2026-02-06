@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Building, Calendar, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -323,56 +333,62 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <View className="mb-2 flex-row items-center justify-between px-5 pb-2">
-        <View className="flex-row items-center gap-4">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            activeOpacity={0.7}
-            className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
-          >
-            <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
-          </TouchableOpacity>
-          <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
-        </View>
-        <IconNavBar />
-      </View>
-
-      <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
-        <ProfileHeader
-          firstName={fName}
-          lastName={lName}
-          organizationName={profileData?.orgMapping.organizationName || ''}
-        />
-
-        {Object.entries(groupedFields).map(([groupName, fields]) => (
-          <View key={groupName} style={styles.card} className="mb-6 rounded-3xl bg-white p-6 dark:bg-gray-800">
-            {renderSectionHeader(groupName)}
-            <View className="space-y-4">{fields.map(field => renderField(field))}</View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
+          <View className="flex-row items-center gap-4">
+            <Pressable
+              hitSlop={10}
+              onPress={() => router.back()}
+              className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
+            >
+              <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
+            </Pressable>
+            <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
           </View>
-        ))}
+          <IconNavBar />
+        </View>
 
-        <ProfileActionButtons
-          isEditing={isEditing}
-          isLoading={isLoading}
-          isDarkMode={isDarkMode}
-          onEdit={handleEdit}
-          onSave={handleSave}
-          onCancel={handleCancel}
+        <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ProfileHeader
+            firstName={fName}
+            lastName={lName}
+            organizationName={profileData?.orgMapping.organizationName || ''}
+          />
+
+          {Object.entries(groupedFields).map(([groupName, fields]) => (
+            <View key={groupName} style={styles.card} className="mb-6 rounded-3xl bg-white p-6 dark:bg-gray-800">
+              {renderSectionHeader(groupName)}
+              <View className="space-y-4">{fields.map(field => renderField(field))}</View>
+            </View>
+          ))}
+
+          <ProfileActionButtons
+            isEditing={isEditing}
+            isLoading={isLoading}
+            isDarkMode={isDarkMode}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+          <View className="h-10" />
+        </ScrollView>
+        <ESignatureModal
+          visible={showESignatureModal}
+          username={eSignatureUsername}
+          errorMessage={eSignatureError}
+          onCancel={() => {
+            setFormFields([...originalFormFields]);
+            setShowESignatureModal(false);
+            setESignatureError('');
+          }}
+          onConfirm={handleESignatureSubmit}
         />
-        <View className="h-10" />
-      </ScrollView>
-      <ESignatureModal
-        visible={showESignatureModal}
-        username={eSignatureUsername}
-        errorMessage={eSignatureError}
-        onCancel={() => {
-          setFormFields([...originalFormFields]);
-          setShowESignatureModal(false);
-          setESignatureError('');
-        }}
-        onConfirm={handleESignatureSubmit}
-      />
-      <MfaChangeWarningModal visible={showReloginModal} onContinue={handleRelogin} />
+        <MfaChangeWarningModal visible={showReloginModal} onContinue={handleRelogin} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

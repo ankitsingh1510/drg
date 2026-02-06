@@ -3,7 +3,6 @@ import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } fro
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { useSetAtom } from 'jotai';
-import { useColorScheme } from 'nativewind';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
@@ -17,8 +16,6 @@ export default function Patients() {
   const logout = useLogout();
   const { user } = useAuth();
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,7 +174,6 @@ export default function Patients() {
             paddingTop: 10,
             paddingBottom: 40,
           }}
-          estimatedItemSize={220}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

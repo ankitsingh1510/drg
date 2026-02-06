@@ -56,6 +56,7 @@ export default function ProfileTextField({
             placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
             keyboardType={field.widgetType === 'email' ? 'email-address' : 'default'}
             editable={!field.readOnly}
+          style={{ textAlignVertical: 'center' }}
           />
         </View>
       )}
