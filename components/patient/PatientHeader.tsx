@@ -49,7 +49,7 @@ export function PatientHeader({ user, totalCount, query, onSearch, onLogout }: P
             value={query}
             onChangeText={onSearch}
             className="flex-1 text-base font-medium text-gray-800 dark:text-gray-100"
-            placeholder="Search patient name..."
+            placeholder="Search by assay, patient name, or physician name…"
             placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
           />
         </View>
