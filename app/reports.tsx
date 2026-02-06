@@ -28,6 +28,7 @@ import InteractionBox from '@/components/interaction/Interactions';
 import { NotificationPermissionModal } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { configAPI } from '@/services/config';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
@@ -141,6 +142,7 @@ export default function Reports() {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
+  const [showVideoAvatar, setShowVideoAvatar] = useState(true);
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
 
@@ -150,6 +152,12 @@ export default function Reports() {
       if (isFirebaseEnabled && Device.isDevice && status === 'granted') {
         getFcmToken();
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    configAPI.getConfig().then(config => {
+      setShowVideoAvatar(config.showVideoAvatar);
     });
   }, []);
 
@@ -405,16 +413,18 @@ export default function Reports() {
         >
           {currentIngestionStatus === 'ingested' && (
             <View className="flex-row items-center justify-center gap-4 py-2">
-              <ReAnimated.View entering={FadeInUp.delay(500).duration(800).springify()}>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="flex-row items-center justify-center rounded-full bg-blue-600 px-6 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
-                  onPress={handleTalkToDrG}
-                >
-                  <Feather name="video" size={20} color="white" strokeWidth={2.5} />
-                  <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
-                </TouchableOpacity>
-              </ReAnimated.View>
+              {showVideoAvatar && (
+                <ReAnimated.View entering={FadeInUp.delay(500).duration(800).springify()}>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="flex-row items-center justify-center rounded-full bg-blue-600 px-6 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
+                    onPress={handleTalkToDrG}
+                  >
+                    <Feather name="video" size={20} color="white" strokeWidth={2.5} />
+                    <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
+                  </TouchableOpacity>
+                </ReAnimated.View>
+              )}
 
               <ReAnimated.View entering={FadeInUp.delay(650).duration(800).springify()}>
                 <TouchableOpacity
