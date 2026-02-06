@@ -82,6 +82,12 @@ export default function LoginScreen() {
       if (response && response.token) {
         const token = response.token;
         const tokenPayload = decryptToken(token);
+        const isDrgUser = tokenPayload.assignedApplications.some(app => app.name.toLowerCase() === 'drg');
+        if (!isDrgUser) {
+          setIsLoading(false);
+          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
+          return;
+        }
         if (!tokenPayload) {
           throw new Error('Invalid token received');
         }
@@ -209,8 +215,12 @@ export default function LoginScreen() {
               />
               <View className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDF5E6] to-transparent dark:from-gray-900" />
               <View className="absolute left-6 top-[25%]">
-                <Text className="text-4xl font-extrabold tracking-tight text-white shadow-lg">Dr. G</Text>
-                <Text className="mt-1 text-lg font-medium text-white/90 shadow-md">Intelligent Clinical Assistant</Text>
+                <Text className="text-4xl font-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
+                  Dr. G
+                </Text>
+                <Text className="mt-1 text-lg font-medium text-gray-600 shadow-lg shadow-md dark:text-gray-100">
+                  Intelligent Clinical Assistant
+                </Text>
               </View>
             </View>
 
@@ -224,7 +234,9 @@ export default function LoginScreen() {
                     contentFit="contain"
                   />
                 </View>
-                <Text className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Welcome Back</Text>
+                <Text className="text-3xl font-extrabold text-gray-900 dark:text-gray-100" numberOfLines={1}>
+                  Welcome Back
+                </Text>
                 <Text className="mt-1 text-base text-gray-500 dark:text-gray-400">
                   Please enter your details to sign in
                 </Text>

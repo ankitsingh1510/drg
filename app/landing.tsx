@@ -99,9 +99,7 @@ export default function LandingScreen() {
           <View className="mr-6 flex-row items-center justify-between">
             <View>
               <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                Hello,
-                {/* <Text className="font-semibold text-blue-600 dark:text-blue-400"> */} {user?.name} {user?.lname}
-                {/* </Text> */}
+                Hello, {user?.name} {user?.lname}
               </Text>
               <View className="mb-6 flex-row items-center pl-6">
                 <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
