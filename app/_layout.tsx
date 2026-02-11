@@ -3,7 +3,7 @@ import { Appearance, Platform, Text, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   Poppins_400Regular,
@@ -25,6 +25,7 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
 import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
+import { toast } from '@/util/toast';
 import '../global.css';
 
 const firebaseConfig =
@@ -73,7 +74,8 @@ Notifications.setNotificationHandler({
 export default function RootLayout() {
   startNetworkLogging();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
-
+  const pathname = usePathname();
+  const localSearchParams = useLocalSearchParams();
   useEffect(() => {
     if (!Device.isDevice || !isFirebaseEnabled) {
       console.log('Push notifications skipped (emulator or Firebase disabled)');
@@ -83,26 +85,30 @@ export default function RootLayout() {
     const responseListener = Notifications.addNotificationResponseReceivedListener(async response => {
       const notificationPayload: any = JSON.parse(response.notification.request.content.data.payload as any);
       if (notificationPayload && notificationPayload?.type == 'ingestion' && notificationPayload?.status == 'success') {
-        const { accession_id, documentId, full_report_path, patientName } = notificationPayload;
-        const signedUrl = await storageAPI.getSignedUrl(full_report_path);
-        router.push({
-          pathname: '/reports' as any,
-          params: {
-            pdfUrl: encodeURIComponent(signedUrl),
-            patientName: patientName,
-            documentId: documentId,
-            accession_id: accession_id,
-            ingestionStatus: 'ingested',
-          },
-        });
+        const { assay_ids, documentId, full_report_path, patientName } = notificationPayload;
+        if (assay_ids === localSearchParams.assayResultIds) {
+          toast.info('Already viewing the report.');
+        } else {
+          const signedUrl = await storageAPI.getSignedUrl(full_report_path);
+          router.push({
+            pathname: '/reports' as any,
+            params: {
+              pdfUrl: encodeURIComponent(signedUrl),
+              patientName: patientName,
+              documentId: documentId,
+              assayResultIds: assay_ids,
+              ingestionStatus: 'ingested',
+            },
+          });
+        }
       }
     });
 
     const unsubscribe = onMessage(messaging(), async remoteMessage => {
       const notificationPayload: any = JSON.parse(remoteMessage.data.payload as any);
       if (notificationPayload && notificationPayload?.type == 'ingestion') {
-        const { accession_id } = notificationPayload;
-        removeIngestionId(Number(accession_id));
+        const { assayIds } = notificationPayload;
+        removeIngestionId(assayIds);
       }
       await Notifications.scheduleNotificationAsync({
         content: {

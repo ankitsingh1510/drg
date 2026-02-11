@@ -70,6 +70,13 @@ async function getFcmToken() {
         console.error('Failed to get APNs token after retries');
         return null;
       }
+    } else {
+      const { status } = await Notifications.requestPermissionsAsync();
+
+      if (status !== 'granted') {
+        console.log('Push notification permission not granted');
+        return null;
+      }
     }
 
     const token = await messagingInstance.getToken();
@@ -89,15 +96,24 @@ async function registerForPushNotificationsAsync() {
     return;
   }
 
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
   const permission = await Notifications.getPermissionsAsync();
   const { status, canAskAgain } = permission;
-  console.log('Current notification permission status:', status);
+
   if (status === 'granted') {
     console.log('Notification permission already granted');
     return;
   }
 
-  if (status === 'undetermined' && canAskAgain) {
+  if (canAskAgain) {
     const { status: newStatus } = await Notifications.requestPermissionsAsync();
     if (newStatus === 'granted') {
       await getFcmToken();
@@ -120,11 +136,11 @@ export default function Reports() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
-  let { pdfUrl, patientName, documentId, accession_id, ingestionStatus } = useLocalSearchParams<{
+  let { pdfUrl, patientName, documentId, assayResultIds, ingestionStatus } = useLocalSearchParams<{
     pdfUrl: string;
     patientName: string;
     documentId: string;
-    accession_id: string;
+    assayResultIds: string;
     ingestionStatus: IngestionStatus;
   }>();
   const addIngestionId = useSetAtom(addIngestionIdAtom);
@@ -171,9 +187,8 @@ export default function Reports() {
         const notificationPayload: any = JSON.parse(remoteMessage.data?.payload as any);
 
         if (notificationPayload && notificationPayload?.type === 'ingestion') {
-          const { accession_id: msgAccessionId, status, documentId } = notificationPayload;
-
-          if (msgAccessionId && String(msgAccessionId) === String(accession_id)) {
+          const { assayIds: msgAccessionId, status, documentId } = notificationPayload;
+          if (msgAccessionId === String(assayResultIds)) {
             if (status === 'success') {
               setCurrentIngestionStatus('ingested');
               setDocId(documentId);
@@ -190,7 +205,7 @@ export default function Reports() {
     return () => {
       unsubscribe();
     };
-  }, [accession_id, removeIngestionId, setDocId]);
+  }, [assayResultIds, removeIngestionId, setDocId]);
   const handleChatWithDrG = async () => {
     if (loadingChat) return;
     try {
@@ -225,15 +240,15 @@ export default function Reports() {
 
   const proceedWithIngestion = async () => {
     toast.success('Analyzing Report. This may take some time...', undefined, 2000);
-    addIngestionId(Number(accession_id));
+    addIngestionId(assayResultIds);
     setCurrentIngestionStatus('ingesting');
 
     try {
-      const res = await ragAPI.ingestReport(accession_id);
+      const res = await ragAPI.ingestReport(assayResultIds);
       toast.success(res.message, undefined, 3000);
     } catch (error) {
       console.log('Error while analyzing report:', error);
-      removeIngestionId(Number(accession_id));
+      removeIngestionId(assayResultIds);
       setCurrentIngestionStatus('failed');
     }
   };

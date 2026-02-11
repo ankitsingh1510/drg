@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
-import { removeIngestionIdAtom } from '@/stores/ingestion';
+import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
@@ -17,6 +17,8 @@ export default function Patients() {
   const { user } = useAuth();
   const router = useRouter();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
+  const addIngestionId = useSetAtom(addIngestionIdAtom);
+  const ingestionIds = useAtomValue(getIngestionIdsAtom);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -27,36 +29,56 @@ export default function Patients() {
   const [totalCount, setTotalCount] = useState(0);
   const insets = useSafeAreaInsets();
 
-  const fetchPatients = useCallback(async (pageNum: number, searchQuery: string, append = false) => {
-    try {
-      const response = await patientsAPI.fetchTestsDetails({
-        page: pageNum,
-        count: 10,
-        searchQuery: searchQuery,
-      });
-      setTotalCount(response.totalCount);
-      if (append) {
-        setPatients(prev => [...prev, ...(response.data || [])]);
-        setPage(pageNum);
-      } else {
-        setPatients(response.data || []);
-        setPage(pageNum);
-      }
+  const fetchPatients = useCallback(
+    async (pageNum: number, searchQuery: string, append = false) => {
+      try {
+        const response = await patientsAPI.fetchTestsDetails({
+          page: pageNum,
+          count: 10,
+          searchQuery: searchQuery,
+        });
+        setTotalCount(response.totalCount);
 
-      setHasMore((response.data || []).length === 10);
-    } catch (error: any) {
-      if (!append) {
-        setPatients([]);
+        // Process ingestion status for each patient
+        (response.data || []).forEach((patient: Patient) => {
+          const assayResultId = patient.assayResultIds;
+          const ingestionStatus = patient.drg_ingestion_status as IngestionStatus;
+
+          // If status is ingesting, add to tracker
+          if (ingestionStatus === 'ingesting') {
+            addIngestionId(assayResultId);
+          }
+
+          // If assay_result_id exists in atom and status is ingested or failed, remove from atom
+          if (ingestionIds.has(assayResultId) && (ingestionStatus === 'ingested' || ingestionStatus === 'failed')) {
+            removeIngestionId(assayResultId);
+          }
+        });
+
+        if (append) {
+          setPatients(prev => [...prev, ...(response.data || [])]);
+          setPage(pageNum);
+        } else {
+          setPatients(response.data || []);
+          setPage(pageNum);
+        }
+
+        setHasMore((response.data || []).length === 10);
+      } catch (error: any) {
+        if (!append) {
+          setPatients([]);
+        }
+        console.error('Error fetching patients:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
+        Alert.alert('Error', errorMessage);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        setLoadingMore(false);
       }
-      console.error('Error fetching patients:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
-      Alert.alert('Error', errorMessage);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      setLoadingMore(false);
-    }
-  }, []);
+    },
+    [addIngestionId, ingestionIds, removeIngestionId]
+  );
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
@@ -79,7 +101,7 @@ export default function Patients() {
     const timeoutId = setTimeout(() => {
       setLoading(true);
       fetchPatients(1, query);
-    }, 500); // Increased to 500ms for better UX
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [query]); // Runs on mount and when query changes
@@ -105,11 +127,11 @@ export default function Patients() {
         if (samePath) {
           if (reportIngestionStatus === 'ingested') {
             ingestionStatus = 'ingested';
-            removeIngestionId(patient.accession_id);
+            removeIngestionId(patient.assayResultIds);
           } else if (reportIngestionStatus === 'ingesting') {
             ingestionStatus = 'ingesting';
           } else if (reportIngestionStatus === 'failed') {
-            removeIngestionId(patient.accession_id);
+            removeIngestionId(patient.assayResultIds);
           }
         } else if (!samePath && reportIngestionStatus === 'ingesting') {
           ingestionStatus = 'ingesting';
@@ -121,7 +143,7 @@ export default function Patients() {
             pdfUrl: encodeURIComponent(signedUrl),
             patientName: patient.patientName,
             documentId: documentId,
-            accession_id: patient.accession_id,
+            assayResultIds: patient.assayResultIds,
             ingestionStatus,
           },
         });
