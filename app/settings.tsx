@@ -1,5 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Linking, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Alert,
+  AppState,
+  Linking,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
@@ -49,11 +60,22 @@ const Settings = () => {
   const logout = useLogout();
   const { theme, toggleTheme } = useThemeSync();
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
+  const appState = useRef(AppState.currentState);
 
   const isDarkMode = theme === 'dark';
 
   useEffect(() => {
     checkNotificationPermission();
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        checkNotificationPermission();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   const checkNotificationPermission = async () => {
