@@ -108,15 +108,6 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
   const permission = await Notifications.getPermissionsAsync();
   const { status, canAskAgain } = permission;
   if (status === 'granted') {
