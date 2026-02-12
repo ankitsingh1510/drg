@@ -82,7 +82,7 @@ async function getFcmToken() {
     const token = await messagingInstance.getToken();
     setFcmToken(token);
     console.log('FCM Token:', token);
-    return true;
+    return token;
   } catch (error) {
     console.error('Error fetching FCM token:', error);
     toast.error('Failed to get notification token', 'Please try again', 3000);
@@ -96,7 +96,7 @@ async function registerForPushNotificationsAsync() {
 
   if (!Device.isDevice || !isFirebaseEnabled) {
     console.log('Push notifications skipped (emulator or Firebase disabled)');
-    return true;
+    return;
   }
 
   if (Platform.OS === 'android') {
@@ -113,21 +113,21 @@ async function registerForPushNotificationsAsync() {
   if (status === 'granted') {
     console.log('Notification permission already granted');
     await getFcmToken();
-    return true;
+    return;
   }
 
   if (status === 'undetermined' || canAskAgain) {
     const { status: newStatus } = await Notifications.requestPermissionsAsync();
     if (newStatus === 'granted') {
       await getFcmToken();
-      return true;
+      return;
     }
     if (newStatus === 'denied') {
-      return true;
+      return;
     }
   }
 
-  return true;
+  return;
 }
 
 export default function Reports() {
@@ -231,7 +231,7 @@ export default function Reports() {
     // Check notification permissions and show modal if not granted
     if (Device.isDevice) {
       const { status, canAskAgain } = await Notifications.getPermissionsAsync();
-      if ((status === 'undetermined' || canAskAgain) && !hasSeenNotificationPermission()) {
+      if ((status !== 'granted' || canAskAgain) && !hasSeenNotificationPermission()) {
         console.log('Notification permission not granted');
         setShowNotificationModal(true);
         setHasSeenNotificationPermission(true);
@@ -260,10 +260,8 @@ export default function Reports() {
     setShowNotificationModal(false);
 
     if (performAction) {
-      const proceedToIngest = await registerForPushNotificationsAsync();
-      if (proceedToIngest) {
-        await proceedWithIngestion();
-      }
+      await registerForPushNotificationsAsync();
+      await proceedWithIngestion();
     }
   };
 
