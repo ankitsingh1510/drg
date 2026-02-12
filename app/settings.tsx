@@ -1,8 +1,9 @@
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, Linking, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
-import { ChevronRight, HelpCircle, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import { Bell, ChevronRight, HelpCircle, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
@@ -47,8 +48,65 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
 const Settings = () => {
   const logout = useLogout();
   const { theme, toggleTheme } = useThemeSync();
+  const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
 
   const isDarkMode = theme === 'dark';
+
+  useEffect(() => {
+    checkNotificationPermission();
+  }, []);
+
+  const checkNotificationPermission = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    setPushNotificationsEnabled(status === 'granted');
+  };
+
+  const handleNotificationToggle = async (value: boolean) => {
+    if (value) {
+      const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+      if (status === 'undetermined' || canAskAgain) {
+        const { status: newStatus } = await Notifications.requestPermissionsAsync();
+        if (newStatus === 'granted') {
+          setPushNotificationsEnabled(true);
+        }
+        return;
+      } else {
+        Alert.alert('Permission Required', 'Please enable notifications in your device settings to receive updates.', [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Open Settings',
+            onPress: () => {
+              if (Platform.OS === 'ios') {
+                Linking.openURL('app-settings:');
+              } else {
+                Linking.openSettings();
+              }
+            },
+          },
+        ]);
+        setPushNotificationsEnabled(false);
+        return;
+      }
+    } else {
+      Alert.alert(
+        'Disable Notifications',
+        'To disable notifications, please update the permission in your device settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Open Settings',
+            onPress: () => {
+              if (Platform.OS === 'ios') {
+                Linking.openURL('app-settings:');
+              } else {
+                Linking.openSettings();
+              }
+            },
+          },
+        ]
+      );
+    }
+  };
 
   const confirmDeleteAccount = () => {
     Alert.alert('Delete Account', 'Are you sure you want to delete your account? This action cannot be undone.', [
@@ -107,7 +165,26 @@ const Settings = () => {
             true: colors.common.info,
           }}
           thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
-              style={{ alignSelf: 'center' }}
+          style={{ alignSelf: 'center' }}
+        />
+      ),
+    },
+    {
+      icon: <Bell size={24} color={pushNotificationsEnabled ? colors.common.success : '#9ca3af'} />,
+      title: 'Push Notifications',
+      subtitle: pushNotificationsEnabled ? 'Get updates and alerts' : 'Enable to receive updates',
+      iconBgColor: pushNotificationsEnabled ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-gray-700/30',
+      btn: (
+        <Switch
+          value={pushNotificationsEnabled}
+          onValueChange={handleNotificationToggle}
+          trackColor={{
+            false: colors.light.border,
+            true: colors.common.success,
+          }}
+          thumbColor={pushNotificationsEnabled ? '#16a34a' : '#f3f4f6'}
+          style={{ alignSelf: 'center' }}
+          ios_backgroundColor={colors.light.border}
         />
       ),
     },

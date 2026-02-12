@@ -32,7 +32,7 @@ import { configAPI } from '@/services/config';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
-import { setFcmToken } from '@/stores/mmkv';
+import { hasSeenNotificationPermission, setFcmToken, setHasSeenNotificationPermission } from '@/stores/mmkv';
 import { IngestionStatus } from '@/types/types';
 import { toast } from '@/util/toast';
 
@@ -70,47 +70,64 @@ async function getFcmToken() {
         console.error('Failed to get APNs token after retries');
         return null;
       }
+    } else {
+      const { status } = await Notifications.requestPermissionsAsync();
+
+      if (status !== 'granted') {
+        console.log('Push notification permission not granted');
+        return true;
+      }
     }
 
     const token = await messagingInstance.getToken();
     setFcmToken(token);
     console.log('FCM Token:', token);
-    return token;
+    return true;
   } catch (error) {
     console.error('Error fetching FCM token:', error);
-    return null;
+    toast.error('Failed to get notification token', 'Please try again', 3000);
+    return false;
   }
 }
+
 async function registerForPushNotificationsAsync() {
   const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true';
+  console.log('Registering for push notifications. Firebase enabled:', isFirebaseEnabled);
 
   if (!Device.isDevice || !isFirebaseEnabled) {
     console.log('Push notifications skipped (emulator or Firebase disabled)');
-    return;
+    return true;
+  }
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
   }
 
   const permission = await Notifications.getPermissionsAsync();
   const { status, canAskAgain } = permission;
-  console.log('Current notification permission status:', status);
   if (status === 'granted') {
     console.log('Notification permission already granted');
-    return;
+    await getFcmToken();
+    return true;
   }
 
-  if (status === 'undetermined' && canAskAgain) {
+  if (status === 'undetermined' || canAskAgain) {
     const { status: newStatus } = await Notifications.requestPermissionsAsync();
     if (newStatus === 'granted') {
       await getFcmToken();
+      return true;
     }
-    return;
+    if (newStatus === 'denied') {
+      return true;
+    }
   }
 
-  if (status === 'denied' && !canAskAgain) {
-    toast.info('Notifications blocked — open settings');
-    return;
-  }
-
-  return;
+  return true;
 }
 
 export default function Reports() {
@@ -213,10 +230,11 @@ export default function Reports() {
   const handleIngestReport = async () => {
     // Check notification permissions and show modal if not granted
     if (Device.isDevice) {
-      const { status } = await Notifications.getPermissionsAsync();
-      if (status !== 'granted') {
+      const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+      if ((status === 'undetermined' || canAskAgain) && !hasSeenNotificationPermission()) {
         console.log('Notification permission not granted');
         setShowNotificationModal(true);
+        setHasSeenNotificationPermission(true);
         return;
       }
     }
@@ -242,8 +260,10 @@ export default function Reports() {
     setShowNotificationModal(false);
 
     if (performAction) {
-      await registerForPushNotificationsAsync();
-      await proceedWithIngestion();
+      const proceedToIngest = await registerForPushNotificationsAsync();
+      if (proceedToIngest) {
+        await proceedWithIngestion();
+      }
     }
   };
 
