@@ -26,14 +26,14 @@ class RagAPI {
     }
   }
 
-  async ingestReport(accession_id: string) {
+  async ingestReport(assayResultIds: string) {
     try {
       const token = storage.getString('token') ?? null;
       const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
       const fcmToken = isFirebaseEnabled ? (getFcmToken() ?? null) : null;
       const formData = new FormData();
       const { status } = await Notifications.getPermissionsAsync();
-      formData.append('accession_id', accession_id);
+      formData.append('assay_ids', assayResultIds);
       if (fcmToken && isFirebaseEnabled && status === 'granted') {
         formData.append('fcmKey', fcmToken);
       }

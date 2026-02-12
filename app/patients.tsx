@@ -2,27 +2,27 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EmptyState, FilterModal, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
+import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
-import { removeIngestionIdAtom } from '@/stores/ingestion';
+import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
   const logout = useLogout();
-  const { user, usersStudyList } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
+  const addIngestionId = useSetAtom(addIngestionIdAtom);
+  const ingestionIds = useAtomValue(getIngestionIdsAtom);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState('Released');
-  const [showFilterModal, setShowFilterModal] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -30,16 +30,31 @@ export default function Patients() {
   const insets = useSafeAreaInsets();
 
   const fetchPatients = useCallback(
-    async (pageNum: number, filterValue: string, searchQuery: string, append = false) => {
+    async (pageNum: number, searchQuery: string, append = false) => {
       try {
         const response = await patientsAPI.fetchTestsDetails({
-          studyFilter: usersStudyList,
           page: pageNum,
           count: 10,
           searchQuery: searchQuery,
-          workflowStatusFilter: filterValue,
         });
         setTotalCount(response.totalCount);
+
+        // Process ingestion status for each patient
+        (response.data || []).forEach((patient: Patient) => {
+          const assayResultId = patient.assayResultIds;
+          const ingestionStatus = patient.drg_ingestion_status as IngestionStatus;
+
+          // If status is ingesting, add to tracker
+          if (ingestionStatus === 'ingesting') {
+            addIngestionId(assayResultId);
+          }
+
+          // If assay_result_id exists in atom and status is ingested or failed, remove from atom
+          if (ingestionIds.has(assayResultId) && (ingestionStatus === 'ingested' || ingestionStatus === 'failed')) {
+            removeIngestionId(assayResultId);
+          }
+        });
+
         if (append) {
           setPatients(prev => [...prev, ...(response.data || [])]);
           setPage(pageNum);
@@ -62,20 +77,20 @@ export default function Patients() {
         setLoadingMore(false);
       }
     },
-    [usersStudyList]
+    [addIngestionId, ingestionIds, removeIngestionId]
   );
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPatients(1, filter, query);
-  }, [filter, query, fetchPatients]);
+    fetchPatients(1, query);
+  }, [query, fetchPatients]);
 
   const handleLoadMore = useCallback(() => {
     if (!loadingMore && hasMore && !loading && !refreshing) {
       setLoadingMore(true);
-      fetchPatients(page + 1, filter, query, true);
+      fetchPatients(page + 1, query, true);
     }
-  }, [page, filter, query, loadingMore, hasMore, loading, refreshing, fetchPatients]);
+  }, [page, query, loadingMore, hasMore, loading, refreshing, fetchPatients]);
 
   const handleSearch = useCallback((text: string) => {
     setQuery(text);
@@ -84,24 +99,12 @@ export default function Patients() {
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (usersStudyList.length > 0) {
-        setLoading(true);
-        fetchPatients(1, filter, query);
-      }
-    }, 500); // Increased to 500ms for better UX
+      setLoading(true);
+      fetchPatients(1, query);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query, filter]); // Runs on mount and when query/filter changes
-
-  const handleFilterChange = useCallback(
-    (newFilter: string) => {
-      setFilter(newFilter);
-      setShowFilterModal(false);
-      setLoading(true);
-      fetchPatients(1, newFilter, query);
-    },
-    [query, fetchPatients]
-  );
+  }, [query]); // Runs on mount and when query changes
 
   const handleViewReport = useCallback(
     async (patient: Patient) => {
@@ -124,11 +127,11 @@ export default function Patients() {
         if (samePath) {
           if (reportIngestionStatus === 'ingested') {
             ingestionStatus = 'ingested';
-            removeIngestionId(patient.accession_id);
+            removeIngestionId(patient.assayResultIds);
           } else if (reportIngestionStatus === 'ingesting') {
             ingestionStatus = 'ingesting';
           } else if (reportIngestionStatus === 'failed') {
-            removeIngestionId(patient.accession_id);
+            removeIngestionId(patient.assayResultIds);
           }
         } else if (!samePath && reportIngestionStatus === 'ingesting') {
           ingestionStatus = 'ingesting';
@@ -140,7 +143,7 @@ export default function Patients() {
             pdfUrl: encodeURIComponent(signedUrl),
             patientName: patient.patientName,
             documentId: documentId,
-            accession_id: patient.accession_id,
+            assayResultIds: patient.assayResultIds,
             ingestionStatus,
           },
         });
@@ -168,11 +171,6 @@ export default function Patients() {
     return <EmptyState type="no-patients" />;
   }, [loading]);
 
-  // Early returns for different states
-  if (usersStudyList.length === 0 && !loading) {
-    return <EmptyState type="no-studies" onLogout={logout} />;
-  }
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -187,15 +185,7 @@ export default function Patients() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader
-        user={user}
-        totalCount={totalCount}
-        query={query}
-        filter={filter}
-        onSearch={handleSearch}
-        onFilterPress={() => setShowFilterModal(true)}
-        onLogout={logout}
-      />
+      <PatientHeader user={user} totalCount={totalCount} query={query} onSearch={handleSearch} onLogout={logout} />
 
       <View className="flex-1">
         <FlashList
@@ -230,13 +220,6 @@ export default function Patients() {
           </View>
         )}
       </View>
-
-      <FilterModal
-        visible={showFilterModal}
-        currentFilter={filter}
-        onClose={() => setShowFilterModal(false)}
-        onFilterChange={handleFilterChange}
-      />
     </SafeAreaView>
   );
 }

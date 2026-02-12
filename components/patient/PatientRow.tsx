@@ -12,6 +12,7 @@ interface PatientRowProps {
 
 export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps) => {
   const [loadingReport, setLoadingReport] = useState(false);
+  const [diseaseNameExpanded, setDiseaseNameExpanded] = useState(false);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -166,9 +167,14 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
               <Dna size={14} color="#9ca3af" strokeWidth={2.5} />
               <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Type</Text>
             </View>
-            <Text numberOfLines={1} className="text-right text-base font-extrabold text-gray-800 dark:text-gray-200">
-              {patient.diseaseName || 'N/A'}
-            </Text>
+            <TouchableOpacity onPress={() => setDiseaseNameExpanded(!diseaseNameExpanded)} activeOpacity={0.7}>
+              <Text
+                numberOfLines={diseaseNameExpanded ? undefined : 1}
+                className="text-right text-base font-extrabold text-gray-800 dark:text-gray-200"
+              >
+                {patient.diseaseName || 'N/A'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
