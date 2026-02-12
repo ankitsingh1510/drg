@@ -1,15 +1,15 @@
 import { atom } from 'jotai';
 
-export const ingestionIdsAtom = atom<Set<number>>(new Set<number>());
+export const ingestionIdsAtom = atom<Set<string>>(new Set<string>());
 
-export const addIngestionIdAtom = atom(null, (get, set, id: number) => {
+export const addIngestionIdAtom = atom(null, (get, set, id: string) => {
   const prev = get(ingestionIdsAtom);
   const next = new Set(prev);
   next.add(id);
   set(ingestionIdsAtom, next);
 });
 
-export const removeIngestionIdAtom = atom(null, (get, set, id: number) => {
+export const removeIngestionIdAtom = atom(null, (get, set, id: string) => {
   const prev = get(ingestionIdsAtom);
 
   if (!prev.has(id)) return;
