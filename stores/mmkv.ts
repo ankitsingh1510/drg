@@ -9,3 +9,11 @@ export const setFcmToken = (token: string) => {
 export const getFcmToken = (): string | null => {
   return storage.getString('fcmToken') ?? null;
 };
+
+export const hasSeenNotificationPermission = (): boolean => {
+  return storage.getBoolean('hasSeenNotificationPermission') ?? false;
+};
+
+export const setHasSeenNotificationPermission = (value: boolean) => {
+  storage.set('hasSeenNotificationPermission', value);
+};
