@@ -43,14 +43,20 @@ export function PatientHeader({ user, totalCount, query, onSearch, onLogout }: P
       </View>
 
       {/* Search and Filter Row */}
-      <View className="flex-row items-center gap-3">
-        <View className="flex-1 flex-row items-center rounded-full border border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <View className="flex-row items-center">
+        <View className="h-14 flex-1 flex-row items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <TextInput
             value={query}
             onChangeText={onSearch}
             className="flex-1 text-base font-medium text-gray-800 dark:text-gray-100"
             placeholder="Search by assay, patient name, or physician name…"
             placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
+            style={{
+              paddingVertical: Platform.OS === 'android' ? 12 : 10,
+              includeFontPadding: false,
+              lineHeight: Platform.OS === 'android' ? 20 : undefined,
+            }}
+            textAlignVertical="center"
           />
         </View>
       </View>
