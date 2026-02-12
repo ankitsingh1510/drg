@@ -32,7 +32,7 @@ import { configAPI } from '@/services/config';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
-import { setFcmToken } from '@/stores/mmkv';
+import { hasSeenNotificationPermission, setFcmToken, setHasSeenNotificationPermission } from '@/stores/mmkv';
 import { IngestionStatus } from '@/types/types';
 import { toast } from '@/util/toast';
 
@@ -75,7 +75,7 @@ async function getFcmToken() {
 
       if (status !== 'granted') {
         console.log('Push notification permission not granted');
-        return null;
+        return true;
       }
     }
 
@@ -85,11 +85,14 @@ async function getFcmToken() {
     return token;
   } catch (error) {
     console.error('Error fetching FCM token:', error);
-    return null;
+    toast.error('Failed to get notification token', 'Please try again', 3000);
+    return false;
   }
 }
+
 async function registerForPushNotificationsAsync() {
   const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true';
+  console.log('Registering for push notifications. Firebase enabled:', isFirebaseEnabled);
 
   if (!Device.isDevice || !isFirebaseEnabled) {
     console.log('Push notifications skipped (emulator or Firebase disabled)');
@@ -105,25 +108,32 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
   const permission = await Notifications.getPermissionsAsync();
   const { status, canAskAgain } = permission;
-
   if (status === 'granted') {
     console.log('Notification permission already granted');
+    await getFcmToken();
     return;
   }
 
-  if (canAskAgain) {
+  if (status === 'undetermined' || canAskAgain) {
     const { status: newStatus } = await Notifications.requestPermissionsAsync();
     if (newStatus === 'granted') {
       await getFcmToken();
+      return;
     }
-    return;
-  }
-
-  if (status === 'denied' && !canAskAgain) {
-    toast.info('Notifications blocked — open settings');
-    return;
+    if (newStatus === 'denied') {
+      return;
+    }
   }
 
   return;
@@ -228,10 +238,11 @@ export default function Reports() {
   const handleIngestReport = async () => {
     // Check notification permissions and show modal if not granted
     if (Device.isDevice) {
-      const { status } = await Notifications.getPermissionsAsync();
-      if (status !== 'granted') {
+      const { status, canAskAgain } = await Notifications.getPermissionsAsync();
+      if ((status !== 'granted' || canAskAgain) && !hasSeenNotificationPermission()) {
         console.log('Notification permission not granted');
         setShowNotificationModal(true);
+        setHasSeenNotificationPermission(true);
         return;
       }
     }
