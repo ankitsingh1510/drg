@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { router } from 'expo-router';
+import { analyticsService } from '@/services/analytics';
 import { storageAPI } from '@/services/storage';
 import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
@@ -101,6 +102,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
+        // Set analytics user identification and properties
+        await analyticsService.setUser(payload.sub, payload.username);
+        await analyticsService.setEnvironment(process.env.EXPO_PUBLIC_API_BASE_URL || 'unknown');
+        await analyticsService.setUserProperties({
+          user_email: emailField || 'unknown',
+        });
+
         // Redirect to patients page if already authenticated
         // router.replace('/patients' as any);
         router.replace('/landing' as any);
@@ -183,6 +191,16 @@ export const useLogin = () => {
 
         const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
+
+        // Set analytics user identification and properties
+        await analyticsService.setUser(payload.sub, payload.username);
+        await analyticsService.setEnvironment(process.env.EXPO_PUBLIC_API_BASE_URL || 'unknown');
+        await analyticsService.setUserProperties({
+          user_email: emailField || 'unknown',
+        });
+
+        // Track login event
+        await analyticsService.trackLogin('email');
 
         // Navigate to patients page
         // router.replace('/patients' as any);

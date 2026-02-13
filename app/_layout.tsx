@@ -18,10 +18,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import NetworkLoggers from '@/components/NetworkLoggers';
 import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
 import { useThemeSync } from '@/hooks/useThemeSync';
+import { analyticsService } from '@/services/analytics';
 import { storageAPI } from '@/services/storage';
 import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
@@ -43,6 +45,7 @@ const firebaseConfig =
         projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
         storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
         appId: process.env.EXPO_PUBLIC_FIREBASE_ANDROID_APP_ID,
+        messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_IOS_MESSAGING_SENDER_ID,
         databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
       };
 
@@ -76,6 +79,21 @@ export default function RootLayout() {
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const pathname = usePathname();
   const localSearchParams = useLocalSearchParams();
+
+  // Initialize analytics
+  useEffect(() => {
+    analyticsService.initialize();
+  }, []);
+
+  // Track screen views
+  useEffect(() => {
+    if (pathname) {
+      // Extract screen name from pathname (remove leading slash)
+      const screenName = pathname === '/' ? 'index' : pathname.substring(1);
+      analyticsService.logScreenView(screenName);
+    }
+  }, [pathname]);
+
   useEffect(() => {
     if (!Device.isDevice || !isFirebaseEnabled) {
       console.log('Push notifications skipped (emulator or Firebase disabled)');
@@ -158,19 +176,21 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <GestureHandlerRootView className="flex-1">
-          <View className={`flex-1 ${theme === 'dark' ? 'dark' : ''} bg-[#FDF5E6] dark:bg-gray-900`}>
-            <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-            <Stack screenOptions={STACK_OPTIONS} />
-            <Toast position="bottom" />
-            <NetworkChecker />
-            {__DEV__ && <NetworkLoggers />}
-          </View>
-        </GestureHandlerRootView>
-      </AuthProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <GestureHandlerRootView className="flex-1">
+            <View className={`flex-1 ${theme === 'dark' ? 'dark' : ''} bg-[#FDF5E6] dark:bg-gray-900`}>
+              <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+              <Stack screenOptions={STACK_OPTIONS} />
+              <Toast position="bottom" />
+              <NetworkChecker />
+              {__DEV__ && <NetworkLoggers />}
+            </View>
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 

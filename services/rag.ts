@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { getFcmToken, storage } from '@/stores/mmkv';
+import { analyticsService } from './analytics';
 import { apiFetch } from './fetchClient';
 
 class RagAPI {
@@ -45,9 +46,23 @@ class RagAPI {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      // Track report ingestion
+      await analyticsService.trackFeatureUsage('report_ingestion', {
+        assay_result_ids: assayResultIds,
+        action: 'ingest_report',
+      });
+
       return response.data;
     } catch (error) {
       console.error('Error Ingesting file:', error);
+
+      // Log error
+      await analyticsService.logError(error as Error, {
+        action: 'ingest_report',
+        assay_result_ids: assayResultIds,
+      });
+
       throw error;
     }
   }
@@ -71,9 +86,22 @@ class RagAPI {
         },
       });
 
+      // Track report view/fetch
+      await analyticsService.trackFeatureUsage('report_view', {
+        document_id: documentId,
+        action: 'fetch_report',
+      });
+
       return response.data;
     } catch (error) {
       console.error('Fetch Results Error:', error);
+
+      // Log error
+      await analyticsService.logError(error as Error, {
+        action: 'fetch_report',
+        document_id: params.documentId,
+      });
+
       throw error;
     }
   }

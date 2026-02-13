@@ -21,6 +21,7 @@ import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
+import { analyticsService } from '@/services/analytics';
 import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 
 type SettingCardProps = {

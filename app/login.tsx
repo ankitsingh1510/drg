@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
+import { analyticsService } from '@/services/analytics';
 import { storageAPI } from '@/services/storage';
 import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
@@ -42,6 +43,12 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (params.logout === 'true') {
+      // Track logout event
+      analyticsService.trackLogout();
+
+      // Clear analytics user data
+      analyticsService.clearUser();
+
       setIsLoading(true);
       storage.clearAll();
 

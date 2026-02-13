@@ -1,3 +1,4 @@
+import { analyticsService } from './analytics';
 import { apiFetch } from './fetchClient';
 
 interface SignedUrlResponse {
@@ -16,10 +17,23 @@ export const elevenLabsAPI = {
           method: 'POST',
         }
       );
-
       const data = response.data as SignedUrlResponse;
+
+      // Track chat feature usage
+      await analyticsService.trackFeatureUsage('chat', {
+        action: 'get_chat_url',
+        agent_id: process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID,
+      });
+
       return data.signed_url;
     } catch (error) {
+      console.error('Error getting ElevenLabs signed URL:', error);
+
+      // Log error
+      await analyticsService.logError(error as Error, {
+        action: 'get_chat_url',
+      });
+
       console.error('Error getting ElevenLabs signed URL:', error);
       throw error;
     }

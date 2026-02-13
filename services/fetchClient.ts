@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { storage } from '@/stores/mmkv';
+import { analyticsService } from './analytics';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -61,6 +62,11 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
         url: finalURL,
         data,
       });
+      // Log API error to analytics
+      await analyticsService.logApiError(path, response.status, data?.message || data?.error || 'Request failed', {
+        method: options.method || 'GET',
+        url: finalURL,
+      });
 
       throw { status: response.status, message: 'Request failed', data };
     }
@@ -75,7 +81,23 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
 
     // NETWORK / TIMEOUT ERROR
     if (error.message === 'Request timed out') {
+      // Log network failure
+      await analyticsService.logNetworkFailure({
+        endpoint: path,
+        error_message: 'Request timed out',
+      });
+
       throw { status: 0, message: 'Network timeout — please try again.' };
+    }
+
+    // If it's an API error (has status), we already logged it above
+    // For other errors (like network errors), log them here
+    if (!error.status) {
+      await analyticsService.logNetworkFailure({
+        endpoint: path,
+        error_message: error.message || 'Network error',
+        error_type: error.name || 'unknown',
+      });
     }
 
     throw error;

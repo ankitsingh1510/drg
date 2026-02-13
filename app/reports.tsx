@@ -28,6 +28,7 @@ import InteractionBox from '@/components/interaction/Interactions';
 import { NotificationPermissionModal } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { analyticsService } from '@/services/analytics';
 import { configAPI } from '@/services/config';
 import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
@@ -211,6 +212,18 @@ export default function Reports() {
     if (loadingChat) return;
     try {
       setLoadingChat(true);
+
+      // Track chat button click
+      await analyticsService.trackFeatureUsage('chat', {
+        action: 'chat_button_clicked',
+        document_id: documentId || 'unknown',
+        assay_result_ids: assayResultIds,
+      });
+      await analyticsService.trackButtonClick('chat_with_drg', {
+        screen: 'reports',
+        document_id: documentId,
+      });
+
       const signedUrl = await elevenLabsAPI.getSignedUrl();
       setChatSignedUrl(signedUrl);
       setShowInteraction({ isVisible: true, mode: 'chat' });
@@ -222,7 +235,18 @@ export default function Reports() {
     }
   };
 
-  const handleTalkToDrG = () => {
+  const handleTalkToDrG = async () => {
+    // Track talk button click
+    await analyticsService.trackFeatureUsage('talk', {
+      action: 'talk_button_clicked',
+      document_id: documentId || 'unknown',
+      assay_result_ids: assayResultIds,
+    });
+    await analyticsService.trackButtonClick('talk_with_drg', {
+      screen: 'reports',
+      document_id: documentId,
+    });
+
     setShowInteraction({ isVisible: true, mode: 'video' });
   };
 

@@ -1,4 +1,5 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
+import { analyticsService } from './analytics';
 import { apiFetch } from './fetchClient';
 
 interface FetchTestsDetailsParams {
@@ -81,9 +82,26 @@ class PatientsAPI {
 
     try {
       const response = await this.getGQLResponse(reqParams);
+
+      // Track patient list fetch
+      await analyticsService.logEvent('patient_list_fetched', {
+        page,
+        count,
+        has_search_query: !!searchQuery,
+        result_count: response.data.fetchTestsDetailsForDrG.totalCount,
+      });
+
       return response.data.fetchTestsDetailsForDrG;
     } catch (error) {
       console.error('Error fetching tests details:', error);
+
+      // Log error
+      await analyticsService.logError(error as Error, {
+        action: 'fetch_patient_list',
+        page,
+        count,
+      });
+
       throw error;
     }
   }
