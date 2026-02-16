@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { EmptyState } from '@/components/patient';
 import OncoCard from '@/components/widgets/OncoCard';
+import { OrderWizard } from '@/components/wizard';
 import { colors } from '@/constants/colors';
 import { apiFetch } from '@/services/fetchClient';
 
@@ -18,6 +19,7 @@ type TestData = {
 export default function TestsScreen() {
   const [data, setData] = useState<TestData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wizardVisible, setWizardVisible] = useState(false);
 
   const getAllTests = async () => {
     try {
@@ -44,6 +46,13 @@ export default function TestsScreen() {
         <View className="flex-1">
           <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
         </View>
+        <TouchableOpacity
+          onPress={() => setWizardVisible(true)}
+          className="mr-3 rounded-lg bg-blue-500 px-4 py-2 dark:bg-blue-400"
+          activeOpacity={0.7}
+        >
+          <Text className="font-semibold text-white">AI Assist</Text>
+        </TouchableOpacity>
         <IconNavBar />
       </Animated.View>
       {loading ? (
@@ -68,6 +77,8 @@ export default function TestsScreen() {
           ListEmptyComponent={() => <EmptyState type="no-tests" />}
         />
       )}
+
+      <OrderWizard visible={wizardVisible} onClose={() => setWizardVisible(false)} />
     </SafeAreaView>
   );
 }
