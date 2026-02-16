@@ -123,6 +123,70 @@ class UsersAPI {
       throw error;
     }
   }
+
+  async changePassword(paramInfo: {
+    userMasterId: string | number;
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<any> {
+    try {
+      const formBody = new URLSearchParams({
+        user_master_id: String(paramInfo.userMasterId),
+        current_password: paramInfo.currentPassword,
+        new_password: paramInfo.newPassword,
+        conf_password: paramInfo.confirmPassword,
+      }).toString();
+
+      const response = await apiFetch(this.baseUrl + '/api/v1/users/changePassword', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody,
+      });
+      console.log('Change password response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error changing password:', error);
+      throw error;
+    }
+  }
+
+  async sendResetPasswordLink(email: string): Promise<any> {
+    try {
+      const formBody = new URLSearchParams({
+        email,
+      }).toString();
+
+      const response = await apiFetch(this.baseUrl + '/api/v1/users/resetPasswordLink', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody,
+      });
+      return response;
+    } catch (error) {
+      console.error('Error sending reset password link:', error);
+      throw error;
+    }
+  }
+
+  async revokeToken(token: string): Promise<any> {
+    try {
+      const response = await apiFetch(this.baseUrl + '/api/token/revoke', {
+        method: 'POST',
+        body: JSON.stringify({ token }),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error revoking token:', error);
+      throw error;
+    }
+  }
 }
 
 export const usersAPI = new UsersAPI();
