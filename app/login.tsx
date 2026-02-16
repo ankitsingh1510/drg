@@ -21,7 +21,6 @@ import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
 import { storageAPI } from '@/services/storage';
-import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
 import { storage } from '@/stores/mmkv';
 import { decryptToken } from '@/util/helpers';
@@ -33,8 +32,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaModal, setShowMfaModal] = useState(false);
   const login = useLogin();
-  const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setUsersStudyList, setTargetLocation } =
-    useAuth();
+  const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setTargetLocation } = useAuth();
   const router = useRouter();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -47,7 +45,6 @@ export default function LoginScreen() {
 
       setUser(null);
       setToken(null);
-      setUsersStudyList([]);
       setTargetLocation(null);
 
       if (router.canDismiss()) {
@@ -91,8 +88,16 @@ export default function LoginScreen() {
         if (!tokenPayload) {
           throw new Error('Invalid token received');
         }
-        // Check if MFA is enabled and not verified
-        if (
+        if (tokenPayload.force_password_change === 1) {
+          // Store token temporarily for the change password request
+          storage.set('token', token);
+          setIsLoading(false);
+          toast.info('Password Update Required', 'Please update your password to continue.');
+          router.replace({
+            pathname: '/reset-password' as any,
+            params: { userMasterId: tokenPayload.sub },
+          });
+        } else if (
           tokenPayload.user_type === 'localUser' &&
           (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
           !tokenPayload.isMfaVerified
@@ -151,10 +156,6 @@ export default function LoginScreen() {
       };
 
       setUser(userData);
-      // Fetch study list
-      const studyList = await studyAPI.getStudyList();
-      const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
-      setUsersStudyList(studyIds);
       // Get upload config
       const config = await storageAPI.getUploadConfig();
       setTargetLocation(config?.data?.targetLocation || null);
@@ -295,6 +296,13 @@ export default function LoginScreen() {
                     />
                   </TouchableOpacity>
                 </View>
+
+                {/* Forgot Password Link */}
+                <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mt-4 items-end">
+                  <Text className="text-sm font-medium" style={{ color: colors.common.primary }}>
+                    Forgot Password?
+                  </Text>
+                </TouchableOpacity>
 
                 {/* Login Button */}
                 <TouchableOpacity

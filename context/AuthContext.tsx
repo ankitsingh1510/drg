@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { storageAPI } from '@/services/storage';
-import { studyAPI } from '@/services/study';
 import { usersAPI } from '@/services/users';
 import { storage } from '@/stores/mmkv';
 import { decryptToken } from '@/util/helpers';
@@ -21,14 +20,12 @@ interface AuthContextType {
   isLoading: boolean;
   targetLocation: string | null;
   studyIdentifier: string;
-  usersStudyList: number[];
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setIsLoading: (loading: boolean) => void;
   setTargetLocation: (location: string | null) => void;
   setStudyIdentifier: (identifier: string) => void;
-  setUsersStudyList: (list: number[]) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,8 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [targetLocation, setTargetLocation] = useState<string | null>(null);
   const [studyIdentifier, setStudyIdentifier] = useState<string>('');
-  const [usersStudyList, setUsersStudyList] = useState<number[]>([]);
-
   const isAuthenticated = !!user && !!token;
 
   useEffect(() => {
@@ -92,10 +87,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role_id: payload.role_id,
         };
 
-        const studyList = await studyAPI.getStudyList();
-        const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
-        setUsersStudyList(studyIds);
-
         setUser(userData);
 
         const config = await storageAPI.getUploadConfig();
@@ -122,14 +113,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     targetLocation,
     studyIdentifier,
-    usersStudyList,
     isAuthenticated,
     setUser,
     setToken,
     setIsLoading,
     setTargetLocation,
     setStudyIdentifier,
-    setUsersStudyList,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -137,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 // Custom hooks for authentication operations
 export const useLogin = () => {
-  const { setUser, setToken, setIsLoading, setUsersStudyList, setTargetLocation } = useAuth();
+  const { setUser, setToken, setIsLoading, setTargetLocation } = useAuth();
 
   return async (email: string, password: string) => {
     try {
@@ -176,11 +165,6 @@ export const useLogin = () => {
 
         setUser(userData);
 
-        // Fetch study list
-        const studyList = await studyAPI.getStudyList();
-        const studyIds = studyList?.data?.map((x: any) => x.studyId) || [];
-        setUsersStudyList(studyIds);
-
         const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
@@ -202,6 +186,12 @@ export const useLogin = () => {
 export const useLogout = () => {
   return async () => {
     console.log('Logging out');
+
+    const currentToken = storage.getString('token') ?? null;
+    if (currentToken) {
+      usersAPI.revokeToken(currentToken).catch(err => console.warn('Token revocation failed:', err));
+    }
+
     // The login page will handle clearing storage and contexts
     router.replace('/login?logout=true' as any);
   };

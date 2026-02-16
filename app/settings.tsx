@@ -14,12 +14,12 @@ import {
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
-import { Bell, ChevronRight, HelpCircle, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import { Bell, ChevronRight, HelpCircle, Lock, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
-import { useLogout } from '@/context/AuthContext';
+import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 
@@ -58,6 +58,7 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
 
 const Settings = () => {
   const logout = useLogout();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useThemeSync();
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
   const appState = useRef(AppState.currentState);
@@ -145,6 +146,17 @@ const Settings = () => {
     router.push('/profile' as any);
   };
 
+  const goToChangePassword = () => {
+    if (!user?.sub) {
+      Alert.alert('Error', 'Unable to access change password. Please log in again.');
+      return;
+    }
+    router.push({
+      pathname: '/reset-password' as any,
+      params: { userMasterId: user.sub, source: 'settings' },
+    });
+  };
+
   const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
 
   const resetOnboarding = () => {
@@ -168,6 +180,14 @@ const Settings = () => {
       iconBgColor: 'bg-blue-100 dark:bg-blue-900/30',
       btn: <ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />,
       onPress: goToProfile,
+    },
+    {
+      icon: <Lock size={24} color={colors.common.warning} />,
+      title: 'Change Password',
+      subtitle: 'Update your password',
+      iconBgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+      btn: <ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />,
+      onPress: goToChangePassword,
     },
     {
       icon: isDarkMode ? (
