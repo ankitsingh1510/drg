@@ -218,7 +218,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
   //     try {
   //       setLoading(true);
   //       setError(null);
-  //       const response = await apiFetch('http://192.168.1.5:3020/api/v1/drg/order-wizard/questions');
+  //       const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/questions`);
   //       setQuestions(response.data.data.questions);
   //     } catch (err) {
   //       console.error('Error fetching questions:', err);
@@ -266,7 +266,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiFetch('http://192.192.16.187:3020/api/v1/drg/order-wizard/recommend', {
+      const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
         method: 'POST',
         body: JSON.stringify({ answers: allAnswers }),
       });
