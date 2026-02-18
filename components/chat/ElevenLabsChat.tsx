@@ -69,10 +69,11 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   });
 
   useSpeechRecognitionEvent('result', event => {
-    if (event.results && event.results.length > 0 && isListeningRef.current) {
-      const transcript = event.results[0]?.transcript;
+    if (event.isFinal && event.results && event.results.length > 0) {
+      const result = event.results[0];
+      const transcript = result?.transcript;
       if (transcript) {
-        setInputText(transcript);
+        setInputText(prev => (prev ? prev + ' ' + transcript : transcript).trim());
       }
     }
   });
@@ -255,7 +256,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
         ExpoSpeechRecognitionModule.start({
           lang: 'en-US',
           interimResults: true,
-          continuous: false,
+          continuous: true,
         });
       } catch (e) {
         console.error('Error starting voice:', e);
