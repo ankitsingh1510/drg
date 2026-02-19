@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
@@ -26,6 +26,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const isDark = colorScheme === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
@@ -34,6 +35,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const flashListRef = useRef<any>(null);
   const reportContextRef = useRef<string | null>(null);
   const isListeningRef = useRef(false);
+  const micAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     initializeChat();
@@ -61,19 +63,44 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   useSpeechRecognitionEvent('start', () => {
     isListeningRef.current = true;
     setIsListening(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(micAnim, {
+          toValue: 1.3,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(micAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   });
 
   useSpeechRecognitionEvent('end', () => {
     isListeningRef.current = false;
     setIsListening(false);
+    setInterimTranscript('');
+    micAnim.stopAnimation();
+    micAnim.setValue(1);
   });
 
   useSpeechRecognitionEvent('result', event => {
-    if (event.isFinal && event.results && event.results.length > 0) {
+    if (event.results && event.results.length > 0) {
       const result = event.results[0];
       const transcript = result?.transcript;
-      if (transcript) {
-        setInputText(prev => (prev ? prev + ' ' + transcript : transcript).trim());
+
+      if (event.isFinal) {
+        if (transcript) {
+          setInputText(prev => (prev ? prev + ' ' + transcript : transcript).trim());
+          setInterimTranscript('');
+        }
+      } else {
+        if (transcript) {
+          setInterimTranscript(transcript);
+        }
       }
     }
   });
@@ -377,9 +404,13 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
             borderColor: isDark ? colors.dark.border : '#e5e7eb',
             maxHeight: 100,
           }}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type your message..."
+          value={inputText + (interimTranscript ? ' ' + interimTranscript : '')}
+          onChangeText={text => {
+            if (!isListening) {
+              setInputText(text);
+            }
+          }}
+          placeholder={`${isListening ? 'Listening...' : 'Type your message here'}`}
           placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
           multiline
           maxLength={500}
@@ -398,16 +429,14 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
           disabled={!isConnected}
         >
           {isListening ? (
-            <View className="items-center justify-center">
+            <Animated.View
+              className="items-center justify-center"
+              style={{
+                transform: [{ scale: micAnim }],
+              }}
+            >
               <Ionicons name="mic" size={24} color="#ffffff" />
-              <View
-                className="absolute h-11 w-11 rounded-full"
-                style={{
-                  backgroundColor: '#ef4444',
-                  opacity: 0.3,
-                }}
-              />
-            </View>
+            </Animated.View>
           ) : (
             <Ionicons name="mic-outline" size={24} color={isDark ? colors.dark.text : colors.light.text} />
           )}
