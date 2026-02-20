@@ -147,7 +147,7 @@ export function QuestionCard({ question, currentAnswer, onAnswer, onBack, showBa
           {showBack && (
             <TouchableOpacity
               onPress={onBack}
-              className="flex-1 rounded-xl border-2 border-gray-300 bg-white py-4 dark:border-gray-600 dark:bg-gray-700"
+              className="flex-1 justify-center rounded-xl border-2 border-gray-300 bg-white py-4 dark:border-gray-600 dark:bg-gray-700"
               activeOpacity={0.7}
             >
               <Text className="text-center text-base font-semibold text-gray-700 dark:text-gray-200">Back</Text>
@@ -158,7 +158,7 @@ export function QuestionCard({ question, currentAnswer, onAnswer, onBack, showBa
             <TouchableOpacity
               onPress={() => onAnswer(selectedOptions)}
               disabled={!isMultiChoiceValid}
-              className={`flex-1 rounded-xl py-4 ${
+              className={`flex-1 justify-center rounded-xl  py-4 ${
                 isMultiChoiceValid ? 'bg-blue-500 dark:bg-blue-400' : 'bg-gray-300 dark:bg-gray-700'
               }`}
               activeOpacity={0.7}
