@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from 'nativewind';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
@@ -20,6 +22,8 @@ export default function TestsScreen() {
   const [data, setData] = useState<TestData[]>([]);
   const [loading, setLoading] = useState(true);
   const [wizardVisible, setWizardVisible] = useState(false);
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const getAllTests = async () => {
     try {
@@ -46,13 +50,13 @@ export default function TestsScreen() {
         <View className="flex-1">
           <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => setWizardVisible(true)}
           className="mr-3 rounded-lg bg-blue-500 px-4 py-2 dark:bg-blue-400"
           activeOpacity={0.7}
         >
           <Text className="font-semibold text-white">AI Assist</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <IconNavBar />
       </Animated.View>
       {loading ? (
@@ -79,6 +83,16 @@ export default function TestsScreen() {
       )}
 
       <OrderWizard visible={wizardVisible} onClose={() => setWizardVisible(false)} />
+      <View className="m-4 items-center justify-center px-1">
+        <TouchableOpacity
+          onPress={() => setWizardVisible(true)}
+          style={{ backgroundColor: colors.common.primary }}
+          className="w-full flex-row items-center justify-center rounded-lg bg-blue-500 px-11 py-4 dark:bg-blue-400"
+        >
+          <Ionicons name="sparkles" size={20} color="#fff" style={{ marginRight: 8 }} />
+          <Text className="font-bold text-white">Get Suggestions</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
