@@ -36,6 +36,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const reportContextRef = useRef<string | null>(null);
   const isListeningRef = useRef(false);
   const micAnim = useRef(new Animated.Value(1)).current;
+  const waveAnims = useRef(Array.from({ length: 15 }, () => new Animated.Value(0.3))).current;
 
   useEffect(() => {
     initializeChat();
@@ -77,6 +78,23 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
         }),
       ])
     ).start();
+
+    waveAnims.forEach((anim, index) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: 0.3 + Math.random() * 0.7,
+            duration: 300 + Math.random() * 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 0.2 + Math.random() * 0.5,
+            duration: 300 + Math.random() * 400,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    });
   });
 
   useSpeechRecognitionEvent('end', () => {
@@ -85,6 +103,10 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
     setInterimTranscript('');
     micAnim.stopAnimation();
     micAnim.setValue(1);
+    waveAnims.forEach(anim => {
+      anim.stopAnimation();
+      anim.setValue(0.3);
+    });
   });
 
   useSpeechRecognitionEvent('result', event => {
@@ -396,27 +418,64 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
           borderTopColor: isDark ? colors.dark.border : colors.light.border,
         }}
       >
-        <TextInput
-          className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-[15px]"
-          style={{
-            backgroundColor: isDark ? colors.dark.background : '#f9fafb',
-            color: isDark ? colors.dark.text : colors.light.text,
-            borderColor: isDark ? colors.dark.border : '#e5e7eb',
-            maxHeight: 100,
-          }}
-          value={inputText + (interimTranscript ? ' ' + interimTranscript : '')}
-          onChangeText={text => {
-            if (!isListening) {
-              setInputText(text);
-            }
-          }}
-          placeholder={`${isListening ? 'Listening...' : 'Type your message here'}`}
-          placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
-          multiline
-          maxLength={500}
-          editable={isConnected && !isListening}
-          onSubmitEditing={sendMessage}
-        />
+        {isListening ? (
+          <View
+            className="mr-2 flex-1 items-center justify-center rounded-[20px] border"
+            style={{
+              backgroundColor: isDark ? colors.dark.background : '#f9fafb',
+              borderColor: isDark ? colors.dark.border : '#e5e7eb',
+              height: 44,
+              flexDirection: 'row',
+              paddingHorizontal: 12,
+            }}
+          >
+            <View className="flex-row items-center justify-center" style={{ height: 30 }}>
+              {waveAnims.map((anim, i) => (
+                <Animated.View
+                  key={i}
+                  style={{
+                    width: 3,
+                    backgroundColor: colors.common.primary,
+                    marginHorizontal: 1.5,
+                    borderRadius: 2,
+                    opacity: 0.8,
+                    transform: [
+                      {
+                        scaleY: anim,
+                      },
+                    ],
+                    height: 30,
+                  }}
+                />
+              ))}
+            </View>
+            <Text className="ml-3 text-[13px] font-medium" style={{ color: colors.common.primary }}>
+              Listening...
+            </Text>
+          </View>
+        ) : (
+          <TextInput
+            className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-[15px]"
+            style={{
+              backgroundColor: isDark ? colors.dark.background : '#f9fafb',
+              color: isDark ? colors.dark.text : colors.light.text,
+              borderColor: isDark ? colors.dark.border : '#e5e7eb',
+              maxHeight: 100,
+            }}
+            value={inputText + (interimTranscript ? ' ' + interimTranscript : '')}
+            onChangeText={text => {
+              if (!isListening) {
+                setInputText(text);
+              }
+            }}
+            placeholder="Type your message here"
+            placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
+            multiline
+            maxLength={500}
+            editable={isConnected && !isListening}
+            onSubmitEditing={sendMessage}
+          />
+        )}
 
         {/* Mic Button */}
         <TouchableOpacity
