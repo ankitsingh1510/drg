@@ -97,36 +97,35 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     try {
       setLoading(true);
       setError(null);
+      const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
+        method: 'POST',
+        body: JSON.stringify({ answers }),
+      });
 
-      // TODO: Replace with actual API call when backend is ready
-      // const response = await apiFetch(`http://192.192.16.187:3020/api/v1/drg/order-wizard/recommend`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({ answers }),
-      // });
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
+      // Simulate API delay for testing
+      // await new Promise(resolve => setTimeout(resolve, 1500));
       // Static mock data for testing
-      const mockResult: RecommendationResponse = {
-        sessionId: 'mock-session-123',
-        recommendation: {
-          testName: 'OncoIndx Prime Plus',
-          testVariant: 'TBx',
-          confidence: 'high',
-          reasoning:
-            "OncoIndx Prime Plus best fits this patient's profile because the patient has recurrent disease, prior multiple lines of treatment failure, and is looking for therapeutic feasibility for Immunotherapy, PARPi, HRD scoring, germline testing, and molecular solutions for aggressive disease. All required criteria are met, including age >50, cancer stage II, recurrence, and at least one 'Yes' in the advanced disease constraints (multiple lines treatment failure). Tissue is available, so the TBx variant is appropriate. This test provides comprehensive actionable genomic insights for targeted and systemic therapy planning in complex, recurrent cases.",
-          alternativeTests: [
-            {
-              testName: 'OncoMonitor MRD',
-              reason:
-                'Could be considered for post-surgical surveillance using blood, but it does not provide the detailed therapeutic and genomic profiling needed for recurrent aggressive disease.',
-            },
-          ],
-        },
-      };
+      // const mockResult: RecommendationResponse = {
+      //   sessionId: 'mock-session-123',
+      //   recommendation: {
+      //     testName: 'OncoIndx Prime Plus',
+      //     testVariant: 'TBx',
+      //     confidence: 'high',
+      //     reasoning:
+      //       "OncoIndx Prime Plus best fits this patient's profile because the patient has recurrent disease, prior multiple lines of treatment failure, and is looking for therapeutic feasibility for Immunotherapy, PARPi, HRD scoring, germline testing, and molecular solutions for aggressive disease. All required criteria are met, including age >50, cancer stage II, recurrence, and at least one 'Yes' in the advanced disease constraints (multiple lines treatment failure). Tissue is available, so the TBx variant is appropriate. This test provides comprehensive actionable genomic insights for targeted and systemic therapy planning in complex, recurrent cases.",
+      //     alternativeTests: [
+      //       {
+      //         testName: 'OncoMonitor MRD',
+      //         reason:
+      //           'Could be considered for post-surgical surveillance using blood, but it does not provide the detailed therapeutic and genomic profiling needed for recurrent aggressive disease.',
+      //       },
+      //     ],
+      //   },
+      // };
+      // setResult(mockResult);
 
-      setResult(mockResult);
+      console.log('AI recommendation=->', response.data.data);
+      setResult(response.data.data);
     } catch (err) {
       console.error('Error getting recommendation:', err);
       setError('Failed to get recommendation. Please try again.');
@@ -161,7 +160,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
       <View key={question.id} className="mb-6">
         {/* Question Title */}
         <View className="mb-3 flex-row items-start justify-between">
-          <Text className="flex-1 text-base font-semibold text-slate-900 dark:text-gray-100">{question.text}</Text>
+          <Text className="flex-1 text-base font-semibold text-slate-900 dark:text-gray-100">{question.title}</Text>
           {question.subtitle && (
             <Text className="ml-2 text-sm text-blue-500 dark:text-blue-400">{question.subtitle}</Text>
           )}
@@ -268,12 +267,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
             </TouchableOpacity>
           </View>
         ) : result ? (
-          <ResultScreen
-            recommendation={result.recommendation}
-            scores={result.scores}
-            onClose={handleClose}
-            onRestart={resetWizard}
-          />
+          <ResultScreen recommendation={result.recommendation} onClose={handleClose} onRestart={resetWizard} />
         ) : (
           <>
             <ScrollView className="flex-1 px-3" showsVerticalScrollIndicator={false}>
@@ -310,7 +304,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
 
                 <TouchableOpacity
                   onPress={submitAnswers}
-                  disabled={answeredQuestions / totalQuestions >= 0.3} // Enable button after 30% of questions are answered
+                  disabled={answeredQuestions / totalQuestions < 0.3} // As of now I am enabling button after 30% of questions are answered
                   className={`flex-[6] flex-row items-center justify-center rounded-xl py-3.5 ${
                     answeredQuestions / totalQuestions >= 0.3 ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
