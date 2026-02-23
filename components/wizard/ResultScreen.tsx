@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
-import type { AlternativeTest, Recommendation, Score } from './index';
+import type { AlternativeTest, Recommendation } from './index';
 
 interface ResultScreenProps {
   recommendation: Recommendation;
-  scores: Score[];
   onClose: () => void;
   onRestart: () => void;
 }
 
-export function ResultScreen({ recommendation, scores, onClose, onRestart }: ResultScreenProps) {
+export function ResultScreen({ recommendation, onClose, onRestart }: ResultScreenProps) {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [whyThisTestExpanded, setWhyThisTestExpanded] = useState(false);

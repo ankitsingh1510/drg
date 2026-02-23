@@ -8,7 +8,7 @@ export type DependsOn = {
 
 export type Question = {
   id: string;
-  text: string;
+  title: string;
   subtitle?: string;
   type: QuestionType;
   options: string[];
@@ -30,16 +30,9 @@ export type Recommendation = {
   alternativeTests?: AlternativeTest[];
 };
 
-export type Score = {
-  testName: string;
-  score: number;
-  variant: string | null;
-};
-
 export type RecommendationResponse = {
   sessionId?: string;
   recommendation: Recommendation;
-  scores?: Score[];
   testName?: string;
   testVariant?: string | null;
   confidence?: string;
@@ -55,7 +48,7 @@ export const STATIC_QUESTIONS: Question[] = [
   // DEMOGRAPHICS
   {
     id: 'patientGender',
-    text: 'Patient Gender',
+    title: 'Patient Gender',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Male', 'Female', 'Other'],
@@ -65,7 +58,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'patientAge',
-    text: 'Patient Age',
+    title: 'Patient Age',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['< 50 years', '> 50 years'],
@@ -75,7 +68,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'familyHistory',
-    text: 'Family History of Cancer',
+    title: 'Family History of Cancer',
     subtitle: 'parents / grandparents / siblings',
     type: 'single_choice',
     options: ['Yes', 'No', 'Unknown'],
@@ -87,7 +80,7 @@ export const STATIC_QUESTIONS: Question[] = [
   // DISEASE INFORMATION
   {
     id: 'initialDiagnosis',
-    text: 'Initial Diagnosis',
+    title: 'Initial Diagnosis',
     subtitle: 'type your answer',
     type: 'text',
     options: [],
@@ -97,7 +90,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'diseaseStage',
-    text: 'Disease Stage',
+    title: 'Disease Stage',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Stage I', 'Stage II', 'Stage III', 'Stage IV'],
@@ -107,7 +100,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'priorLinesOfTreatment',
-    text: 'Prior Lines of Treatment',
+    title: 'Prior Lines of Treatment',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['1st Line (1L)', '2nd Line or beyond (2L+)'],
@@ -117,7 +110,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'caseOf',
-    text: 'Case of',
+    title: 'Case of',
     subtitle: 'select all that apply',
     type: 'multi_choice',
     options: ['Dual Primary', 'Recurrence', 'Relapse', 'None'],
@@ -127,7 +120,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'conflictInTumorOrigin',
-    text: 'Conflict in Tumor Origin?',
+    title: 'Conflict in Tumor Origin?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No', 'N/A'],
@@ -137,7 +130,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'firstLineTreatmentResistance',
-    text: '1st Line Treatment Resistance?',
+    title: '1st Line Treatment Resistance?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -149,7 +142,7 @@ export const STATIC_QUESTIONS: Question[] = [
   // SPECIMEN AVAILABILITY
   {
     id: 'specimenAvailable',
-    text: 'Specimen Available for Testing',
+    title: 'Specimen Available for Testing',
     subtitle: 'select all that apply',
     type: 'multi_choice',
     options: ['🧬 Tissue', '🩸 Blood', '💧 Urine', '🫁 Pleural Fluid', '🧠 CSF', '🧪 Ascitic Fluid'],
@@ -161,7 +154,7 @@ export const STATIC_QUESTIONS: Question[] = [
   // ADDITIONAL DISEASE INFORMATION
   {
     id: 'surgicalTreatmentDone',
-    text: 'Was surgical treatment done?',
+    title: 'Was surgical treatment done?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -171,7 +164,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'naCtRtTt',
-    text: 'Is NA CT/RT/TT being administered?',
+    title: 'Is NA CT/RT/TT being administered?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -181,7 +174,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'multipleLinesTreatmentFailure',
-    text: 'Was multiple lines treatment failure encountered?',
+    title: 'Was multiple lines treatment failure encountered?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -193,7 +186,7 @@ export const STATIC_QUESTIONS: Question[] = [
   // CLINICAL OBJECTIVES
   {
     id: 'lookingForNeoadjuvant',
-    text: 'Looking for neoadjuvant options for treatment initiation?',
+    title: 'Looking for neoadjuvant options for treatment initiation?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -203,7 +196,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForPostSurgicalSurveillance',
-    text: 'Looking for post-surgical surveillance?',
+    title: 'Looking for post-surgical surveillance?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -213,7 +206,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForTherapeuticSurveillance',
-    text: 'Looking for therapeutic surveillance?',
+    title: 'Looking for therapeutic surveillance?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -223,7 +216,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForHistopathologicalClarity',
-    text: 'Looking for conflicting histopathological clarity?',
+    title: 'Looking for conflicting histopathological clarity?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -233,7 +226,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForImmunotherapy',
-    text: 'Looking for therapeutic feasibility to use Immunotherapy?',
+    title: 'Looking for therapeutic feasibility to use Immunotherapy?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -243,7 +236,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForPARPi',
-    text: 'Looking for therapeutic feasibility to use PARPi?',
+    title: 'Looking for therapeutic feasibility to use PARPi?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -253,7 +246,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForHRDScore',
-    text: 'Looking for HRD score?',
+    title: 'Looking for HRD score?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -263,7 +256,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForGermline',
-    text: 'Looking for germline testing?',
+    title: 'Looking for germline testing?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
@@ -273,7 +266,7 @@ export const STATIC_QUESTIONS: Question[] = [
   },
   {
     id: 'lookingForMolecularSolution',
-    text: 'Looking for molecular solution for recurrent/aggressive disease?',
+    title: 'Looking for molecular solution for recurrent/aggressive disease?',
     subtitle: 'select one',
     type: 'single_choice',
     options: ['Yes', 'No'],
