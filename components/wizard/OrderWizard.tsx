@@ -99,31 +99,8 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
       setError(null);
       const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
         method: 'POST',
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers: answers }),
       });
-
-      // Simulate API delay for testing
-      // await new Promise(resolve => setTimeout(resolve, 1500));
-      // Static mock data for testing
-      // const mockResult: RecommendationResponse = {
-      //   sessionId: 'mock-session-123',
-      //   recommendation: {
-      //     testName: 'OncoIndx Prime Plus',
-      //     testVariant: 'TBx',
-      //     confidence: 'high',
-      //     reasoning:
-      //       "OncoIndx Prime Plus best fits this patient's profile because the patient has recurrent disease, prior multiple lines of treatment failure, and is looking for therapeutic feasibility for Immunotherapy, PARPi, HRD scoring, germline testing, and molecular solutions for aggressive disease. All required criteria are met, including age >50, cancer stage II, recurrence, and at least one 'Yes' in the advanced disease constraints (multiple lines treatment failure). Tissue is available, so the TBx variant is appropriate. This test provides comprehensive actionable genomic insights for targeted and systemic therapy planning in complex, recurrent cases.",
-      //     alternativeTests: [
-      //       {
-      //         testName: 'OncoMonitor MRD',
-      //         reason:
-      //           'Could be considered for post-surgical surveillance using blood, but it does not provide the detailed therapeutic and genomic profiling needed for recurrent aggressive disease.',
-      //       },
-      //     ],
-      //   },
-      // };
-      // setResult(mockResult);
-
       console.log('AI recommendation=->', response.data.data);
       setResult(response.data.data);
     } catch (err) {
@@ -155,6 +132,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     const isMultiChoice = question.type === 'multi_choice';
     const isTextInput = question.type === 'text';
     const selectedOptions = Array.isArray(currentAnswer) ? currentAnswer : [];
+    const isClinicalObjectives = question.section === 'CLINICAL OBJECTIVES';
 
     return (
       <View key={question.id} className="mb-6">
@@ -166,7 +144,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
           )}
         </View>
 
-        {/* Text Input */}
+        {/* Text Input [kept for future use] */}
         {isTextInput ? (
           <TextInput
             value={typeof currentAnswer === 'string' ? currentAnswer : ''}
@@ -178,8 +156,46 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
             numberOfLines={3}
             textAlignVertical="top"
           />
+        ) : isClinicalObjectives ? (
+          <View className="gap-3">
+            {question.options.map(option => {
+              const isSelected = selectedOptions.includes(option);
+
+              return (
+                <TouchableOpacity
+                  key={option}
+                  onPress={() => toggleMultiChoice(question.id, option)}
+                  className={`flex-row items-center rounded-xl border-2 px-4 py-3.5 ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30'
+                      : 'border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800'
+                  }`}
+                  activeOpacity={0.7}
+                >
+                  {/* Checkbox */}
+                  <View
+                    className={`mr-3 h-6 w-6 items-center justify-center rounded border-2 ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-500 dark:border-blue-400 dark:bg-blue-400'
+                        : 'border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-700'
+                    }`}
+                  >
+                    {isSelected && <Ionicons name="checkmark" size={16} color="#fff" />}
+                  </View>
+
+                  {/* Option Text */}
+                  <Text
+                    className={`flex-1 text-base ${
+                      isSelected ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    {option}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         ) : (
-          /* Options */
           <View className="flex-row flex-wrap gap-2">
             {question.options.map(option => {
               const isSelected = isMultiChoice ? selectedOptions.includes(option) : currentAnswer === option;
@@ -304,17 +320,19 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
 
                 <TouchableOpacity
                   onPress={submitAnswers}
-                  disabled={answeredQuestions / totalQuestions < 0.3} // As of now I am enabling button after 30% of questions are answered
-                  className={`flex-[6] flex-row items-center justify-center rounded-xl py-3.5 ${
-                    answeredQuestions / totalQuestions >= 0.3 ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-600'
-                  }`}
+                  // disabled={answeredQuestions / totalQuestions < 0.3} // As of now I am enabling button after 30% of questions are answered
+                  // className={`flex-[6] flex-row items-center justify-center rounded-xl py-3.5 ${
+                  //   answeredQuestions / totalQuestions >= 0.3 ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-600'
+                  // }`}
+                  className={`flex-[6] flex-row items-center justify-center rounded-xl bg-yellow-500 bg-yellow-500 py-3.5`}
                   activeOpacity={0.7}
                 >
                   <Ionicons name="sparkles" size={20} color="#fff" style={{ marginRight: 8 }} />
                   <Text
-                    className={`text-base font-semibold ${
-                      answeredQuestions / totalQuestions >= 0.3 ? 'text-white' : 'text-gray-500 dark:text-gray-400'
-                    }`}
+                    // className={`text-base font-semibold ${
+                    //   answeredQuestions / totalQuestions >= 0.3 ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                    // }`}
+                    className={`text-base font-semibold text-gray-500 text-white`}
                   >
                     Get Suggestions
                   </Text>
