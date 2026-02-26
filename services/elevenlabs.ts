@@ -11,7 +11,7 @@ export const elevenLabsAPI = {
   getSignedUrl: async (): Promise<string> => {
     try {
       const response = await apiFetch(
-        `${process.env.EXPO_PUBLIC_CHAT_URL}/drg/api/auth/elevenlabs/?agent_id=${process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID}`,
+        `${process.env.EXPO_PUBLIC_AMPLIFY_URL}/drg/api/auth/elevenlabs/?agent_id=${process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID}`,
         {
           method: 'POST',
         }

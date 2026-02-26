@@ -23,13 +23,12 @@ import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import ReAnimated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import ElevenLabsChat from '@/components/chat/ElevenLabsChat';
+import Chat from '@/components/chat/Chat';
 import InteractionBox from '@/components/interaction/Interactions';
 import { NotificationPermissionModal } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { configAPI } from '@/services/config';
-import { elevenLabsAPI } from '@/services/elevenlabs';
 import { ragAPI } from '@/services/rag';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { hasSeenNotificationPermission, setFcmToken, setHasSeenNotificationPermission } from '@/stores/mmkv';
@@ -131,7 +130,7 @@ async function registerForPushNotificationsAsync() {
 }
 
 export default function Reports() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
@@ -155,9 +154,7 @@ export default function Reports() {
     isVisible: false,
     mode: 'video',
   });
-  const [chatSignedUrl, setChatSignedUrl] = useState<string | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [loadingChat, setLoadingChat] = useState(false);
   const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
   const [showVideoAvatar, setShowVideoAvatar] = useState(true);
   const containerHeight = useRef(0);
@@ -207,19 +204,8 @@ export default function Reports() {
       unsubscribe();
     };
   }, [assayResultIds, removeIngestionId, setDocId]);
-  const handleChatWithDrG = async () => {
-    if (loadingChat) return;
-    try {
-      setLoadingChat(true);
-      const signedUrl = await elevenLabsAPI.getSignedUrl();
-      setChatSignedUrl(signedUrl);
-      setShowInteraction({ isVisible: true, mode: 'chat' });
-    } catch (error) {
-      console.error('Error getting signed URL:', error);
-      toast.error('Failed to connect to chat', 'Please try again', 3000);
-    } finally {
-      setLoadingChat(false);
-    }
+  const handleChatWithDrG = () => {
+    setShowInteraction({ isVisible: true, mode: 'chat' });
   };
 
   const handleTalkToDrG = () => {
@@ -273,7 +259,6 @@ export default function Reports() {
   };
 
   const handleCloseChatSplit = () => {
-    setChatSignedUrl(null);
     setShowInteraction({ isVisible: false, mode: 'chat' });
     setPdfHeight(50); // Reset to 50/50 split
   };
@@ -382,7 +367,7 @@ export default function Reports() {
         </ReAnimated.View>
 
         {/* Draggable Splitter */}
-        {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
+        {showInteraction.isVisible && showInteraction.mode === 'chat' && (
           <View
             {...panResponder.panHandlers}
             style={{
@@ -404,19 +389,14 @@ export default function Reports() {
         )}
 
         {/* ElevenLabs Chat Split Screen */}
-        {showInteraction.isVisible && showInteraction.mode === 'chat' && chatSignedUrl && (
+        {showInteraction.isVisible && showInteraction.mode === 'chat' && (
           <View
             style={{
               height: `${100 - pdfHeight}%`,
               borderTopWidth: 0,
             }}
           >
-            <ElevenLabsChat
-              signedUrl={chatSignedUrl}
-              documentId={String(docId)}
-              token={token || ''}
-              onClose={handleCloseChatSplit}
-            />
+            <Chat documentId={String(docId)} token={token || ''} userId={user?.sub} onClose={handleCloseChatSplit} />
           </View>
         )}
       </KeyboardAvoidingView>
@@ -446,7 +426,6 @@ export default function Reports() {
               <ReAnimated.View entering={FadeInUp.delay(650).duration(800).springify()}>
                 <TouchableOpacity
                   activeOpacity={0.8}
-                  disabled={loadingChat}
                   className="flex-row items-center justify-center rounded-full bg-indigo-600 px-6 py-4 shadow-lg shadow-indigo-300 dark:shadow-none"
                   onPress={handleChatWithDrG}
                 >
