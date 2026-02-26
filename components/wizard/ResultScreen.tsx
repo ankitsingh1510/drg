@@ -1,185 +1,146 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'nativewind';
-import type { AlternativeTest, Recommendation } from './index';
+import type { SuggestedTest } from './index';
+import { TestDetailScreen } from './TestDetailScreen';
 
 interface ResultScreenProps {
-  recommendation: Recommendation;
+  suggestedTests: SuggestedTest[];
   onClose: () => void;
   onRestart: () => void;
 }
 
-export function ResultScreen({ recommendation, onClose, onRestart }: ResultScreenProps) {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const [whyThisTestExpanded, setWhyThisTestExpanded] = useState(false);
-
-  // Count total parameters analyzed
-  const totalParameters = 12; // Based on the sections and questions
-
-  const getConfidenceBadge = (confidence: string) => {
-    const isHigh = confidence.toLowerCase() === 'high';
+const getConfidenceInfo = (confidence: number) => {
+  if (confidence >= 0.8) {
     return {
-      bgColor: isHigh ? 'bg-green-100 dark:bg-green-900/30' : 'bg-orange-100 dark:bg-orange-900/30',
-      textColor: isHigh ? 'text-green-700 dark:text-green-300' : 'text-orange-700 dark:text-orange-300',
-      icon: isHigh ? 'shield-checkmark-outline' : 'shield-half',
+      label: 'High Confidence',
+      bgColor: 'bg-green-100 dark:bg-green-900/30',
+      textColor: 'text-green-700 dark:text-green-300',
+      iconColor: '#10b981',
     };
+  }
+  if (confidence >= 0.4) {
+    return {
+      label: 'Moderate Confidence',
+      bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+      textColor: 'text-yellow-700 dark:text-yellow-300',
+      iconColor: '#eab308',
+    };
+  }
+  return {
+    label: 'Low Confidence',
+    bgColor: 'bg-gray-100 dark:bg-gray-700',
+    textColor: 'text-gray-600 dark:text-gray-400',
+    iconColor: '#9ca3af',
+  };
+};
+
+// Card background colors based on confidence
+const getCardHeaderBg = (confidence: number): string => {
+  if (confidence >= 0.8) return '#1a365d';
+  if (confidence >= 0.4) return '#3d2e1f';
+  return '#2d2d3d';
+};
+
+export function ResultScreen({ suggestedTests, onClose, onRestart }: ResultScreenProps) {
+  const [selectedTest, setSelectedTest] = useState<SuggestedTest | null>(null);
+
+  // Sort tests by confidence descending
+  const sortedTests = [...suggestedTests].sort((a, b) => b.confidence - a.confidence);
+
+  // Count total parameters (based on the question count)
+  const totalParameters = 14;
+
+  // Parse reasoning into short bullet points (first 3 sentences)
+  const getShortBullets = (reasoning: string): string[] => {
+    if (!reasoning) return [];
+    const sentences = reasoning.split(/\.\s+/).filter(s => s.trim().length > 0);
+    return sentences.slice(0, 3).map(s => s.replace(/\.$/, '').trim());
   };
 
-  // Parse reasoning into bullet points
-  const parseReasoningBullets = (reasoning: string): string[] => {
-    // Handle undefined or empty reasoning
-    if (!reasoning || typeof reasoning !== 'string') {
-      return [];
-    }
-
-    // Try to extract sentences or split by common delimiters
-    const sentences = reasoning.split(/\. (?=[A-Z])/);
-    if (sentences.length > 3) {
-      return sentences.slice(0, 4).map(s => s.replace(/\.$/, '').trim());
-    }
-    // Fallback: split into chunks
-    const words = reasoning.split(' ');
-    const chunkSize = Math.ceil(words.length / 4);
-    const bullets: string[] = [];
-    for (let i = 0; i < 4 && i * chunkSize < words.length; i++) {
-      bullets.push(words.slice(i * chunkSize, (i + 1) * chunkSize).join(' '));
-    }
-    return bullets;
-  };
-
-  const reasoningBullets = parseReasoningBullets(recommendation.reasoning || '');
-
-  const confidenceBadge = getConfidenceBadge(recommendation.confidence);
-  const alternativeTests = recommendation.alternativeTests || [];
+  // If a test is selected, show the detail screen
+  if (selectedTest) {
+    return <TestDetailScreen test={selectedTest} onBack={() => setSelectedTest(null)} />;
+  }
 
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <View className="px-5 py-6">
-        {/* Title Section */}
-        <Text className="mb-1 text-2xl font-bold text-slate-900 dark:text-gray-100">Recommended Test</Text>
-        <Text className="mb-6 text-sm text-gray-600 dark:text-gray-400">Based on patient clinical profile</Text>
-
-        {/* AI Info Box */}
-        <View className="mb-4 flex-row items-center rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-700 dark:bg-green-900/20">
+        {/* AI Analysis Banner */}
+        <View className="mb-5 flex-row items-center rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-700 dark:bg-green-900/20">
           <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
             <Ionicons name="checkmark-circle-outline" size={28} color="#10b981" />
           </View>
           <Text className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            DrG AI analyzed <Text className="font-bold">{totalParameters} clinical parameters</Text> for this
-            recommendation
+            Based on analysis of <Text className="font-bold">{totalParameters} clinical parameters.</Text>
           </Text>
         </View>
 
-        {/* AI Recommended Badge */}
-        <View className="flex-row items-center rounded-t-2xl bg-purple-600 px-4 py-3 dark:bg-purple-700">
-          <Ionicons name="sparkles" size={20} color="#fff" style={{ marginRight: 8 }} />
-          <Text className="font-semibold text-white">AI Recommended</Text>
-        </View>
-
-        {/* Main Recommendation Card */}
-        <View className="mb-6 rounded-b-2xl border border-t-0 border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
-          {/* Test Name and Confidence */}
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="flex-1 text-2xl font-bold text-slate-900 dark:text-gray-100">
-              {recommendation.testName}
-            </Text>
-            <View className={`ml-3 flex-row items-center rounded-full px-3 py-1.5 ${confidenceBadge.bgColor}`}>
-              <Ionicons
-                name={confidenceBadge.icon as any}
-                size={16}
-                color={isDark ? '#86efac' : '#15803d'}
-                style={{ marginRight: 4 }}
-              />
-              <Text className={`text-xs font-bold ${confidenceBadge.textColor}`}>
-                {recommendation.confidence.charAt(0).toUpperCase() + recommendation.confidence.slice(1)} Confidence
-              </Text>
-            </View>
-          </View>
-
-          {/* Description */}
-          <Text className="mb-4 leading-6 text-gray-600 dark:text-gray-400">
-            Comprehensive 523-gene solid tumor panel with MSI, TMB, and HRD analysis — optimized for advanced NSCLC with
-            prior therapy resistance
+        {/* Recommendations Header */}
+        <View className="mb-4 flex-row items-center">
+          <Ionicons name="sparkles" size={22} color="#eab308" style={{ marginRight: 8 }} />
+          <Text className="text-sm font-bold uppercase tracking-widest text-yellow-600 dark:text-yellow-500">
+            Recommendations
           </Text>
-
-          {/* Bullet Points */}
-          <View className="mb-4 space-y-2">
-            {reasoningBullets.map((bullet, index) => (
-              <View key={index} className="mb-2 flex-row">
-                <Text className="mr-2 text-gray-600 dark:text-gray-400">•</Text>
-                <Text className="flex-1 text-sm leading-5 text-gray-600 dark:text-gray-400">{bullet}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Why This Test - Expandable */}
-          <TouchableOpacity
-            onPress={() => setWhyThisTestExpanded(!whyThisTestExpanded)}
-            className="flex-row items-center justify-center py-2"
-            activeOpacity={0.7}
-          >
-            <Text className="mr-2 font-semibold text-yellow-600 dark:text-yellow-500">Why this test?</Text>
-            <Ionicons name={whyThisTestExpanded ? 'chevron-up' : 'chevron-down'} size={20} color="#ca8a04" />
-          </TouchableOpacity>
-
-          {whyThisTestExpanded && (
-            <View className="mt-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50">
-              <Text className="text-sm leading-6 text-gray-700 dark:text-gray-300">
-                {recommendation.reasoning || 'No additional details available.'}
-              </Text>
-            </View>
-          )}
         </View>
 
-        {/* Alternative Options */}
-        {alternativeTests.length > 0 && (
-          <View className="mb-6">
-            <Text className="mb-4 text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              ALTERNATIVE OPTIONS
-            </Text>
+        {/* Test Cards */}
+        {sortedTests.map((test, index) => {
+          const conf = getConfidenceInfo(test.confidence);
+          const bullets = getShortBullets(test.reasoning);
+          const headerBg = getCardHeaderBg(test.confidence);
 
-            {alternativeTests.map((altTest, index) => (
-              <View
-                key={index}
-                className="mb-4 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
-              >
+          return (
+            <View
+              key={`${test.testName}-${index}`}
+              className="mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+            >
+              {/* Card Header with solid background */}
+              <View className="px-4 pb-5 pt-4" style={{ backgroundColor: headerBg }}>
+                {/* Top row: variant badge + confidence badge */}
                 <View className="mb-3 flex-row items-center justify-between">
-                  <Text className="flex-1 text-xl font-bold text-slate-900 dark:text-gray-100">{altTest.testName}</Text>
-                  <View className="ml-3 flex-row items-center rounded-full bg-orange-100 px-3 py-1.5 dark:bg-orange-900/30">
-                    <Ionicons name="shield-half" size={16} color="#ea580c" style={{ marginRight: 4 }} />
-                    <Text className="text-xs font-bold text-orange-700 dark:text-orange-300">Moderate Confidence</Text>
+                  {test.testVariant ? (
+                    <View className="rounded-full bg-green-500/80 px-3 py-1">
+                      <Text className="text-xs font-bold text-white">{test.testVariant}</Text>
+                    </View>
+                  ) : (
+                    <View />
+                  )}
+                  <View className={`flex-row items-center rounded-full px-3 py-1.5 ${conf.bgColor}`}>
+                    <Ionicons name="checkmark-circle" size={14} color={conf.iconColor} style={{ marginRight: 4 }} />
+                    <Text className={`text-xs font-bold ${conf.textColor}`}>{conf.label}</Text>
                   </View>
                 </View>
 
-                <Text className="leading-6 text-gray-600 dark:text-gray-400">{altTest.reason}</Text>
-
-                {/* Placeholder bullets */}
-                <View className="mt-4 space-y-2">
-                  <View className="flex-row">
-                    <Text className="mr-2 text-gray-600 dark:text-gray-400">•</Text>
-                    <Text className="flex-1 text-sm leading-5 text-gray-600 dark:text-gray-400">
-                      Minimally invasive alternative
-                    </Text>
-                  </View>
-                  <View className="flex-row">
-                    <Text className="mr-2 text-gray-600 dark:text-gray-400">•</Text>
-                    <Text className="flex-1 text-sm leading-5 text-gray-600 dark:text-gray-400">
-                      Monitors treatment resistance mutations
-                    </Text>
-                  </View>
-                  <View className="flex-row">
-                    <Text className="mr-2 text-gray-600 dark:text-gray-400">•</Text>
-                    <Text className="flex-1 text-sm leading-5 text-gray-600 dark:text-gray-400">
-                      Rapid 7-day turnaround
-                    </Text>
-                  </View>
-                </View>
+                {/* Test Name */}
+                <Text className="text-xl font-bold text-white">{test.testName}</Text>
               </View>
-            ))}
-          </View>
-        )}
+
+              {/* Card Body: bullet points + link */}
+              <View className="px-4 pb-4 pt-3">
+                {/* Reasoning Bullets */}
+                {bullets.map((bullet, bIndex) => (
+                  <View key={bIndex} className="mb-2 flex-row">
+                    <Text className="mr-2 text-gray-400 dark:text-gray-500">•</Text>
+                    <Text className="flex-1 text-sm leading-5 text-gray-600 dark:text-gray-400">{bullet}</Text>
+                  </View>
+                ))}
+
+                {/* View Detailed Recommendation */}
+                <TouchableOpacity
+                  onPress={() => setSelectedTest(test)}
+                  className="mt-2 flex-row items-center"
+                  activeOpacity={0.7}
+                >
+                  <Text className="mr-1 text-sm font-semibold text-yellow-600 dark:text-yellow-500">
+                    View Detailed Recommendation
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color="#ca8a04" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );
