@@ -17,32 +17,22 @@ export type Question = {
   dependsOn?: DependsOn | null;
 };
 
-export type AlternativeTest = {
-  testName: string;
-  reason: string;
-};
-
-export type Recommendation = {
+export type SuggestedTest = {
   testName: string;
   testVariant: string | null;
-  confidence: string;
+  confidence: number;
   reasoning: string;
-  alternativeTests?: AlternativeTest[];
 };
 
 export type RecommendationResponse = {
   sessionId?: string;
-  recommendation: Recommendation;
-  testName?: string;
-  testVariant?: string | null;
-  confidence?: string;
-  reasoning?: string;
-  alternativeTests?: AlternativeTest[];
+  suggestedTests: SuggestedTest[];
 };
 
 // Component Exports
 export { default as OrderWizard } from './OrderWizard';
 export { ResultScreen } from './ResultScreen';
+export { TestDetailScreen } from './TestDetailScreen';
 
 export const STATIC_QUESTIONS: Question[] = [
   // DEMOGRAPHICS
