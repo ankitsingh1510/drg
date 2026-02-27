@@ -47,7 +47,6 @@ export const SimpleButton = React.memo(
     );
   }
 );
-SimpleButton.displayName = 'SimpleButton';
 
 const styles = StyleSheet.create({
   container: {

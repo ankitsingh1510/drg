@@ -6,13 +6,14 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
+  const logout = useLogout();
   const { user } = useAuth();
   const router = useRouter();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
@@ -183,8 +184,8 @@ export default function Patients() {
   );
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <PatientHeader user={user} totalCount={totalCount} query={query} onSearch={handleSearch} onLogout={logout} />
 
       <View className="flex-1">
         <FlashList

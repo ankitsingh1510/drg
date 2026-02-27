@@ -92,8 +92,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
-        // Redirect to home tabs if already authenticated
-        router.replace('/(tabs)' as any);
+        // Redirect to patients page if already authenticated
+        // router.replace('/patients' as any);
+        router.replace('/landing' as any);
       } catch (error) {
         console.error('Error initializing auth:', error);
         // await AsyncStorage.removeItem('token');
@@ -167,8 +168,9 @@ export const useLogin = () => {
         const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
-        // Navigate to home tabs
-        router.replace('/(tabs)' as any);
+        // Navigate to patients page
+        // router.replace('/patients' as any);
+        router.replace('/landing' as any);
       } else {
         throw new Error('Authentication failed');
       }

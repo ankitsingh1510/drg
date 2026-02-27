@@ -22,5 +22,5 @@ export default function Index() {
     return <Redirect href="/onboarding" />;
   }
 
-  return <Redirect href={isAuthenticated ? '/(tabs)' : '/login'} />;
+  return <Redirect href={isAuthenticated ? '/landing' : '/login'} />;
 }

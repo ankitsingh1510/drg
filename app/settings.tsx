@@ -14,9 +14,10 @@ import {
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
-import { Bell, ChevronRight, HelpCircle, Lock, LogOut, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import { Bell, ChevronRight, HelpCircle, Lock, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
@@ -253,7 +254,12 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <View className="mb-4 flex-row items-center justify-between px-6 pb-2">
+        <Text className="text-2xl font-bold text-gray-900 dark:text-white">Settings</Text>
+        <IconNavBar />
+      </View>
+
       <ScrollView className="mt-4 flex-1" showsVerticalScrollIndicator={false}>
         {settingsData.map((item, index) => (
           <Animated.View
@@ -265,49 +271,6 @@ const Settings = () => {
             <SettingCard {...item} />
           </Animated.View>
         ))}
-
-        {/* Logout button */}
-        <Animated.View entering={FadeInUp.delay(settingsData.length * 150).duration(600).springify()}>
-          <TouchableOpacity
-            onPress={() =>
-              Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Sign Out', style: 'destructive', onPress: logout },
-              ])
-            }
-            activeOpacity={0.8}
-            style={{
-              marginHorizontal: 20,
-              marginBottom: 8,
-              borderRadius: 12,
-              overflow: 'hidden',
-              shadowColor: '#dc2626',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 6,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 10,
-                paddingVertical: 16,
-                backgroundColor: isDarkMode ? '#7f1d1d' : '#fee2e2',
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDarkMode ? '#991b1b' : '#fecaca',
-              }}
-            >
-              <LogOut size={20} color="#dc2626" strokeWidth={2} />
-              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>
-                Sign Out
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
 
         <View className="h-6" />
       </ScrollView>

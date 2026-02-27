@@ -9,6 +9,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeadingDivider } from '@/components/navigation/HeadingDivider';
 import HScroller from '@/components/navigation/HScroller';
+import IconNavBar from '@/components/navigation/IconNavBar';
 import { SimpleButton } from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
@@ -29,7 +30,7 @@ export default function LandingScreen() {
         heading: 'Patient',
         color: '#006400',
         sub: 'Patients Recent labs & imaging',
-        onPress: () => router.push('/(tabs)/patients' as any),
+        onPress: () => router.push('/patients' as any),
       },
       {
         icon: TestTube2,
@@ -50,7 +51,7 @@ export default function LandingScreen() {
         heading: 'Settings',
         color: '#E5575E',
         sub: 'Profile & App Preferences',
-        onPress: () => router.push('/(tabs)/settings' as any),
+        onPress: () => router.push('/settings' as any),
       },
     ],
     []
@@ -92,16 +93,21 @@ export default function LandingScreen() {
   );
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <View className="px-6 pt-4">
-            <Text className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Hello, {user?.name} {user?.lname}
-            </Text>
-            <View className="mb-6 mt-1 flex-row items-center">
-              <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
-              <Text className="ml-2 text-base text-gray-500 dark:text-gray-400">{date}</Text>
+          <View className="mr-6 flex-row items-center justify-between">
+            <View>
+              <Text className="text-blue mt-8 pl-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                Hello, {user?.name} {user?.lname}
+              </Text>
+              <View className="mb-6 flex-row items-center pl-6">
+                <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
+                <Text className="ml-2 text-xl text-gray-500 dark:text-gray-400">{date}</Text>
+              </View>
+            </View>
+            <View className="mt-4">
+              <IconNavBar />
             </View>
           </View>
           <HScroller />
