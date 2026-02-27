@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Activity, AlertCircle, Calendar, CheckCircle2, Clock, Dna, Hash, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-
+import { colors } from '@/constants/colors';
 import { type Patient } from '@/services/patients';
 
 interface PatientRowProps {
@@ -203,4 +203,3 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
     </View>
   );
 });
-PatientRow.displayName = 'PatientRow';

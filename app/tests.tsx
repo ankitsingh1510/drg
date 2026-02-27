@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator,Text, FlatList, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IconNavBar from '@/components/navigation/IconNavBar';
 import { EmptyState } from '@/components/patient';
 import OncoCard from '@/components/widgets/OncoCard';
 import { OrderWizard } from '@/components/wizard';
@@ -42,7 +43,16 @@ export default function TestsScreen() {
   }, []);
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <Animated.View
+        entering={FadeInUp.duration(600).springify()}
+        className="mb-4 flex-row items-center justify-between px-5"
+      >
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
+        </View>
+        <IconNavBar />
+      </Animated.View>
 
       <Animated.View entering={FadeInUp.duration(600).springify()} className="mx-4 mb-6">
         <View className="overflow-hidden rounded-2xl" style={{ backgroundColor: '#6B5CE7' }}>

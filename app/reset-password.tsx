@@ -5,7 +5,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -127,182 +126,124 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
-        edges={['left', 'right', 'bottom']}
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
+          edges={['left', 'right', 'bottom']}
         >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View className="flex-1 bg-[#FDF5E6] px-6 pt-6 dark:bg-gray-900">
-              {/* Header section */}
-              <View className="mb-8 items-center">
-                <View
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 36,
-                    backgroundColor: isDark ? 'rgba(218,165,33,0.15)' : 'rgba(218,165,33,0.12)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 16,
-                  }}
-                >
-                  <Ionicons
-                    name="lock-closed"
-                    size={32}
-                    color={colors.common.primary}
-                  />
-                </View>
-                <Text
-                  style={{ fontFamily: 'Poppins_700Bold', fontSize: 22, color: isDark ? '#f9fafb' : '#111827', marginBottom: 6 }}
-                >
-                  Update Your Password
-                </Text>
-                <Text
-                  style={{ fontFamily: 'Poppins_400Regular', fontSize: 14, color: isDark ? '#9ca3af' : '#6b7280', textAlign: 'center', lineHeight: 20 }}
-                >
-                  Choose a strong password to keep{'\n'}your account secure
-                </Text>
-              </View>
-
-              <View className="space-y-5">
-                <View className="relative p-1">
-                  <View className="absolute left-4 top-4 z-10">
-                    <Ionicons
-                      name="lock-closed-outline"
-                      size={20}
-                      color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                    />
-                  </View>
-                  <TextInput
-                    style={{
-                      borderRadius: 16,
-                      borderWidth: 1,
-                      borderColor: isDark ? '#374151' : '#e5e7eb',
-                      backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                      paddingVertical: 14,
-                      paddingLeft: 48,
-                      paddingRight: 48,
-                      color: isDark ? '#f9fafb' : '#111827',
-                      fontSize: 15,
-                    }}
-                    placeholder="Current Password"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={currentPassword}
-                    onChangeText={setCurrentPassword}
-                    secureTextEntry={!showCurrent}
-                    autoCapitalize="none"
-                  />
-                  <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowCurrent(prev => !prev)}>
-                    <Ionicons name={showCurrent ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
-                  </TouchableOpacity>
-                </View>
-
-                <View className="relative p-1">
-                  <View className="absolute left-4 top-4 z-10">
-                    <Ionicons
-                      name="key-outline"
-                      size={20}
-                      color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                    />
-                  </View>
-                  <TextInput
-                    style={{
-                      borderRadius: 16,
-                      borderWidth: 1,
-                      borderColor: isDark ? '#374151' : '#e5e7eb',
-                      backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                      paddingVertical: 14,
-                      paddingLeft: 48,
-                      paddingRight: 48,
-                      color: isDark ? '#f9fafb' : '#111827',
-                      fontSize: 15,
-                    }}
-                    placeholder="New Password"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                    secureTextEntry={!showNew}
-                    autoCapitalize="none"
-                  />
-                  <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowNew(prev => !prev)}>
-                    <Ionicons name={showNew ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
-                  </TouchableOpacity>
-                </View>
-
-                <View className="relative p-1">
-                  <View className="absolute left-4 top-4 z-10">
-                    <Ionicons
-                      name="key-outline"
-                      size={20}
-                      color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                    />
-                  </View>
-                  <TextInput
-                    style={{
-                      borderRadius: 16,
-                      borderWidth: 1,
-                      borderColor: isDark ? '#374151' : '#e5e7eb',
-                      backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                      paddingVertical: 14,
-                      paddingLeft: 48,
-                      paddingRight: 48,
-                      color: isDark ? '#f9fafb' : '#111827',
-                      fontSize: 15,
-                    }}
-                    placeholder="Confirm New Password"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry={!showConfirm}
-                    autoCapitalize="none"
-                  />
-                  <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowConfirm(prev => !prev)}>
-                    <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                style={{
-                  marginTop: 32,
-                  borderRadius: 16,
-                  backgroundColor: colors.common.primary,
-                  paddingVertical: 16,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'row',
-                  shadowColor: colors.common.primary,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 6,
-                  elevation: 3,
-                }}
-                onPress={handleChangePassword}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={{ color: '#fff', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>Update Password</Text>
-                )}
-              </TouchableOpacity>
-
-              <View style={{ height: 40 }} />
+          <View className="flex-1">
+            <View className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#FDF5E6] to-transparent dark:from-gray-900" />
+            <View className="absolute left-6 top-[25%]">
+              <Text className="text-3xl font-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
+                Update Password
+              </Text>
+              <Text className="mt-1 text-base font-medium text-gray-600 shadow-lg dark:text-gray-100">
+                Required before you continue
+              </Text>
             </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
-      </SafeAreaView>
+          </View>
+
+          <View className="flex-1 rounded-t-[40px] bg-[#FDF5E6] px-8 pt-0 dark:bg-gray-900">
+            <View className="mb-8 items-center">
+              <Text className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">Secure Your Account</Text>
+              <Text className="mt-1 text-base text-gray-500 dark:text-gray-400">
+                Enter your current and new password
+              </Text>
+            </View>
+
+            <View className="space-y-5">
+              <View className="relative p-1">
+                <View className="absolute left-4 top-4 z-10">
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
+                  />
+                </View>
+                <TextInput
+                  className="rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-12 text-black shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Current Password"
+                  placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
+                  value={currentPassword}
+                  onChangeText={setCurrentPassword}
+                  secureTextEntry={!showCurrent}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowCurrent(prev => !prev)}>
+                  <Ionicons name={showCurrent ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="relative p-1">
+                <View className="absolute left-4 top-4 z-10">
+                  <Ionicons
+                    name="key-outline"
+                    size={20}
+                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
+                  />
+                </View>
+                <TextInput
+                  className="rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-12 text-black shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="New Password"
+                  placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  secureTextEntry={!showNew}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowNew(prev => !prev)}>
+                  <Ionicons name={showNew ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="relative p-1">
+                <View className="absolute left-4 top-4 z-10">
+                  <Ionicons
+                    name="key-outline"
+                    size={20}
+                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
+                  />
+                </View>
+                <TextInput
+                  className="rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-12 text-black shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Confirm New Password"
+                  placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirm}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity className="absolute right-4 top-4" onPress={() => setShowConfirm(prev => !prev)}>
+                  <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              className="mt-8 flex-row items-center justify-center rounded-2xl bg-[#2563EB] py-4 shadow-lg"
+              onPress={handleChangePassword}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-base font-semibold text-white">Update Password</Text>
+              )}
+            </TouchableOpacity>
+
+            {isFromSettings ? (
+              <TouchableOpacity className="mt-5 items-center" onPress={handleBackToSettings}>
+                <Text className="text-base font-medium text-gray-500 dark:text-gray-400">Back to settings</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity className="mt-5 items-center" onPress={handleBackToLogin}>
+                <Text className="text-base font-medium text-gray-500 dark:text-gray-400">Back to login</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
-
