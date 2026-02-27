@@ -97,58 +97,58 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     try {
       setLoading(true);
       setError(null);
-      // const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({ answers: answers }),
-      // });
-      // console.log('AI recommendation=->', response.data.data);
-      // setResult(response.data.data);
-      setResult({
-        suggestedTests: [
-          {
-            testName: 'OncoRisk',
-            testVariant: null,
-            confidence: 0.2,
-            reasoning:
-              'The patient is >50 years with unknown family history, which satisfies demographic criteria. However, the clinical objectives do not include Germline testing, which is mandatory for this test. Therefore, despite eligibility by age and history, the lack of germline intent significantly limits relevance.',
-          },
-          {
-            testName: 'OncoTarget',
-            testVariant: 'LBx',
-            confidence: 0.6,
-            reasoning:
-              "The patient is >50 years with Stage II disease and a clinical objective of Neoadjuvant options for treatment initiation, which aligns with this test’s purpose. However, surgical treatment has already been performed and treatment resistance status is not explicitly confirmed as 'No,' creating partial uncertainty. Blood is available, so the LBx variant is appropriate, but timing may reduce ideal applicability.",
-          },
-          {
-            testName: 'OncoIndx',
-            testVariant: 'LBx',
-            confidence: 0.1,
-            reasoning:
-              'Although the patient is >50 years and Stage II fits the stage criteria, there is no evidence of 1st line treatment resistance, which is mandatory. Additionally, the clinical objectives do not include Immunotherapy feasibility, PARPi, or HRD Score. Therefore, this test has minimal relevance in the current setting.',
-          },
-          {
-            testName: 'OncoIndx Prime Plus',
-            testVariant: 'LBx',
-            confidence: 0.0,
-            reasoning:
-              'This test requires Stage III/IV disease, recurrence or relapse, prior treatment lines, and at least one resistance or tumor conflict condition. The patient has Stage II disease without documented recurrence or treatment failure, and the clinical objectives do not align with advanced profiling needs. Hence, this test is not applicable.',
-          },
-          {
-            testName: 'OncoMonitor TRM',
-            testVariant: null,
-            confidence: 0.0,
-            reasoning:
-              'This test is designed for non-surgical patients under active systemic therapy with therapeutic surveillance intent. The patient has undergone surgery and there is no indication of active CT/RT/TT administration or therapeutic surveillance objective. Therefore, this test is not appropriate.',
-          },
-          {
-            testName: 'OncoMonitor MRD',
-            testVariant: null,
-            confidence: 0.9,
-            reasoning:
-              'The patient is >50 years with Stage II disease, has undergone surgical treatment, and the clinical objective includes Post-surgical surveillance. Blood specimen is available, fulfilling all required criteria. This test is highly appropriate for minimal residual disease monitoring in the current clinical context.',
-          },
-        ],
+      const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
+        method: 'POST',
+        body: JSON.stringify({ answers: answers }),
       });
+      console.log('AI recommendation=->', response.data.data);
+      setResult(response.data.data);
+      // setResult({
+      //   suggestedTests: [
+      //     {
+      //       testName: 'OncoRisk',
+      //       testVariant: null,
+      //       confidence: 0.2,
+      //       reasoning:
+      //         'The patient is >50 years with unknown family history, which satisfies demographic criteria. However, the clinical objectives do not include Germline testing, which is mandatory for this test. Therefore, despite eligibility by age and history, the lack of germline intent significantly limits relevance.',
+      //     },
+      //     {
+      //       testName: 'OncoTarget',
+      //       testVariant: 'LBx',
+      //       confidence: 0.6,
+      //       reasoning:
+      //         "The patient is >50 years with Stage II disease and a clinical objective of Neoadjuvant options for treatment initiation, which aligns with this test’s purpose. However, surgical treatment has already been performed and treatment resistance status is not explicitly confirmed as 'No,' creating partial uncertainty. Blood is available, so the LBx variant is appropriate, but timing may reduce ideal applicability.",
+      //     },
+      //     {
+      //       testName: 'OncoIndx',
+      //       testVariant: 'LBx',
+      //       confidence: 0.1,
+      //       reasoning:
+      //         'Although the patient is >50 years and Stage II fits the stage criteria, there is no evidence of 1st line treatment resistance, which is mandatory. Additionally, the clinical objectives do not include Immunotherapy feasibility, PARPi, or HRD Score. Therefore, this test has minimal relevance in the current setting.',
+      //     },
+      //     {
+      //       testName: 'OncoIndx Prime Plus',
+      //       testVariant: 'LBx',
+      //       confidence: 0.0,
+      //       reasoning:
+      //         'This test requires Stage III/IV disease, recurrence or relapse, prior treatment lines, and at least one resistance or tumor conflict condition. The patient has Stage II disease without documented recurrence or treatment failure, and the clinical objectives do not align with advanced profiling needs. Hence, this test is not applicable.',
+      //     },
+      //     {
+      //       testName: 'OncoMonitor TRM',
+      //       testVariant: null,
+      //       confidence: 0.0,
+      //       reasoning:
+      //         'This test is designed for non-surgical patients under active systemic therapy with therapeutic surveillance intent. The patient has undergone surgery and there is no indication of active CT/RT/TT administration or therapeutic surveillance objective. Therefore, this test is not appropriate.',
+      //     },
+      //     {
+      //       testName: 'OncoMonitor MRD',
+      //       testVariant: null,
+      //       confidence: 0.9,
+      //       reasoning:
+      //         'The patient is >50 years with Stage II disease, has undergone surgical treatment, and the clinical objective includes Post-surgical surveillance. Blood specimen is available, fulfilling all required criteria. This test is highly appropriate for minimal residual disease monitoring in the current clinical context.',
+      //     },
+      //   ],
+      // });
     } catch (err) {
       console.error('Error getting recommendation:', err);
       setError('Failed to get recommendation. Please try again.');
