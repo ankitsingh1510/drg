@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, AppState, Dimensions, StyleSheet, Text, View } from 'react-native';
-import { Audio } from 'expo-av';
+import { setAudioModeAsync, requestRecordingPermissionsAsync } from 'expo-audio';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { WebView } from 'react-native-webview';
@@ -116,12 +116,12 @@ export default function VideoInteraction({
 
   const requestMicrophonePermission = async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
+      const { status } = await requestRecordingPermissionsAsync();
       if (status === 'granted') {
         // Configure audio session for recording
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
+        await setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
         });
       } else {
         Alert.alert('Microphone Permission Required', 'Please enable microphone access in settings to talk to Dr.G', [

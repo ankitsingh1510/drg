@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import IconNavBar from '@/components/navigation/IconNavBar';
 import { EmptyState } from '@/components/patient';
 import OncoCard from '@/components/widgets/OncoCard';
 import { colors } from '@/constants/colors';
@@ -36,16 +35,7 @@ export default function TestsScreen() {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <Animated.View
-        entering={FadeInUp.duration(600).springify()}
-        className="mb-4 flex-row items-center justify-between px-5"
-      >
-        <View className="flex-1">
-          <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
-        </View>
-        <IconNavBar />
-      </Animated.View>
+    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       {loading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.common.primary} />
