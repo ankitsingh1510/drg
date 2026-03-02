@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { useColorScheme } from 'nativewind';
+import Markdown, { RenderRules } from 'react-native-markdown-display';
 import { io, Socket } from 'socket.io-client';
+import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser';
 import { colors } from '@/constants/colors';
 
 interface Message {
@@ -43,6 +45,41 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
   const flashListRef = useRef<any>(null);
   const currentStreamingMessageIdRef = useRef<string | null>(null);
   const isListeningRef = useRef(false);
+  const streamingRawMarkdownRef = useRef('');
+  const streamingRenderableMarkdownRef = useRef('');
+  const markdownParserRef = useRef<any>(null);
+
+  const normalizeMarkdownText = (raw: unknown): string => {
+    if (typeof raw !== 'string') {
+      return '';
+    }
+
+    return raw
+      .replace(/\r\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\([*_`~])/g, '$1');
+  };
+
+  const getStreamingMarkdownParser = () => {
+    if (!markdownParserRef.current) {
+      markdownParserRef.current = getMarkdown('rag-chat');
+    }
+    return markdownParserRef.current;
+  };
+
+  const getStreamSafeMarkdown = (candidate: string, fallback: string) => {
+    if (!candidate) {
+      return '';
+    }
+
+    try {
+      const parser = getStreamingMarkdownParser();
+      parseMarkdownToStructure(candidate, parser);
+      return candidate;
+    } catch {
+      return fallback;
+    }
+  };
 
   useEffect(() => {
     connectSocket();
@@ -147,12 +184,18 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
       });
 
       socket.on('streamChunk', data => {
-        const chunk = data?.chunk || data?.text || data?.content || '';
+        const chunk = normalizeMarkdownText(data?.chunk || data?.text || data?.content || '');
         if (!chunk) {
           return;
         }
 
         setIsWaitingForResponse(false);
+        streamingRawMarkdownRef.current += chunk;
+        const safeMarkdown = getStreamSafeMarkdown(
+          streamingRawMarkdownRef.current,
+          streamingRenderableMarkdownRef.current
+        );
+        streamingRenderableMarkdownRef.current = safeMarkdown;
 
         const streamingId = currentStreamingMessageIdRef.current;
         if (!streamingId) {
@@ -163,7 +206,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
             {
               id: newMessageId,
               type: 'agent',
-              text: chunk,
+              text: safeMarkdown || chunk,
               timestamp: new Date(),
             },
           ]);
@@ -173,7 +216,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
               message.id === streamingId
                 ? {
                     ...message,
-                    text: message.text + chunk,
+                    text: safeMarkdown,
                   }
                 : message
             )
@@ -185,15 +228,33 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
 
       socket.on('ragResponse', (data: RagResponsePayload) => {
         setIsWaitingForResponse(false);
+        console.log('RAG response received:', data);
+        const responseText = normalizeMarkdownText(data?.text || '');
+        const finalSafeMarkdown = getStreamSafeMarkdown(responseText, responseText);
 
         if (currentStreamingMessageIdRef.current) {
+          const streamingId = currentStreamingMessageIdRef.current;
+          if (finalSafeMarkdown) {
+            setMessages(prev =>
+              prev.map(message =>
+                message.id === streamingId
+                  ? {
+                      ...message,
+                      text: finalSafeMarkdown,
+                    }
+                  : message
+              )
+            );
+          }
+          streamingRawMarkdownRef.current = '';
+          streamingRenderableMarkdownRef.current = '';
+          markdownParserRef.current = null;
           currentStreamingMessageIdRef.current = null;
           return;
         }
 
-        const responseText = data?.text || data?.answer?.text || data?.content;
-        if (responseText) {
-          addMessage('agent', responseText);
+        if (finalSafeMarkdown) {
+          addMessage('agent', finalSafeMarkdown);
         }
       });
 
@@ -248,6 +309,9 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
     addMessage('user', messageToSend);
     setIsWaitingForResponse(true);
     currentStreamingMessageIdRef.current = null;
+    streamingRawMarkdownRef.current = '';
+    streamingRenderableMarkdownRef.current = '';
+    markdownParserRef.current = null;
     socketRef.current.emit('ragInference', { question: messageToSend });
   };
 
@@ -298,23 +362,107 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
     }
   };
 
-  const renderMessage = ({ item: message }: { item: Message }) => (
-    <View className={`mb-3 ${message.type === 'user' ? 'items-end' : 'items-start'}`}>
-      <View
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${message.type === 'user' ? '' : isDark ? 'border' : 'border'}`}
-        style={{
-          backgroundColor:
-            message.type === 'user' ? colors.common.primary : isDark ? colors.dark.cardBackground : '#f3f4f6',
-          borderColor: message.type === 'agent' ? (isDark ? colors.dark.border : '#e5e7eb') : undefined,
-        }}
-      >
+  const markdownRules = useMemo<RenderRules>(
+    () => ({
+      bullet_list_icon: (node, children, parent, styles) => (
         <Text
-          className="text-[15px] leading-5"
-          style={{ color: message.type === 'user' ? '#ffffff' : isDark ? colors.dark.text : colors.light.text }}
+          key={node.key}
+          style={[
+            styles.bullet_list_icon,
+            {
+              color: isDark ? colors.dark.text : colors.light.text,
+            },
+          ]}
         >
-          {message.text}
+          {'•'}
         </Text>
-      </View>
+      ),
+    }),
+    [isDark]
+  );
+
+  const renderMessage = ({ item: message }: { item: Message }) => (
+    <View className={`mb-3 ${message.type === 'user' ? 'items-end' : 'w-full items-start'}`}>
+      {message.type === 'user' ? (
+        <View
+          className="max-w-[80%] rounded-2xl px-4 py-2.5"
+          style={{
+            backgroundColor: colors.common.primary,
+          }}
+        >
+          <Text className="text-[15px] leading-5" style={{ color: '#ffffff' }}>
+            {message.text}
+          </Text>
+        </View>
+      ) : (
+        <View style={{ width: '100%' }}>
+          <Markdown
+            rules={markdownRules}
+            style={{
+              body: {
+                backgroundColor: 'transparent',
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              paragraph: {
+                fontSize: 15,
+                lineHeight: 22,
+                marginBottom: 8,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              strong: {
+                fontWeight: 'bold',
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              // ✅ Proper list indentation
+              bullet_list: {
+                marginBottom: 8,
+              },
+              ordered_list: {
+                marginBottom: 8,
+              },
+              list_item: {
+                flexDirection: 'row',
+                marginBottom: 4,
+              },
+              bullet_list_icon: {
+                marginTop: 0,
+                marginRight: 6,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              bullet_list_content: {
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 22,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              ordered_list_icon: {
+                marginTop: 6,
+                marginRight: 6,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              ordered_list_content: {
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 22,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              code_inline: {
+                backgroundColor: isDark ? '#1f2937' : '#e5e7eb',
+                color: isDark ? '#f3f4f6' : '#111827',
+                borderRadius: 4,
+              },
+              fence: {
+                backgroundColor: isDark ? '#111827' : '#e5e7eb',
+                color: isDark ? '#f3f4f6' : '#111827',
+                borderRadius: 8,
+                padding: 10,
+              },
+            }}
+          >
+            {message.text}
+          </Markdown>
+        </View>
+      )}
     </View>
   );
 
