@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
-import { apiFetch } from '@/services/fetchClient';
+import { extractFromDocument, getRecommendation } from '@/services/orderWizard';
+import { pickDocument, pickImage } from '@/util/documentPicker';
 import { type Question, type RecommendationResponse, STATIC_QUESTIONS, type SuggestedTest } from './index';
 import { ResultScreen } from './ResultScreen';
+import { UploadOptionsModal } from './UploadOptionsModal';
 
 interface OrderWizardProps {
   visible: boolean;
@@ -21,29 +23,10 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
   const [result, setResult] = useState<RecommendationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
-  // Fetch questions on mount
-  //   useEffect(() => {
-  //     if (visible) {
-  //       fetchQuestions();
-  //     }
-  //   }, [visible]);
-
-  //   const fetchQuestions = async () => {
-  //     try {
-  //       setLoading(true);
-  //       setError(null);
-  //       const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/questions`);
-  //       setQuestions(response.data.data.questions);
-  //     } catch (err) {
-  //       console.error('Error fetching questions:', err);
-  //       setError('Failed to load questions. Please try again.');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  // Filter visible questions based on dependsOn logic
   const visibleQuestions = questions.filter(q => {
     if (!q.dependsOn) return true;
     const parentAnswer = answers[q.dependsOn.questionId];
@@ -54,7 +37,6 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     return q.dependsOn.value.includes(parentAnswer);
   });
 
-  // Group questions by section
   const sections = visibleQuestions.reduce(
     (acc, q) => {
       const section = q.section || 'Other';
@@ -65,17 +47,14 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     {} as Record<string, Question[]>
   );
 
-  // Handle answer selection
   const handleAnswer = (questionId: string, answer: string | string[]) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
 
-  // Toggle selection for single choice
   const toggleSingleChoice = (questionId: string, option: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: option }));
   };
 
-  // Toggle selection for multi choice
   const toggleMultiChoice = (questionId: string, option: string) => {
     setAnswers(prev => {
       const current = prev[questionId] || [];
@@ -87,68 +66,17 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     });
   };
 
-  // Clear all answers
   const clearAll = () => {
     setAnswers({});
   };
 
-  // Submit all answers and get recommendation
   const submitAnswers = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiFetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/v1/drg/order-wizard/recommend`, {
-        method: 'POST',
-        body: JSON.stringify({ answers: answers }),
-      });
-      console.log('AI recommendation=->', response.data.data);
-      setResult(response.data.data);
-      // setResult({
-      //   suggestedTests: [
-      //     {
-      //       testName: 'OncoRisk',
-      //       testVariant: null,
-      //       confidence: 0.2,
-      //       reasoning:
-      //         'The patient is >50 years with unknown family history, which satisfies demographic criteria. However, the clinical objectives do not include Germline testing, which is mandatory for this test. Therefore, despite eligibility by age and history, the lack of germline intent significantly limits relevance.',
-      //     },
-      //     {
-      //       testName: 'OncoTarget',
-      //       testVariant: 'LBx',
-      //       confidence: 0.6,
-      //       reasoning:
-      //         "The patient is >50 years with Stage II disease and a clinical objective of Neoadjuvant options for treatment initiation, which aligns with this test’s purpose. However, surgical treatment has already been performed and treatment resistance status is not explicitly confirmed as 'No,' creating partial uncertainty. Blood is available, so the LBx variant is appropriate, but timing may reduce ideal applicability.",
-      //     },
-      //     {
-      //       testName: 'OncoIndx',
-      //       testVariant: 'LBx',
-      //       confidence: 0.1,
-      //       reasoning:
-      //         'Although the patient is >50 years and Stage II fits the stage criteria, there is no evidence of 1st line treatment resistance, which is mandatory. Additionally, the clinical objectives do not include Immunotherapy feasibility, PARPi, or HRD Score. Therefore, this test has minimal relevance in the current setting.',
-      //     },
-      //     {
-      //       testName: 'OncoIndx Prime Plus',
-      //       testVariant: 'LBx',
-      //       confidence: 0.0,
-      //       reasoning:
-      //         'This test requires Stage III/IV disease, recurrence or relapse, prior treatment lines, and at least one resistance or tumor conflict condition. The patient has Stage II disease without documented recurrence or treatment failure, and the clinical objectives do not align with advanced profiling needs. Hence, this test is not applicable.',
-      //     },
-      //     {
-      //       testName: 'OncoMonitor TRM',
-      //       testVariant: null,
-      //       confidence: 0.0,
-      //       reasoning:
-      //         'This test is designed for non-surgical patients under active systemic therapy with therapeutic surveillance intent. The patient has undergone surgery and there is no indication of active CT/RT/TT administration or therapeutic surveillance objective. Therefore, this test is not appropriate.',
-      //     },
-      //     {
-      //       testName: 'OncoMonitor MRD',
-      //       testVariant: null,
-      //       confidence: 0.9,
-      //       reasoning:
-      //         'The patient is >50 years with Stage II disease, has undergone surgical treatment, and the clinical objective includes Post-surgical surveillance. Blood specimen is available, fulfilling all required criteria. This test is highly appropriate for minimal residual disease monitoring in the current clinical context.',
-      //     },
-      //   ],
-      // });
+      const data = await getRecommendation(answers);
+      console.log('AI recommendation=->', data);
+      setResult(data);
     } catch (err) {
       console.error('Error getting recommendation:', err);
       setError('Failed to get recommendation. Please try again.');
@@ -157,11 +85,77 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
     }
   };
 
-  // Reset wizard state
+  const uploadDocument = async (uri: string, fileName: string, mimeType: string) => {
+    try {
+      setUploading(true);
+      setError(null);
+
+      const extractedData = await extractFromDocument(uri, fileName, mimeType);
+      console.log('Extracted data:', extractedData);
+      const answersData = (extractedData as any)?.extractedAnswers || extractedData;
+
+      if (answersData && typeof answersData === 'object') {
+        const mappedAnswers: Record<string, string | string[]> = {};
+        Object.entries(answersData).forEach(([key, value]) => {
+          const question = questions.find(
+            q => q.id.toLowerCase() === key.toLowerCase() || q.title.toLowerCase().includes(key.toLowerCase())
+          );
+
+          if (question && value) {
+            if (question.type === 'multi_choice' && Array.isArray(value)) {
+              mappedAnswers[question.id] = value;
+            } else if (question.type === 'single_choice' && typeof value === 'string') {
+              mappedAnswers[question.id] = value;
+            } else if (question.type === 'text' && typeof value === 'string') {
+              mappedAnswers[question.id] = value;
+            }
+          }
+        });
+
+        // Replace all answers with newly extracted data (don't merge)
+        setAnswers(mappedAnswers);
+        setUploadedFileName(fileName);
+
+        const filledCount = Object.keys(mappedAnswers).length;
+        Alert.alert(
+          'Document Processed',
+          filledCount > 0
+            ? `Successfully extracted and filled ${filledCount} answer${filledCount !== 1 ? 's' : ''} from the document.`
+            : 'No data could be extracted from this document. All answers have been cleared.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (err) {
+      console.error('Error extracting document:', err);
+      Alert.alert('Upload Failed', err.data.message, [{ text: 'OK' }]);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDocumentPick = async () => {
+    const file = await pickDocument();
+    if (file) {
+      await uploadDocument(file.uri, file.name, file.mimeType);
+    }
+  };
+
+  const handleImagePick = async () => {
+    const image = await pickImage();
+    if (image) {
+      await uploadDocument(image.uri, image.name, image.mimeType);
+    }
+  };
+
+  const showUploadOptions = () => {
+    setShowUploadModal(true);
+  };
+
   const resetWizard = () => {
     setAnswers({});
     setResult(null);
     setError(null);
+    setUploadedFileName(null);
   };
 
   const handleClose = () => {
@@ -315,7 +309,6 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
           )}
         </View>
 
-        {/* Content */}
         {loading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.common.primary} />
@@ -329,15 +322,72 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
             </TouchableOpacity>
           </View>
         ) : result ? (
-          <ResultScreen suggestedTests={result.suggestedTests} onClose={handleClose} onRestart={resetWizard} />
+          <ResultScreen
+            suggestedTests={result.suggestedTests}
+            answeredQuestionsCount={answeredQuestions}
+            onClose={handleClose}
+            onRestart={resetWizard}
+          />
         ) : (
           <>
             <ScrollView className="flex-1 px-3" showsVerticalScrollIndicator={false}>
-              <View className="py-4">
+              <View className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800">
+                <View className="mb-3 flex-row items-center justify-between">
+                  <Text className="text-s font-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
+                    Upload Records
+                  </Text>
+                  <Text className="text-sm text-blue-600 dark:text-blue-400">upload files</Text>
+                </View>
+
+                <Text className="mb-4 text-base text-gray-700 dark:text-gray-300">
+                  Upload records for automatic analysis
+                </Text>
+
+                <TouchableOpacity
+                  onPress={showUploadOptions}
+                  disabled={uploading}
+                  className="items-center justify-center rounded-2xl border-2 border-dashed border-gray-400 bg-transparent py-6 dark:border-gray-500"
+                  style={{ opacity: uploading ? 0.5 : 1 }}
+                  activeOpacity={0.7}
+                >
+                  {uploading ? (
+                    <View className="items-center">
+                      <ActivityIndicator size="large" color={'#2563eb'} className="mb-3" />
+                      <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">Processing...</Text>
+                    </View>
+                  ) : uploadedFileName ? (
+                    <View className="items-center px-4">
+                      <Ionicons name="checkmark-circle" size={48} color="#10b981" className="mb-3" />
+                      <Text className="text-center text-base font-semibold text-gray-700 dark:text-gray-300">
+                        Uploaded: {uploadedFileName}
+                      </Text>
+                      <Text className="mt-2 text-sm text-gray-500 dark:text-gray-400">Tap to upload another</Text>
+                    </View>
+                  ) : (
+                    <View className="items-center">
+                      <Ionicons name="cloud-upload-outline" size={64} color={isDark ? '#9ca3af' : '#6b7280'} />
+                      <Text className="mt-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                        Tap to upload documents
+                      </Text>
+                      <Text className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        PDF, images, or text files supported
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View className="my-4 flex-row items-center">
+                <View className="h-[1px] flex-1 bg-gray-300 dark:bg-gray-600" />
+                <Text className="mx-4 text-sm font-semibold text-gray-500 dark:text-gray-400">OR</Text>
+                <View className="h-[1px] flex-1 bg-gray-300 dark:bg-gray-600" />
+              </View>
+
+              <View>
                 {Object.entries(sections).map(([sectionName, sectionQuestions]) => (
                   <View
                     key={sectionName}
-                    className="mb-3 rounded-2xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800"
+                    className="mb-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800"
                   >
                     {/* Section Header */}
                     <Text className="text-s mb-4 font-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
@@ -366,28 +416,27 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
 
                 <TouchableOpacity
                   onPress={submitAnswers}
-                  // disabled={answeredQuestions / totalQuestions < 0.3} // As of now I am enabling button after 30% of questions are answered
-                  // className={`flex-[6] flex-row items-center justify-center rounded-xl py-3.5 ${
-                  //   answeredQuestions / totalQuestions >= 0.3 ? 'bg-yellow-500' : 'bg-gray-300 dark:bg-gray-600'
-                  // }`}
-                  className={`flex-[6] flex-row items-center justify-center rounded-xl bg-yellow-500 bg-yellow-500 py-3.5`}
+                  className={`flex-[6] flex-row items-center justify-center rounded-xl py-3.5 ${
+                    uploading ? 'bg-gray-400 dark:bg-gray-600' : 'bg-yellow-500'
+                  }`}
+                  style={{ opacity: uploading ? 0.6 : 1 }}
                   activeOpacity={0.7}
+                  disabled={uploading}
                 >
                   <Ionicons name="sparkles" size={20} color="#fff" style={{ marginRight: 8 }} />
-                  <Text
-                    // className={`text-base font-semibold ${
-                    //   answeredQuestions / totalQuestions >= 0.3 ? 'text-white' : 'text-gray-500 dark:text-gray-400'
-                    // }`}
-                    className={`text-base font-semibold text-gray-500 text-white`}
-                  >
-                    Get Suggestions
-                  </Text>
+                  <Text className={`text-base font-semibold text-white`}>Get Suggestions</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </>
         )}
       </SafeAreaView>
+      <UploadOptionsModal
+        visible={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSelectGallery={handleImagePick}
+        onSelectFiles={handleDocumentPick}
+      />
     </Modal>
   );
 }

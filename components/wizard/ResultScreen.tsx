@@ -14,6 +14,7 @@ type TestData = {
 
 interface ResultScreenProps {
   suggestedTests: SuggestedTest[];
+  answeredQuestionsCount: number;
   onClose: () => void;
   onRestart: () => void;
 }
@@ -50,7 +51,7 @@ const getCardHeaderBg = (confidence: number): string => {
   return '#2d2d3d';
 };
 
-export function ResultScreen({ suggestedTests, onClose, onRestart }: ResultScreenProps) {
+export function ResultScreen({ suggestedTests, answeredQuestionsCount, onClose, onRestart }: ResultScreenProps) {
   const [selectedTest, setSelectedTest] = useState<SuggestedTest | null>(null);
   const [selectedTestImage, setSelectedTestImage] = useState<string>('');
   const [testImages, setTestImages] = useState<Record<string, string>>({});
@@ -88,9 +89,6 @@ export function ResultScreen({ suggestedTests, onClose, onRestart }: ResultScree
   // Sort tests by confidence descending
   const sortedTests = [...suggestedTests].sort((a, b) => b.confidence - a.confidence);
 
-  // Count total parameters (based on the question count)
-  const totalParameters = 14;
-
   // Parse reasoning into short bullet points (first 3 sentences)
   const getShortBullets = (reasoning: string): string[] => {
     if (!reasoning) return [];
@@ -112,7 +110,7 @@ export function ResultScreen({ suggestedTests, onClose, onRestart }: ResultScree
             <Ionicons name="checkmark-circle-outline" size={20} color="#10b981" />
           </View>
           <Text className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Based on analysis of <Text className="font-bold">{totalParameters} clinical parameters.</Text>
+            Based on analysis of <Text className="font-bold">{answeredQuestionsCount} clinical parameters.</Text>
           </Text>
         </View>
 

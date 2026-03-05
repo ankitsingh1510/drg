@@ -55,20 +55,20 @@ export default function TestsScreen() {
       </Animated.View>
 
       <Animated.View entering={FadeInUp.duration(600).springify()} className="mx-4 mb-6">
-        <View className="overflow-hidden rounded-2xl" style={{ backgroundColor: '#6B5CE7' }}>
+        <View className="overflow-hidden rounded-2xl" style={{ backgroundColor: '#2958C2' }}>
           <View className="flex-row items-center justify-between px-5 py-6">
             <View className="flex-1">
-              <View className="mb-2 self-start rounded-full border border-white/30 bg-white/20 px-4 py-0.5">
+              <View className="mb-2 items-center justify-center self-start rounded-full border border-white/30 bg-white/20 px-5 py-1">
                 <Text className="text-xs font-semibold text-white">AI-POWERED</Text>
               </View>
-              <Text className="text-2xl font-bold text-white">Find the Right Test</Text>
+              <Text className="text-xl font-bold text-white">Find the Right Test</Text>
               <Text className="text-m mb-1 mb-4 text-white">Get AI-based test recommendations.</Text>
               <TouchableOpacity
-                className="flex-row items-center gap-1 self-start rounded bg-white px-6 py-3"
+                className="flex-row items-center gap-1 self-start rounded-xl bg-white px-6 py-3"
                 onPress={() => setWizardVisible(true)}
               >
-                <Ionicons name="sparkles" size={18} color="#6B5CE7" />
-                <Text className="px-1 font-bold" style={{ color: '#6B5CE7' }}>
+                <Ionicons name="sparkles" size={18} color="#2958C2" />
+                <Text className="px-1 font-bold" style={{ color: '#2958C2' }}>
                   Test Suggestion Wizard
                 </Text>
               </TouchableOpacity>
