@@ -50,6 +50,25 @@ export default function TabLayout() {
   const ACTIVE_COLOR = '#daa521';
   const INACTIVE_COLOR = isDark ? '#9ca3af' : '#9ca3af';
 
+  const sharedHeaderOptions = {
+    headerShown: true,
+    headerTransparent: true,
+    headerBackground: () => (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: isDark ? 'rgba(17,24,39,0.82)' : 'rgba(253,245,230,0.82)',
+        }}
+      />
+    ),
+    headerTintColor: isDark ? '#f9fafb' : '#111827',
+    headerTitleStyle: {
+      fontFamily: 'Poppins_600SemiBold',
+      fontSize: 20,
+    },
+    headerShadowVisible: false,
+  } as any;
+
   return (
     <Tabs
       screenOptions={{
@@ -70,17 +89,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          ...sharedHeaderOptions,
           title: 'Home',
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: isDark ? '#111827' : '#FDF5E6',
-          },
-          headerTintColor: isDark ? '#f9fafb' : '#111827',
-          headerTitleStyle: {
-            fontFamily: 'Poppins_600SemiBold',
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               color={color}
@@ -93,17 +103,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="patients"
         options={{
+          ...sharedHeaderOptions,
           title: 'Patients',
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: isDark ? '#111827' : '#FDF5E6',
-          },
-          headerTintColor: isDark ? '#f9fafb' : '#111827',
-          headerTitleStyle: {
-            fontFamily: 'Poppins_600SemiBold',
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               color={color}
@@ -116,17 +117,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
+          ...sharedHeaderOptions,
           title: 'Settings',
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: isDark ? '#111827' : '#FDF5E6',
-          },
-          headerTintColor: isDark ? '#f9fafb' : '#111827',
-          headerTitleStyle: {
-            fontFamily: 'Poppins_600SemiBold',
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               color={color}

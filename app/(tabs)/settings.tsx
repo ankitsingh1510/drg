@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
 import { Bell, ChevronRight, HelpCircle, Lock, LogOut, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -59,6 +60,7 @@ const Settings = () => {
   const logout = useLogout();
   const { user } = useAuth();
   const { theme, toggleTheme } = useThemeSync();
+  const headerHeight = useHeaderHeight();
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
   const appState = useRef(AppState.currentState);
 
@@ -254,7 +256,12 @@ const Settings = () => {
 
   return (
     <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
-      <ScrollView className="mt-4 flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: headerHeight }}
+      >
         {settingsData.map((item, index) => (
           <Animated.View
             key={index}
@@ -267,7 +274,11 @@ const Settings = () => {
         ))}
 
         {/* Logout button */}
-        <Animated.View entering={FadeInUp.delay(settingsData.length * 150).duration(600).springify()}>
+        <Animated.View
+          entering={FadeInUp.delay(settingsData.length * 150)
+            .duration(600)
+            .springify()}
+        >
           <TouchableOpacity
             onPress={() =>
               Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -293,18 +304,16 @@ const Settings = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 10,
-                paddingVertical: 16,
+                gap: 8,
+                paddingVertical: 10,
                 backgroundColor: isDarkMode ? '#7f1d1d' : '#fee2e2',
                 borderRadius: 12,
                 borderWidth: 1,
                 borderColor: isDarkMode ? '#991b1b' : '#fecaca',
               }}
             >
-              <LogOut size={20} color="#dc2626" strokeWidth={2} />
-              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>
-                Sign Out
-              </Text>
+              <LogOut size={18} color="#dc2626" strokeWidth={2} />
+              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>Sign Out</Text>
             </View>
           </TouchableOpacity>
         </Animated.View>
