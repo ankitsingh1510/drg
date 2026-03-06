@@ -1,33 +1,10 @@
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { Tabs } from 'expo-router';
-import { ClipboardList, CogIcon, Home, Mic } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
 
 const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 84 : 64;
-
-type TabIconProps = {
-  color: string;
-  focused: boolean;
-  icon: React.ReactNode;
-};
-
-function TabIcon({ color, focused, icon }: TabIconProps) {
-  return (
-    <View
-      style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: focused ? 'rgba(218, 165, 33, 0.12)' : 'transparent',
-      }}
-    >
-      {icon}
-    </View>
-  );
-}
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -48,7 +25,7 @@ export default function TabLayout() {
   };
 
   const ACTIVE_COLOR = '#daa521';
-  const INACTIVE_COLOR = isDark ? '#9ca3af' : '#9ca3af';
+  const INACTIVE_COLOR = '#9ca3af';
 
   const sharedHeaderOptions = {
     headerShown: true,
@@ -92,11 +69,7 @@ export default function TabLayout() {
           ...sharedHeaderOptions,
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon={<Home size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
-            />
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={23} color={color} />
           ),
         }}
       />
@@ -106,11 +79,7 @@ export default function TabLayout() {
           ...sharedHeaderOptions,
           title: 'Patients',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon={<ClipboardList size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
-            />
+            <Ionicons name={focused ? 'clipboard' : 'clipboard-outline'} size={23} color={color} />
           ),
         }}
       />
@@ -120,11 +89,7 @@ export default function TabLayout() {
           ...sharedHeaderOptions,
           title: 'Scribe',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon={<Mic size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
-            />
+            <Ionicons name={focused ? 'mic' : 'mic-outline'} size={23} color={color} />
           ),
         }}
       />
@@ -134,11 +99,7 @@ export default function TabLayout() {
           ...sharedHeaderOptions,
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              color={color}
-              focused={focused}
-              icon={<CogIcon size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
-            />
+            <Ionicons name={focused ? 'settings' : 'settings-outline'} size={23} color={color} />
           ),
         }}
       />

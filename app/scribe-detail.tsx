@@ -4,7 +4,7 @@ import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
-import { Calendar, Mic, Pause, Phone, Play, Trash2 } from 'lucide-react-native';
+import { Calendar, FileText, Mic, Pause, Phone, Play, Trash2 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { persistentScribeSessionsAtom } from '@/stores/scribe';
 
@@ -53,7 +53,7 @@ export default function ScribeDetailScreen() {
     );
   }
 
-  const duration = status.duration || 1; // Prevent division by zero
+  const duration = status.duration || 1;
   const currentTime = status.currentTime || 0;
   const progress = (currentTime / duration) * 100;
 
@@ -121,9 +121,57 @@ export default function ScribeDetailScreen() {
           </Text>
         </View>
 
+        {/* Transcribe Button */}
+        <Pressable
+          onPress={() =>
+            router.push({
+              pathname: '/scribe-transcription' as any,
+              params: {
+                id: session.id,
+                audioUri: session.audioUri,
+                patientName: session.patientName || 'Untitled Session',
+              },
+            })
+          }
+          style={{
+            marginTop: 36,
+            borderRadius: 20,
+            overflow: 'hidden',
+            shadowColor: '#daa521',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.35,
+            shadowRadius: 12,
+            elevation: 6,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#daa521',
+              paddingVertical: 18,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <FileText size={20} color="white" />
+            <Text
+              style={{
+                marginLeft: 10,
+                fontSize: 16,
+                fontWeight: '700',
+                color: '#ffffff',
+                letterSpacing: 0.3,
+              }}
+            >
+              Transcribe Recording
+            </Text>
+          </View>
+        </Pressable>
+
+        {/* Delete Button */}
         <Pressable
           onPress={handleDelete}
-          className="mt-20 flex-row items-center justify-center rounded-2xl border border-red-100 bg-red-50/50 py-4 active:opacity-80 dark:border-red-900/30 dark:bg-red-900/20"
+          className="mt-6 flex-row items-center justify-center rounded-2xl border border-red-100 bg-red-50/50 py-4 active:opacity-80 dark:border-red-900/30 dark:bg-red-900/20"
         >
           <Trash2 size={20} color="#ef4444" />
           <Text className="ml-2 font-bold text-red-500">Delete Session</Text>
