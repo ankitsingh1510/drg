@@ -242,6 +242,24 @@ export default function RootLayout() {
                   },
                 }}
               />
+              <Stack.Screen
+                name="scribe-detail"
+                options={{
+                  headerShown: true,
+                  title: 'Scribe Detail',
+                  headerBackButtonDisplayMode: 'minimal',
+                  headerBackTitle: '',
+                  headerShadowVisible: false,
+                  headerStyle: {
+                    backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',
+                  },
+                  headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
+                  headerTitleStyle: {
+                    fontFamily: 'Poppins_600SemiBold',
+                    fontSize: 18,
+                  },
+                }}
+              />
             </Stack>
             <Toast position="bottom" />
             <NetworkChecker />

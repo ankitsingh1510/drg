@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { Tabs } from 'expo-router';
-import { ClipboardList, CogIcon, Home } from 'lucide-react-native';
+import { ClipboardList, CogIcon, Home, Mic } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 
 const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 84 : 64;
@@ -110,6 +110,20 @@ export default function TabLayout() {
               color={color}
               focused={focused}
               icon={<ClipboardList size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="scribe"
+        options={{
+          ...sharedHeaderOptions,
+          title: 'Scribe',
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              color={color}
+              focused={focused}
+              icon={<Mic size={22} color={color} strokeWidth={focused ? 2.4 : 1.8} />}
             />
           ),
         }}

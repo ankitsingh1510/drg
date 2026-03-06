@@ -1,5 +1,6 @@
 import React from 'react';
-import { Platform, TextInput, View } from 'react-native';
+import { Platform, Text, TextInput, View } from 'react-native';
+import { Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 
 interface PatientHeaderProps {
@@ -8,7 +9,7 @@ interface PatientHeaderProps {
   onSearch: (text: string) => void;
 }
 
-export function PatientHeader({ query, onSearch }: PatientHeaderProps) {
+export function PatientHeader({ totalCount, query, onSearch }: PatientHeaderProps) {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -22,20 +23,27 @@ export function PatientHeader({ query, onSearch }: PatientHeaderProps) {
     >
       <View className="flex-row items-center">
         <View className="h-12 flex-1 flex-row items-center rounded-full border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+          <View className="items-center justify-center">
+            <Search size={20} color={isDark ? '#6b7280' : '#9ca3af'} />
+          </View>
           <TextInput
             value={query}
             onChangeText={onSearch}
-            className="flex-1 text-base font-medium text-gray-800 dark:text-gray-100"
+            className="ml-2 flex-1 text-base font-medium text-gray-800 dark:text-gray-100"
             placeholder="Search patients, assay, physician…"
             placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
             style={{
-              paddingVertical: Platform.OS === 'android' ? 12 : 10,
+              height: 48,
+              paddingTop: 0,
+              paddingBottom: Platform.OS === 'ios' ? 4 : 0,
               includeFontPadding: false,
-              lineHeight: Platform.OS === 'android' ? 20 : undefined,
             }}
             textAlignVertical="center"
           />
         </View>
+      </View>
+      <View className="mt-2 flex-row items-center justify-between px-1">
+        <Text className="text-xs font-bold uppercase tracking-widest text-gray-400">{totalCount} Total Patients</Text>
       </View>
     </View>
   );
