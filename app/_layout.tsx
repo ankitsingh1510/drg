@@ -72,10 +72,13 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
-  startNetworkLogging();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const pathname = usePathname();
   const localSearchParams = useLocalSearchParams();
+  useEffect(() => {
+    if (__DEV__) startNetworkLogging();
+  }, []);
+
   useEffect(() => {
     if (!Device.isDevice || !isFirebaseEnabled) {
       console.log('Push notifications skipped (emulator or Firebase disabled)');
