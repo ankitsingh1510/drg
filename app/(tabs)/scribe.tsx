@@ -350,7 +350,16 @@ export default function ScribeScreen() {
                             onChangeText={setName}
                             placeholder="Enter patient name"
                             placeholderTextColor="#9ca3af"
-                            className="flex-1 p-4 text-lg font-medium text-gray-900 dark:text-white"
+                            style={{
+                              flex: 1,
+                              height: 64,
+                              marginLeft: 12,
+                              paddingVertical: 0,
+                              fontSize: 17,
+                              fontWeight: '500',
+                              color: isDark ? '#ffffff' : '#111827',
+                              includeFontPadding: false,
+                            }}
                           />
                         </View>
                       </View>
@@ -367,7 +376,16 @@ export default function ScribeScreen() {
                             placeholder="Enter phone number"
                             placeholderTextColor="#9ca3af"
                             keyboardType="phone-pad"
-                            className="flex-1 p-4 text-lg font-medium text-gray-900 dark:text-white"
+                            style={{
+                              flex: 1,
+                              height: 64,
+                              marginLeft: 12,
+                              paddingVertical: 0,
+                              fontSize: 17,
+                              fontWeight: '500',
+                              color: isDark ? '#ffffff' : '#111827',
+                              includeFontPadding: false,
+                            }}
                           />
                         </View>
                       </View>

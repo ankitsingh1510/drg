@@ -5,4 +5,5 @@ export interface ScribeSession {
   audioUri: string;
   duration?: number;
   timestamp: number;
+  transcript?: string; // Cached on-device transcription
 }
