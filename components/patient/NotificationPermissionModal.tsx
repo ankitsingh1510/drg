@@ -32,7 +32,7 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
             </Text>
             <Text className="mb-6 text-center text-base text-gray-600 dark:text-gray-400">
               Analysis can take a few minutes.{'\n'}
-              We'll notify you as soon as your report is analyzed.
+              We&apos;ll notify you as soon as your report is analyzed.
             </Text>
 
             <View className="flex-row gap-3">

@@ -114,7 +114,7 @@ export default function ForgotPasswordScreen() {
                       color: isDark ? '#D1D5DB' : '#6B7280',
                     }}
                   >
-                    We've sent a password reset link to{'\n'}
+                    We&apos;ve sent a password reset link to{'\n'}
                     <Text className="font-semibold">{email}</Text>
                   </Text>
                   <Text
@@ -131,7 +131,7 @@ export default function ForgotPasswordScreen() {
                       color: isDark ? '#9CA3AF' : '#9CA3AF',
                     }}
                   >
-                    If you don't see the email, check your spam or junk folder.
+                    If you don&apos;t see the email, check your spam or junk folder.
                   </Text>
                 </View>
               ) : (
@@ -158,7 +158,7 @@ export default function ForgotPasswordScreen() {
                         color: isDark ? '#D1D5DB' : '#6B7280',
                       }}
                     >
-                      Enter your email address and we'll send you a link to reset your password.
+                      Enter your email address and we&apos;ll send you a link to reset your password.
                     </Text>
                   </View>
 
@@ -172,12 +172,15 @@ export default function ForgotPasswordScreen() {
                     >
                       Email Address
                     </Text>
-                    <View className="relative">
-                      <View className="absolute left-4 top-3 z-10">
-                        <Ionicons name="mail-outline" size={20} color={isDark ? '#9CA3AF' : '#9CA3AF'} />
-                      </View>
+                    <View className="flex-row items-center rounded-xl border border-gray-200 bg-white px-4 dark:border-gray-600 dark:bg-gray-700">
+                      <Ionicons name="mail-outline" size={20} color={isDark ? '#9CA3AF' : '#9CA3AF'} />
                       <TextInput
-                        className="rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-black dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        style={{
+                          flex: 1,
+                          paddingVertical: 12,
+                          paddingHorizontal: 12,
+                          color: isDark ? 'white' : 'black',
+                        }}
                         placeholder="your.email@example.com"
                         placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
                         value={email}

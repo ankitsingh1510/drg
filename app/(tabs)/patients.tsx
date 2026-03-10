@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
-import { useAuth, useLogout } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function Patients() {
-  const logout = useLogout();
   const { user } = useAuth();
   const router = useRouter();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
@@ -28,6 +28,7 @@ export default function Patients() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
 
   const fetchPatients = useCallback(
     async (pageNum: number, searchQuery: string, append = false) => {
@@ -184,8 +185,8 @@ export default function Patients() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader user={user} totalCount={totalCount} query={query} onSearch={handleSearch} onLogout={logout} />
+    <SafeAreaView edges={[]} style={{ flex: 1, paddingTop: headerHeight }} className="bg-[#FDF5E6] dark:bg-gray-900">
+      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />
 
       <View className="flex-1">
         <FlashList
