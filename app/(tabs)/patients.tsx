@@ -136,6 +136,8 @@ export default function Patients() {
           }
         } else if (!samePath && reportIngestionStatus === 'ingesting') {
           ingestionStatus = 'ingesting';
+        } else if (!samePath) {
+          ingestionStatus = '';
         }
 
         router.push({
