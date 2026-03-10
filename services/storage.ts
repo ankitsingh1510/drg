@@ -63,12 +63,35 @@ class StorageAPI {
     }
   }
 
-  async getSignedUrl(blobPath: string): Promise<string> {
+  async getSignedUrl(storageParam: string | number): Promise<string> {
     try {
-      const encodedPath = encodeURIComponent(blobPath);
-      const url = `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl` + `?viewFile=true`;
-      const response = await apiFetch(url, { method: 'GET' });
-      return response.data?.signedUrl;
+      const isStorageId =
+        typeof storageParam === 'number' || (typeof storageParam === 'string' && !isNaN(Number(storageParam)));
+      const reqParams: GQLRequestParams = isStorageId
+        ? {
+            query: `query GetSignedURL($storageId: Int!) {
+              getSignedURL(storageId: $storageId)
+            }`,
+            variables: { storageId: Number(storageParam) },
+          }
+        : {
+            query: `query GetSignedURL($storagePath: String!) {
+              getSignedURL(storagePath: $storagePath)
+            }`,
+            variables: { storagePath: storageParam },
+          };
+
+      const response = await this.getGQLResponse(reqParams);
+      const signedUrl =
+        typeof response?.data?.getSignedURL === 'string'
+          ? response.data.getSignedURL
+          : response?.data?.getSignedURL?.data;
+
+      if (!signedUrl) {
+        throw new Error('Signed URL not found in GraphQL response');
+      }
+
+      return signedUrl;
     } catch (error) {
       console.error('Error fetching signed URL:', error);
       throw error;
