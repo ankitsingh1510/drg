@@ -69,10 +69,10 @@ class StorageAPI {
         typeof storageParam === 'number' || (typeof storageParam === 'string' && !isNaN(Number(storageParam)));
       const reqParams: GQLRequestParams = isStorageId
         ? {
-            query: `query GetSignedURL($storageId: Int!) {
-              getSignedURL(storageId: $storageId)
+            query: `query GetSignedURL($storageId: Int!, $viewFile: Boolean!) {
+              getSignedURL(storageId: $storageId, viewFile: $viewFile)
             }`,
-            variables: { storageId: Number(storageParam) },
+            variables: { storageId: Number(storageParam), viewFile: true },
           }
         : {
             query: `query GetSignedURL($storagePath: String!) {
@@ -82,10 +82,7 @@ class StorageAPI {
           };
 
       const response = await this.getGQLResponse(reqParams);
-      const signedUrl =
-        typeof response?.data?.getSignedURL === 'string'
-          ? response.data.getSignedURL
-          : response?.data?.getSignedURL?.data;
+      const signedUrl = response?.data?.getSignedURL?.data;
 
       if (!signedUrl) {
         throw new Error('Signed URL not found in GraphQL response');
