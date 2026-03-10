@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,11 +10,10 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Building, Calendar, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
+import { Building, Calendar, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
-import IconNavBar from '@/components/navigation/IconNavBar';
 import {
   FieldDropdownModal,
   ProfileActionButtons,
@@ -322,7 +320,7 @@ const Profile = () => {
 
   if (isLoading && !profileData) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900">
+      <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
         <ActivityIndicator size="large" color={colors.common.primary} />
       </SafeAreaView>
     );
@@ -332,26 +330,12 @@ const Profile = () => {
   const groupedFields = groupFieldsByDisplayGroup();
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
-          <View className="flex-row items-center gap-4">
-            <Pressable
-              hitSlop={10}
-              onPress={() => router.back()}
-              className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
-            >
-              <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
-            </Pressable>
-            <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
-          </View>
-          <IconNavBar />
-        </View>
-
         <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <ProfileHeader
             firstName={fName}

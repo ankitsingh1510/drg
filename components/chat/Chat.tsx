@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
@@ -36,6 +36,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
   const isDark = colorScheme === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
@@ -80,6 +81,8 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
       return fallback;
     }
   };
+  const micAnim = useRef(new Animated.Value(1)).current;
+  const waveAnims = useRef(Array.from({ length: 15 }, () => new Animated.Value(0.3))).current;
 
   useEffect(() => {
     connectSocket();
@@ -99,18 +102,65 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
   useSpeechRecognitionEvent('start', () => {
     isListeningRef.current = true;
     setIsListening(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(micAnim, {
+          toValue: 1.3,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(micAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    waveAnims.forEach((anim, index) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: 0.3 + Math.random() * 0.7,
+            duration: 300 + Math.random() * 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 0.2 + Math.random() * 0.5,
+            duration: 300 + Math.random() * 400,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    });
   });
 
   useSpeechRecognitionEvent('end', () => {
     isListeningRef.current = false;
     setIsListening(false);
+    setInterimTranscript('');
+    micAnim.stopAnimation();
+    micAnim.setValue(1);
+    waveAnims.forEach(anim => {
+      anim.stopAnimation();
+      anim.setValue(0.3);
+    });
   });
 
   useSpeechRecognitionEvent('result', event => {
-    if (event.results && event.results.length > 0 && isListeningRef.current) {
-      const transcript = event.results[0]?.transcript;
-      if (transcript) {
-        setInputText(transcript);
+    if (event.results && event.results.length > 0) {
+      const result = event.results[0];
+      const transcript = result?.transcript;
+
+      if (event.isFinal) {
+        if (transcript) {
+          setInputText(prev => (prev ? prev + ' ' + transcript : transcript).trim());
+          setInterimTranscript('');
+        }
+      } else {
+        if (transcript) {
+          setInterimTranscript(transcript);
+        }
       }
     }
   });
@@ -353,7 +403,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
         ExpoSpeechRecognitionModule.start({
           lang: 'en-US',
           interimResults: true,
-          continuous: false,
+          continuous: true,
         });
       } catch (e) {
         console.error('Error starting voice:', e);
@@ -550,23 +600,64 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
           borderTopColor: isDark ? colors.dark.border : colors.light.border,
         }}
       >
-        <TextInput
-          className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-[15px]"
-          style={{
-            backgroundColor: isDark ? colors.dark.background : '#f9fafb',
-            color: isDark ? colors.dark.text : colors.light.text,
-            borderColor: isDark ? colors.dark.border : '#e5e7eb',
-            maxHeight: 100,
-          }}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type your message..."
-          placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
-          multiline
-          maxLength={500}
-          editable={isConnected && !isListening}
-          onSubmitEditing={sendMessage}
-        />
+        {isListening ? (
+          <View
+            className="mr-2 flex-1 items-center justify-center rounded-[20px] border"
+            style={{
+              backgroundColor: isDark ? colors.dark.background : '#f9fafb',
+              borderColor: isDark ? colors.dark.border : '#e5e7eb',
+              height: 44,
+              flexDirection: 'row',
+              paddingHorizontal: 12,
+            }}
+          >
+            <View className="flex-row items-center justify-center" style={{ height: 30 }}>
+              {waveAnims.map((anim, i) => (
+                <Animated.View
+                  key={i}
+                  style={{
+                    width: 3,
+                    backgroundColor: colors.common.primary,
+                    marginHorizontal: 1.5,
+                    borderRadius: 2,
+                    opacity: 0.8,
+                    transform: [
+                      {
+                        scaleY: anim,
+                      },
+                    ],
+                    height: 30,
+                  }}
+                />
+              ))}
+            </View>
+            <Text className="ml-3 text-[13px] font-medium" style={{ color: colors.common.primary }}>
+              Listening...
+            </Text>
+          </View>
+        ) : (
+          <TextInput
+            className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-[15px]"
+            style={{
+              backgroundColor: isDark ? colors.dark.background : '#f9fafb',
+              color: isDark ? colors.dark.text : colors.light.text,
+              borderColor: isDark ? colors.dark.border : '#e5e7eb',
+              maxHeight: 100,
+            }}
+            value={inputText + (interimTranscript ? ' ' + interimTranscript : '')}
+            onChangeText={text => {
+              if (!isListening) {
+                setInputText(text);
+              }
+            }}
+            placeholder="Type your message here"
+            placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
+            multiline
+            maxLength={500}
+            editable={isConnected && !isListening}
+            onSubmitEditing={sendMessage}
+          />
+        )}
 
         {/* Mic Button */}
         <TouchableOpacity
@@ -579,16 +670,14 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
           disabled={!isConnected}
         >
           {isListening ? (
-            <View className="items-center justify-center">
+            <Animated.View
+              className="items-center justify-center"
+              style={{
+                transform: [{ scale: micAnim }],
+              }}
+            >
               <Ionicons name="mic" size={24} color="#ffffff" />
-              <View
-                className="absolute h-11 w-11 rounded-full"
-                style={{
-                  backgroundColor: '#ef4444',
-                  opacity: 0.3,
-                }}
-              />
-            </View>
+            </Animated.View>
           ) : (
             <Ionicons name="mic-outline" size={24} color={isDark ? colors.dark.text : colors.light.text} />
           )}
