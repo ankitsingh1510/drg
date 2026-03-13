@@ -26,6 +26,7 @@ export interface Patient {
   additionalPhysician: string;
   oncoindx_sub_pipeline: string;
   full_report_path: string;
+  full_report_html_paths: string[] | [];
   summary_report_path: string | null;
   patientName: string;
   analysisCompletionDate: string;

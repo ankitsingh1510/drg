@@ -119,12 +119,21 @@ export default function Patients() {
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
         const ingested_file_path = patient.hasOwnProperty('ingested_file_path') ? patient.ingested_file_path : null;
         let ingestionStatus = null;
-
+        let htmlPath = null;
+        if (patient.full_report_html_paths?.length) {
+          const p = patient.full_report_html_paths[0];
+          htmlPath = p.substring(0, p.lastIndexOf('/'));
+        }
         const reportIngestionStatus: IngestionStatus = patient.hasOwnProperty('drg_ingestion_status')
           ? (patient.drg_ingestion_status as IngestionStatus)
           : null;
 
-        const samePath = ingested_file_path === patient.full_report_path;
+        let samePath: boolean;
+        if (htmlPath) {
+          samePath = htmlPath === ingested_file_path;
+        } else {
+          samePath = ingested_file_path === patient.full_report_path;
+        }
         if (samePath) {
           if (reportIngestionStatus === 'ingested') {
             ingestionStatus = 'ingested';
