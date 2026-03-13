@@ -172,12 +172,15 @@ export default function ForgotPasswordScreen() {
                     >
                       Email Address
                     </Text>
-                    <View className="relative">
-                      <View className="absolute left-4 top-3 z-10">
-                        <Ionicons name="mail-outline" size={20} color={isDark ? '#9CA3AF' : '#9CA3AF'} />
-                      </View>
+                    <View className="flex-row items-center rounded-xl border border-gray-200 bg-white px-4 dark:border-gray-600 dark:bg-gray-700">
+                      <Ionicons name="mail-outline" size={20} color={isDark ? '#9CA3AF' : '#9CA3AF'} />
                       <TextInput
-                        className="rounded-xl border border-gray-200 bg-white py-3 pl-12 pr-4 text-black dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        style={{
+                          flex: 1,
+                          paddingVertical: 12,
+                          paddingHorizontal: 12,
+                          color: isDark ? 'white' : 'black',
+                        }}
                         placeholder="your.email@example.com"
                         placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
                         value={email}
