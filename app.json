@@ -78,8 +78,6 @@
           }
         }
       ],
-      "expo-image",
-      "expo-audio",
       "expo-speech-transcriber"
     ],
     "experiments": {

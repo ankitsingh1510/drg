@@ -23,7 +23,7 @@ export function PatientHeader({ totalCount, query, onSearch }: PatientHeaderProp
 
   return (
     <View
-      className="bg-[#FDF5E6] px-5 pb-4 pt-4 dark:bg-gray-900"
+      className="mt-14 bg-[#FDF5E6] px-5 pb-4 dark:bg-gray-900"
       style={{
         borderBottomWidth: 1,
         borderBottomColor: isDark ? '#1f2937' : '#f1f5f9',

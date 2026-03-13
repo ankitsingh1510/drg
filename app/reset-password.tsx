@@ -5,6 +5,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -181,7 +182,7 @@ export default function ResetPasswordScreen() {
               </View>
 
               <View className="space-y-5">
-                <View className="flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+                <View className="mb-3 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
                   <Ionicons
                     name="lock-closed-outline"
                     size={20}
@@ -207,7 +208,7 @@ export default function ResetPasswordScreen() {
                   </TouchableOpacity>
                 </View>
 
-                <View className="flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+                <View className="mb-3 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
                   <Ionicons
                     name="key-outline"
                     size={20}
@@ -286,10 +287,10 @@ export default function ResetPasswordScreen() {
                   </Text>
                 )}
               </TouchableOpacity>
-            )}
-          </View>
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
