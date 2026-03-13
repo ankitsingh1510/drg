@@ -70,8 +70,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setToken(tokenValue);
 
-        // Fetch user details
-        const userDetails = await usersAPI.getUserDetail({ userMasterId: payload.sub });
+        // Fetch user details and upload config in parallel
+        const [userDetails, config] = await Promise.all([
+          usersAPI.getUserDetail({ userMasterId: payload.sub }),
+          storageAPI.getUploadConfig(),
+        ]);
         const userFields = userDetails.data.userMasterModel.fields;
 
         const nameField = userFields.find((x: any) => x.name === 'name')?.value;
@@ -88,8 +91,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
 
         setUser(userData);
-
-        const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
         // Redirect to patients page if already authenticated
@@ -146,8 +147,11 @@ export const useLogin = () => {
         }
         setToken(tokenValue);
 
-        // Fetch user details
-        const userDetails = await usersAPI.getUserDetail({ userMasterId: payload.sub });
+        // Fetch user details and upload config in parallel
+        const [userDetails, config] = await Promise.all([
+          usersAPI.getUserDetail({ userMasterId: payload.sub }),
+          storageAPI.getUploadConfig(),
+        ]);
         const userFields = userDetails.data.userMasterModel.fields;
 
         const nameField = userFields.find((x: any) => x.name === 'name')?.value;
@@ -164,8 +168,6 @@ export const useLogin = () => {
         };
 
         setUser(userData);
-
-        const config = await storageAPI.getUploadConfig();
         setTargetLocation(config?.data?.targetLocation || null);
 
         // Navigate to patients page

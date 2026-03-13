@@ -3,6 +3,7 @@ import { Alert, BackHandler, ScrollView, Text, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { CalendarDays, ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -20,7 +21,7 @@ const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
 export default function LandingScreen() {
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
-
+  const headerHeight = useHeaderHeight();
   const date = useMemo(() => formatDate(), []);
 
   const clinicalButtons = useMemo(
@@ -93,8 +94,8 @@ export default function LandingScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight }}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
           <View className="mr-6 flex-row items-center justify-between">
             <View>

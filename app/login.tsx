@@ -245,16 +245,19 @@ export default function LoginScreen() {
 
               <View className="space-y-5">
                 {/* Email Input */}
-                <View className="relative">
-                  <View className="absolute left-4 top-4 z-10">
-                    <Ionicons
-                      name="mail-outline"
-                      size={20}
-                      color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                    />
-                  </View>
+                <View className="flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
+                  />
                   <TextInput
-                    className="rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-4 text-black shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    style={{
+                      flex: 1,
+                      paddingVertical: 16,
+                      paddingHorizontal: 12,
+                      color: isDark ? 'white' : 'black',
+                    }}
                     placeholder="Email Address"
                     placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
                     value={email}
@@ -266,16 +269,19 @@ export default function LoginScreen() {
                 </View>
 
                 {/* Password Input */}
-                <View className="relative mt-5">
-                  <View className="absolute left-4 top-4 z-10">
-                    <Ionicons
-                      name="lock-closed-outline"
-                      size={20}
-                      color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                    />
-                  </View>
+                <View className="mt-5 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
+                  />
                   <TextInput
-                    className="rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-14 text-black shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    style={{
+                      flex: 1,
+                      paddingVertical: 16,
+                      paddingHorizontal: 12,
+                      color: isDark ? 'white' : 'black',
+                    }}
                     placeholder="Password"
                     placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
                     value={password}
@@ -286,7 +292,6 @@ export default function LoginScreen() {
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(s => !s)}
-                    className="absolute right-4 top-4 z-10"
                     accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
                   >
                     <Ionicons

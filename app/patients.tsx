@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +29,7 @@ export default function Patients() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
 
   const fetchPatients = useCallback(
     async (pageNum: number, searchQuery: string, append = false) => {
@@ -184,8 +186,8 @@ export default function Patients() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader user={user} totalCount={totalCount} query={query} onSearch={handleSearch} onLogout={logout} />
+    <SafeAreaView edges={[]} style={{ flex: 1, paddingTop: headerHeight }} className="bg-[#FDF5E6] dark:bg-gray-900">
+      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />
 
       <View className="flex-1">
         <FlashList
