@@ -87,7 +87,7 @@ export function ResultScreen({ suggestedTests, answeredQuestionsCount, onClose, 
   };
 
   // Sort tests by confidence descending
-  const sortedTests = [...suggestedTests].sort((a, b) => b.confidence - a.confidence);
+  const sortedTests = [...(suggestedTests ?? [])].sort((a, b) => b.confidence - a.confidence);
 
   // Parse reasoning into short bullet points (first 3 sentences)
   const getShortBullets = (reasoning: string): string[] => {
