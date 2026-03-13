@@ -10,10 +10,10 @@ export default function IconNavBar() {
   const pathname = usePathname();
   const logout = useLogout();
 
-  const isHome = pathname === '/landing' || pathname === '/';
+  const isHome = pathname === '/home';
 
   const goHome = () => {
-    router.push('/landing');
+    router.push('/home');
   };
 
   const goLogout = () => {

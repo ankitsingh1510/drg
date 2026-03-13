@@ -4,7 +4,8 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
 
-const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 84 : 64;
+const TAB_BAR_HEIGHT = 84; // Increased height for better touch targets and aesthetics
+// const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 84 : 64;
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -16,7 +17,7 @@ export default function TabLayout() {
     borderTopWidth: 1,
     height: TAB_BAR_HEIGHT,
     paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-    paddingTop: 8,
+    paddingTop: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: isDark ? 0.3 : 0.08,
@@ -64,7 +65,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           ...sharedHeaderOptions,
           title: 'Home',
