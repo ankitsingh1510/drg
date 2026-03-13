@@ -44,7 +44,7 @@ export default function TestsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
-      <Animated.View
+      {/* <Animated.View
         entering={FadeInUp.duration(600).springify()}
         className="mb-4 flex-row items-center justify-between px-5"
       >
@@ -52,10 +52,10 @@ export default function TestsScreen() {
           <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
         </View>
         <IconNavBar />
-      </Animated.View>
+      </Animated.View> */}
 
-      <Animated.View entering={FadeInUp.duration(600).springify()} className="mx-4 mb-6">
-        <View className="overflow-hidden rounded-2xl" style={{ backgroundColor: '#2958C2' }}>
+      <Animated.View entering={FadeInUp.duration(600).springify()} className="mx-4 -mt-12 mb-6">
+        <View className="rounded-2xl" style={{ backgroundColor: '#2958C2' }}>
           <View className="flex-row items-center justify-between px-5 py-6">
             <View className="flex-1">
               <View className="mb-2 items-center justify-center self-start rounded-full border border-white/30 bg-white/20 px-5 py-1">
