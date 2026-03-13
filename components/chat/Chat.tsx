@@ -178,7 +178,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
   const connectSocket = () => {
     try {
       setIsConnecting(true);
-      const baseUrl = 'http://10.0.2.2:3020';
+      const baseUrl = process.env.EXPO_PUBLIC_RAG_SOCKET_URL;
 
       if (!baseUrl) {
         throw new Error('Missing EXPO_PUBLIC_RAG_SOCKET_URL or EXPO_PUBLIC_API_BASE_URL');
