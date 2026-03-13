@@ -2,6 +2,9 @@ import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type ESignatureData } from '../types/types';
 import { apiFetch } from './fetchClient';
 
+// TODO: move these back to env vars before merging
+const LOCAL_GQL_URL = 'http://192.192.16.187:3301/graphql';
+
 class StorageAPI {
   baseUrl: string;
   gqlUrl: string;
@@ -13,8 +16,21 @@ class StorageAPI {
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
     return new Promise((resolve, reject) => {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+      // When requesting signed upload URLs from the backend, include X-Platform-Handheld
+      // as required by the backend for uploads originating from handheld platforms.
+      try {
+        if (reqParams && typeof reqParams.query === 'string' && reqParams.query.includes('createUploadSignedUrls')) {
+          headers['X-Platform-Handheld'] = 'true';
+        }
+      } catch (e) {
+        // ignore and proceed without the header if any unexpected input
+      }
+
       apiFetch(this.gqlUrl + '/graphql', {
         method: 'POST',
+        headers,
         body: JSON.stringify(reqParams),
       })
         .then(response => resolve(response.data as GQLResponse))
@@ -73,6 +89,56 @@ class StorageAPI {
       console.error('Error fetching signed URL:', error);
       throw error;
     }
+  }
+
+  async createUploadSignedUrls(signedUrlUploadInput: {
+    target?: string;
+    files: Array<{
+      filename: string;
+      contentType?: string;
+      targetLocation?: string;
+      fileSize?: number;
+      crc32cHash: string;
+    }>;
+    anonymized?: string;
+    referenceId?: string;
+    referenceType?: string;
+    fileDataType?: string;
+    checkOrgUserMapping?: boolean;
+  }): Promise<any> {
+    const reqParams: GQLRequestParams = {
+      query: `mutation createUploadSignedUrls($signedUrlUploadInput: SignedUrlUploadInput!) {
+  createUploadSignedUrls(signedUrlUploadInput: $signedUrlUploadInput) {
+    message
+    statusCode
+    error
+    data {
+      key
+      uploadSignedUrl
+      expiresIn
+    }
+  }
+}
+`,
+      variables: { signedUrlUploadInput },
+    };
+    const response = await this.getGQLResponse(reqParams);
+    return response.data.createUploadSignedUrls;
+  }
+
+  async registerSignedURLUpload(signedURLUploadRegistrationParams: {
+    paths: Array<{ path: string; anonymized?: string }>;
+    isPostSignedUrlUploadCall: boolean;
+  }): Promise<any> {
+    const reqParams: GQLRequestParams = {
+      query: `mutation registerSignedURLUpload($signedURLUploadRegistrationParams: SignedURLUploadRegistrationParams!) {
+  registerSignedURLUpload(signedURLUploadRegistrationParams: $signedURLUploadRegistrationParams)
+}
+`,
+      variables: { signedURLUploadRegistrationParams },
+    };
+    const response = await this.getGQLResponse(reqParams);
+    return response.data.registerSignedURLUpload;
   }
 }
 
