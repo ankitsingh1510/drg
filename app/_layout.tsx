@@ -158,7 +158,14 @@ export default function RootLayout() {
     Poppins_600SemiBold,
     Poppins_700Bold,
   });
-  if (!loaded) return null;
+
+  // Don't return null while fonts are loading. Returning null prevents the
+  // root navigator from mounting which can cause navigation calls (from
+  // AuthContext) to error with "navigate before mounting". Render the
+  // layout immediately and allow fonts to apply once ready.
+  if (!loaded) {
+    console.log('Fonts not loaded yet — rendering layout to allow navigation to mount');
+  }
 
   return (
     <SafeAreaProvider>

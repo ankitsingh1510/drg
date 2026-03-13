@@ -256,7 +256,7 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: headerHeight + 40 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView style={{ flex: 1, marginTop: -30 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         className="flex-1"

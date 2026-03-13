@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('No token found. Please log in.');
           setIsLoading(false);
           storage.clearAll();
-          router.replace('/' as any);
+          setTimeout(() => router.replace('/' as any), 0);
           return;
         }
 
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Redirect to patients page if already authenticated
         // router.replace('/patients' as any);
-        router.replace('/landing' as any);
+        setTimeout(() => router.replace('/home' as any), 0);
       } catch (error) {
         console.error('Error initializing auth:', error);
         // await AsyncStorage.removeItem('token');
@@ -172,7 +172,7 @@ export const useLogin = () => {
 
         // Navigate to patients page
         // router.replace('/patients' as any);
-        router.replace('/landing' as any);
+        router.replace('/home' as any);
       } else {
         throw new Error('Authentication failed');
       }

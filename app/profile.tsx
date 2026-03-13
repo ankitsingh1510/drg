@@ -338,7 +338,7 @@ const Profile = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
+        {/* <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
           <View className="flex-row items-center gap-4">
             <Pressable
               hitSlop={10}
@@ -350,9 +350,13 @@ const Profile = () => {
             <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
           </View>
           <IconNavBar />
-        </View>
+        </View> */}
 
-        <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          className="-mt-10 flex-1 px-5"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <ProfileHeader
             firstName={fName}
             lastName={lName}
