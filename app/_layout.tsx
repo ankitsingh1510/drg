@@ -1,5 +1,10 @@
 import React, { useEffect } from 'react';
-import { Appearance, Platform, Text, View } from 'react-native';
+import { Appearance, LogBox, Platform, Text, View } from 'react-native';
+
+// Suppress SafeAreaView deprecation warning from react-native-css-interop (NativeWind).
+// The warning is triggered at module load time by css-interop registering style interop
+// on the built-in RN SafeAreaView. All project code uses react-native-safe-area-context.
+LogBox.ignoreLogs(['SafeAreaView has been deprecated']);
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
