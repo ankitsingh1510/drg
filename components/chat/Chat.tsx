@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { useColorScheme } from 'nativewind';
+import Markdown, { RenderRules } from 'react-native-markdown-display';
+import { io, Socket } from 'socket.io-client';
+import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser';
 import { colors } from '@/constants/colors';
-import { ragAPI } from '@/services/rag';
 
 interface Message {
   id: string;
@@ -15,13 +17,21 @@ interface Message {
 }
 
 interface ElevenLabsChatProps {
-  signedUrl: string;
   documentId: string;
   token: string;
+  userId?: string;
   onClose: () => void;
 }
 
-export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }: ElevenLabsChatProps) {
+interface RagResponsePayload {
+  text?: string;
+  content?: string;
+  answer?: {
+    text?: string;
+  };
+}
+
+export default function ElevenLabsChat({ documentId, token, userId, onClose }: ElevenLabsChatProps) {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,34 +41,62 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   const [isConnecting, setIsConnecting] = useState(true);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
+  const sessionId = useRef<string | null>(null);
+  const socketRef = useRef<Socket | null>(null);
   const flashListRef = useRef<any>(null);
-  const reportContextRef = useRef<string | null>(null);
+  const currentStreamingMessageIdRef = useRef<string | null>(null);
   const isListeningRef = useRef(false);
+  const streamingRawMarkdownRef = useRef('');
+  const streamingRenderableMarkdownRef = useRef('');
+  const markdownParserRef = useRef<any>(null);
+
+  const normalizeMarkdownText = (raw: unknown): string => {
+    if (typeof raw !== 'string') {
+      return '';
+    }
+
+    return raw
+      .replace(/\r\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\([*_`~])/g, '$1');
+  };
+
+  const getStreamingMarkdownParser = () => {
+    if (!markdownParserRef.current) {
+      markdownParserRef.current = getMarkdown('rag-chat');
+    }
+    return markdownParserRef.current;
+  };
+
+  const getStreamSafeMarkdown = (candidate: string, fallback: string) => {
+    if (!candidate) {
+      return '';
+    }
+
+    try {
+      const parser = getStreamingMarkdownParser();
+      parseMarkdownToStructure(candidate, parser);
+      return candidate;
+    } catch {
+      return fallback;
+    }
+  };
   const micAnim = useRef(new Animated.Value(1)).current;
   const waveAnims = useRef(Array.from({ length: 15 }, () => new Animated.Value(0.3))).current;
 
   useEffect(() => {
-    initializeChat();
+    connectSocket();
     return () => {
-      const ws = wsRef.current;
-      if (ws) {
-        // Detach event handlers to prevent events after unmount
-        ws.onopen = null;
-        ws.onmessage = null;
-        ws.onerror = null;
-        ws.onclose = null;
-
-        // Only close if socket is still open or connecting
-        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-          ws.close();
-        }
-
-        wsRef.current = null;
+      console.log('Cleaning up ElevenLabsChat socket and voice on unmount');
+      const socket = socketRef.current;
+      if (socket) {
+        socket.removeAllListeners();
+        socket.disconnect();
+        socketRef.current = null;
       }
       cleanupVoice();
     };
-  }, [signedUrl]);
+  }, [documentId, token, userId]);
 
   // Speech recognition event listeners
   useSpeechRecognitionEvent('start', () => {
@@ -137,95 +175,157 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
     }
   });
 
-  const initializeChat = async () => {
+  const connectSocket = () => {
     try {
       setIsConnecting(true);
+      const baseUrl = process.env.EXPO_PUBLIC_RAG_SOCKET_URL;
 
-      // First, fetch the report result
-      if (documentId && token) {
-        console.log('Fetching report result before connecting...');
-        const res = await ragAPI.fetchReportResult({
-          documentId,
-          authorization: decodeURIComponent(token),
-        });
-        // console.log('Fetched report result:', res.answer?.text);
-        reportContextRef.current = res.answer?.text || null;
+      if (!baseUrl) {
+        throw new Error('Missing EXPO_PUBLIC_RAG_SOCKET_URL or EXPO_PUBLIC_API_BASE_URL');
       }
 
-      // Then, connect to WebSocket
-      connectWebSocket();
-    } catch (error) {
-      console.error('Error fetching report result:', error);
-      // Still attempt to connect even if fetch fails
-      connectWebSocket();
-    }
-  };
+      const cleanToken = decodeURIComponent(token || '').replace(/^Bearer\s+/i, '');
+      const authorizationHeader = `Bearer ${cleanToken}`;
 
-  const connectWebSocket = () => {
-    try {
-      const ws = new WebSocket(signedUrl);
-      wsRef.current = ws;
+      const socket = io(baseUrl, {
+        path: '/api/v1/drg/rag/socket/',
+        autoConnect: false,
+        reconnectionAttempts: 5,
+        timeout: 20000,
+        query: { userId: userId || '', documentId },
+        auth: {
+          authorization: authorizationHeader,
+          sessionId: sessionId.current,
+        },
+      });
 
-      ws.onopen = () => {
-        console.log('WebSocket connected');
+      socketRef.current = socket;
+
+      socket.on('connect', () => {
+        console.log('RAG socket connected');
         setIsConnected(true);
         setIsConnecting(false);
+      });
 
-        const initData = {
-          type: 'conversation_initiation_client_data',
-          conversation_config_override: {
-            conversation: {
-              text_only: true,
-            },
-          },
-        };
-        ws.send(JSON.stringify(initData));
-
-        // Send the pre-fetched report context
-        if (reportContextRef.current && ws.readyState === WebSocket.OPEN) {
-          ws.send(
-            JSON.stringify({
-              type: 'contextual_update',
-              text: reportContextRef.current,
-            })
-          );
-          console.log('Sent contextual update to WebSocket');
-        }
-      };
-
-      ws.onmessage = event => {
-        try {
-          const data = JSON.parse(event.data);
-          // console.log('Received:', data.type);
-          // if (data.type === 'agent_chat_response_part') {
-          //   const agentTextPart = data;
-          //   console.log('Agent text part received:', agentTextPart);
-          // } TODO: Handle streaming parts if needed in future
-          if (data.type === 'agent_response') {
-            const agentText = data.agent_response_event?.agent_response;
-            if (agentText) {
-              setIsWaitingForResponse(false);
-              addMessage('agent', agentText);
-            }
-          }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      };
-
-      ws.onerror = error => {
-        console.error('WebSocket error:', error);
-        setIsConnecting(false);
-        onClose();
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
+      socket.on('disconnect', () => {
+        console.log('RAG socket disconnected');
         setIsConnected(false);
         setIsConnecting(false);
-      };
+        setIsWaitingForResponse(false);
+      });
+
+      socket.on('sessionCreated', data => {
+        console.log('RAG socket session created:', data);
+        const id = data?._id || data?.id;
+        if (id) {
+          console.log('RAG session ID set to:', id);
+          sessionId.current = String(id);
+          socket.auth = {
+            authorization: authorizationHeader,
+            sessionId: sessionId.current,
+          };
+        }
+      });
+
+      socket.on('inferencing', data => {
+        if (data?.inferencing) {
+          setIsWaitingForResponse(true);
+        }
+      });
+
+      socket.on('streamChunk', data => {
+        const chunk = normalizeMarkdownText(data?.chunk || data?.text || data?.content || '');
+        if (!chunk) {
+          return;
+        }
+
+        setIsWaitingForResponse(false);
+        streamingRawMarkdownRef.current += chunk;
+        const safeMarkdown = getStreamSafeMarkdown(
+          streamingRawMarkdownRef.current,
+          streamingRenderableMarkdownRef.current
+        );
+        streamingRenderableMarkdownRef.current = safeMarkdown;
+
+        const streamingId = currentStreamingMessageIdRef.current;
+        if (!streamingId) {
+          const newMessageId = `${Date.now()}-${Math.random()}`;
+          currentStreamingMessageIdRef.current = newMessageId;
+          setMessages(prev => [
+            ...prev,
+            {
+              id: newMessageId,
+              type: 'agent',
+              text: safeMarkdown || chunk,
+              timestamp: new Date(),
+            },
+          ]);
+        } else {
+          setMessages(prev =>
+            prev.map(message =>
+              message.id === streamingId
+                ? {
+                    ...message,
+                    text: safeMarkdown,
+                  }
+                : message
+            )
+          );
+        }
+
+        setTimeout(() => flashListRef.current?.scrollToEnd({ animated: true }), 100);
+      });
+
+      socket.on('ragResponse', (data: RagResponsePayload) => {
+        setIsWaitingForResponse(false);
+        console.log('RAG response received:', data);
+        const responseText = normalizeMarkdownText(data?.text || '');
+        const finalSafeMarkdown = getStreamSafeMarkdown(responseText, responseText);
+
+        if (currentStreamingMessageIdRef.current) {
+          const streamingId = currentStreamingMessageIdRef.current;
+          if (finalSafeMarkdown) {
+            setMessages(prev =>
+              prev.map(message =>
+                message.id === streamingId
+                  ? {
+                      ...message,
+                      text: finalSafeMarkdown,
+                    }
+                  : message
+              )
+            );
+          }
+          streamingRawMarkdownRef.current = '';
+          streamingRenderableMarkdownRef.current = '';
+          markdownParserRef.current = null;
+          currentStreamingMessageIdRef.current = null;
+          return;
+        }
+
+        if (finalSafeMarkdown) {
+          addMessage('agent', finalSafeMarkdown);
+        }
+      });
+
+      socket.on('error', error => {
+        console.error('RAG socket error:', error);
+        setIsConnecting(false);
+        setIsWaitingForResponse(false);
+      });
+
+      socket.on('connect_error', error => {
+        console.error('RAG socket connection error:', error);
+        setIsConnected(false);
+        setIsConnecting(false);
+        setIsWaitingForResponse(false);
+        Alert.alert('Chat Error', 'Unable to connect to RAG chat. Please try again.');
+      });
+
+      // ✅ Connect only after ALL listeners are registered
+      socket.connect();
     } catch (error) {
-      console.error('Error connecting to WebSocket:', error);
+      console.error('Error connecting to RAG socket:', error);
       setIsConnecting(false);
     }
   };
@@ -242,7 +342,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
   };
 
   const sendMessage = () => {
-    if (!inputText.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+    if (!inputText.trim() || !socketRef.current || !isConnected) {
       return;
     }
 
@@ -258,13 +358,11 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
 
     addMessage('user', messageToSend);
     setIsWaitingForResponse(true);
-
-    const userMessage = {
-      type: 'user_message',
-      text: messageToSend,
-    };
-
-    wsRef.current.send(JSON.stringify(userMessage));
+    currentStreamingMessageIdRef.current = null;
+    streamingRawMarkdownRef.current = '';
+    streamingRenderableMarkdownRef.current = '';
+    markdownParserRef.current = null;
+    socketRef.current.emit('ragInference', { question: messageToSend });
   };
 
   const cleanupVoice = async () => {
@@ -314,23 +412,107 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
     }
   };
 
-  const renderMessage = ({ item: message }: { item: Message }) => (
-    <View className={`mb-3 ${message.type === 'user' ? 'items-end' : 'items-start'}`}>
-      <View
-        className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${message.type === 'user' ? '' : isDark ? 'border' : 'border'}`}
-        style={{
-          backgroundColor:
-            message.type === 'user' ? colors.common.primary : isDark ? colors.dark.cardBackground : '#f3f4f6',
-          borderColor: message.type === 'agent' ? (isDark ? colors.dark.border : '#e5e7eb') : undefined,
-        }}
-      >
+  const markdownRules = useMemo<RenderRules>(
+    () => ({
+      bullet_list_icon: (node, children, parent, styles) => (
         <Text
-          className="text-[15px] leading-5"
-          style={{ color: message.type === 'user' ? '#ffffff' : isDark ? colors.dark.text : colors.light.text }}
+          key={node.key}
+          style={[
+            styles.bullet_list_icon,
+            {
+              color: isDark ? colors.dark.text : colors.light.text,
+            },
+          ]}
         >
-          {message.text}
+          {'•'}
         </Text>
-      </View>
+      ),
+    }),
+    [isDark]
+  );
+
+  const renderMessage = ({ item: message }: { item: Message }) => (
+    <View className={`mb-3 ${message.type === 'user' ? 'items-end' : 'w-full items-start'}`}>
+      {message.type === 'user' ? (
+        <View
+          className="max-w-[80%] rounded-2xl px-4 py-2.5"
+          style={{
+            backgroundColor: colors.common.primary,
+          }}
+        >
+          <Text className="text-[15px] leading-5" style={{ color: '#ffffff' }}>
+            {message.text}
+          </Text>
+        </View>
+      ) : (
+        <View style={{ width: '100%' }}>
+          <Markdown
+            rules={markdownRules}
+            style={{
+              body: {
+                backgroundColor: 'transparent',
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              paragraph: {
+                fontSize: 15,
+                lineHeight: 22,
+                marginBottom: 8,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              strong: {
+                fontWeight: 'bold',
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              // ✅ Proper list indentation
+              bullet_list: {
+                marginBottom: 8,
+              },
+              ordered_list: {
+                marginBottom: 8,
+              },
+              list_item: {
+                flexDirection: 'row',
+                marginBottom: 4,
+              },
+              bullet_list_icon: {
+                marginTop: 0,
+                marginRight: 6,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              bullet_list_content: {
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 22,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              ordered_list_icon: {
+                marginTop: 6,
+                marginRight: 6,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              ordered_list_content: {
+                flex: 1,
+                fontSize: 15,
+                lineHeight: 22,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+              code_inline: {
+                backgroundColor: isDark ? '#1f2937' : '#e5e7eb',
+                color: isDark ? '#f3f4f6' : '#111827',
+                borderRadius: 4,
+              },
+              fence: {
+                backgroundColor: isDark ? '#111827' : '#e5e7eb',
+                color: isDark ? '#f3f4f6' : '#111827',
+                borderRadius: 8,
+                padding: 10,
+              },
+            }}
+          >
+            {message.text}
+          </Markdown>
+        </View>
+      )}
     </View>
   );
 
@@ -401,7 +583,7 @@ export default function ElevenLabsChat({ signedUrl, documentId, token, onClose }
               <View className="items-center justify-center py-8">
                 <ActivityIndicator size="large" color={colors.common.primary} />
                 <Text className="mt-3 text-base" style={{ color: isDark ? colors.dark.text : colors.light.text }}>
-                  Connecting to Dr.G...
+                  Connecting to RAG chat...
                 </Text>
               </View>
             ) : null

@@ -11,21 +11,6 @@ class RagAPI {
     this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
   }
 
-  async getSignedUrl(blobPath: string): Promise<string> {
-    try {
-      const encodedPath = encodeURIComponent(blobPath);
-      const url = `${this.baseUrl}/api/v1/storage/blobStoreObjects/${encodedPath}/signedUrl` + `?viewFile=true`;
-      // Fetch GET call, removed axios Instance
-      const response = await apiFetch(url, {
-        method: 'GET',
-      });
-      return response.data?.signedUrl;
-    } catch (error) {
-      console.error('Error fetching signed URL:', error);
-      throw error;
-    }
-  }
-
   async ingestReport(assayResultIds: string) {
     try {
       const token = storage.getString('token') ?? null;

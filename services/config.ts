@@ -12,7 +12,7 @@ interface ConfigResponse {
 export const configAPI = {
   getConfig: async (): Promise<{ showVideoAvatar: boolean }> => {
     try {
-      const response = await apiFetch(`${process.env.EXPO_PUBLIC_CHAT_URL}/drg/api/config`, {
+      const response = await apiFetch(`${process.env.EXPO_PUBLIC_AMPLIFY_URL}/drg/api/config`, {
         method: 'GET',
       });
 
