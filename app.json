@@ -72,13 +72,13 @@
             "useFrameworks": "static",
             "buildReactNativeFromSource": true,
             "deploymentTarget": "16.0",
-            "podfileProperties": {
-              "use_modular_headers!": true
+            "ccacheEnabled": false,
+            "extraPodfileProperties": {
+              "SWIFT_VERSION": "5.0"
             }
           }
         }
       ],
-      "expo-image",
       "expo-audio",
       "expo-speech-transcriber"
     ],
