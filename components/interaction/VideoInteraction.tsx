@@ -194,7 +194,7 @@ export default function VideoInteraction({
             ref={webViewRef}
             source={{
               uri:
-                process.env.EXPO_PUBLIC_CHAT_URL +
+                process.env.EXPO_PUBLIC_AMPLIFY_URL +
                 `/drg/interaction/?documentId=${documentId}&authorization=${encodeURIComponent(token)}`,
             }}
             style={{ flex: 1, backgroundColor: 'white' }}
