@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
-import { Appearance, LogBox, Platform, Text, View } from 'react-native';
-
-// Suppress SafeAreaView deprecation warning from react-native-css-interop (NativeWind).
-// The warning is triggered at module load time by css-interop registering style interop
-// on the built-in RN SafeAreaView. All project code uses react-native-safe-area-context.
-LogBox.ignoreLogs(['SafeAreaView has been deprecated']);
+import { Appearance, LogBox, Platform, Text, TouchableOpacity, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
@@ -16,6 +11,7 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
+import { Ionicons } from '@expo/vector-icons';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
@@ -32,6 +28,11 @@ import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
 import { toast } from '@/util/toast';
 import '../global.css';
+
+// Suppress SafeAreaView deprecation warning from react-native-css-interop (NativeWind).
+// The warning is triggered at module load time by css-interop registering style interop
+// on the built-in RN SafeAreaView. All project code uses react-native-safe-area-context.
+LogBox.ignoreLogs(['SafeAreaView has been deprecated']);
 
 const firebaseConfig =
   Platform.OS === 'ios'
@@ -257,6 +258,34 @@ export default function RootLayout() {
                   title: 'Scribe Detail',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',
+                  headerShadowVisible: false,
+                  headerStyle: {
+                    backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',
+                  },
+                  headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
+                  headerTitleStyle: {
+                    fontFamily: 'Poppins_600SemiBold',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="patients"
+                options={{
+                  headerShown: true,
+                  title: 'Patients',
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => router.back()}
+                      hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                      style={{
+                        // marginLeft: Platform.OS === 'ios' ? -1 : 0,
+                        padding: 4,
+                      }}
+                    >
+                      <Ionicons name="chevron-back" size={26} color={theme === 'dark' ? '#f9fafb' : '#111827'} />
+                    </TouchableOpacity>
+                  ),
                   headerShadowVisible: false,
                   headerStyle: {
                     backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',

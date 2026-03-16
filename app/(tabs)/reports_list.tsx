@@ -13,7 +13,7 @@ import { storageAPI } from '@/services/storage';
 import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
-export default function Patients() {
+export default function ReportsList() {
   const { user } = useAuth();
   const router = useRouter();
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
@@ -227,7 +227,7 @@ export default function Patients() {
           <View className="absolute inset-0 items-center justify-center bg-[#FDF5E6]/90 dark:bg-gray-900/90">
             <ActivityIndicator size="large" color={colors.common.primary} />
             <Text className="mt-4 text-base font-bold tracking-tight text-gray-500 dark:text-gray-400">
-              Loading Orders...
+              Loading Reports...
             </Text>
           </View>
         )}

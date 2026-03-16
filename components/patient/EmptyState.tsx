@@ -21,7 +21,7 @@ export function EmptyState({ type }: EmptyStateProps) {
     return (
       <View className="flex-1 items-center justify-center py-8">
         <Text className="text-center text-sm text-slate-500 dark:text-gray-400">
-          No patients found matching your criteria.
+          No reports found matching your criteria.
         </Text>
       </View>
     );
