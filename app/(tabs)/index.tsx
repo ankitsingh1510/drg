@@ -27,10 +27,10 @@ export default function LandingScreen() {
     () => [
       {
         icon: ClipboardList,
-        heading: 'Patient',
+        heading: 'Patients',
         color: '#006400',
         sub: 'Patients Recent labs & imaging',
-        onPress: () => router.push('/(tabs)/patients' as any),
+        onPress: () => router.push('/patients' as any),
       },
       {
         icon: TestTube2,

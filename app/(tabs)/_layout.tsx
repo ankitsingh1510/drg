@@ -74,12 +74,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="patients"
+        name="reports_list"
         options={{
           ...sharedHeaderOptions,
-          title: 'Patients',
+          title: 'Reports',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'clipboard' : 'clipboard-outline'} size={23} color={color} />
+            <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={23} color={color} />
           ),
         }}
       />
