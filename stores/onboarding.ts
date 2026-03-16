@@ -10,7 +10,7 @@ const mmkvStorage = {
     storage.set(key, JSON.stringify(value));
   },
   removeItem: (key: string) => {
-    storage.remove(key);
+    storage.delete(key);
   },
 };
 

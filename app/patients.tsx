@@ -1,25 +1,35 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'nativewind';
-import { colors } from '@/constants/colors';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PatientsScreen() {
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { token } = useAuth();
+  const webViewRef = useRef<WebView>(null);
+
+  const handleLoadEnd = () => {
+    if (token) {
+      const data = JSON.stringify({ token, patients: [] });
+      const jsCode = `if (window.initPatientWebApp) { window.initPatientWebApp(${data}); }`;
+      webViewRef.current?.injectJavaScript(jsCode);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <WebView 
-        source={{ uri: process.env.EXPO_PUBLIC_PATIENTS_URL || 'https://1cell.ai' }} 
+      <WebView
+        ref={webViewRef}
+        source={{ uri: process.env.EXPO_PUBLIC_PATIENTS_URL || 'https://1cell.ai' }}
         style={styles.webview}
+        onLoadEnd={handleLoadEnd}
         startInLoadingState={true}
         allowsBackForwardNavigationGestures
         bounces={false}
         overScrollMode="never"
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
       />
     </View>
   );
