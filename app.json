@@ -2,14 +2,14 @@
   "expo": {
     "name": "drg",
     "slug": "drg",
-    "version": "1.1.3",
+    "version": "1.1.5",
     "orientation": "portrait",
     "icon": "./assets/images/DrG-logo.png",
     "scheme": "drg",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "buildNumber": "4",
+      "buildNumber": "5",
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
@@ -72,12 +72,14 @@
             "useFrameworks": "static",
             "buildReactNativeFromSource": true,
             "deploymentTarget": "16.0",
-            "podfileProperties": {
-              "use_modular_headers!": true
+            "ccacheEnabled": false,
+            "extraPodfileProperties": {
+              "SWIFT_VERSION": "5.0"
             }
           }
         }
       ],
+      "expo-audio",
       "expo-speech-transcriber"
     ],
     "experiments": {
@@ -87,9 +89,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "5b4db04e-a018-4387-9b2e-92bbbdc58c37"
+        "projectId": "2ac9e79c-febc-4189-a14f-4f8a60f52bc3"
       }
     },
-    "owner": "1cellapps"
+    "owner": "nandirajus"
   }
 }
