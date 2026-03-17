@@ -2,7 +2,6 @@
 
 A React Native mobile application built with Expo for the **Dr.G / 1Cell AI** healthcare platform. It provides authenticated access to patient management, medical report handling, an AI scribe (voice-to-text), chat, and more.
 
----
 
 ## Table of Contents
 
@@ -18,7 +17,7 @@ A React Native mobile application built with Expo for the **Dr.G / 1Cell AI** he
   - [AI Scribe (Session List)](#apptabsscribetsx--ai-scribe-session-list)
   - [Scribe Session Detail](#appscribe-detailtsx--scribe-session-detail)
   - [Scribe Transcription](#appscribe-transcriptiontsx--scribe-transcription)
-  - [Patients WebView Screen](#apppatientstsxpatients-webview-screen)
+  - [Extensions & Remote Config](#appextensionsts--extensions--remote-config)
   - [Settings](#apptabssettingstsx--settings)
 - [WebView Integration — Patients Screen](#webview-integration--patients-screen)
 - [Authentication Flow](#authentication-flow)
@@ -26,28 +25,27 @@ A React Native mobile application built with Expo for the **Dr.G / 1Cell AI** he
 - [Services & API Layer](#services--api-layer)
 - [Theming & Color Palette](#theming--color-palette)
 - [Development Conventions](#development-conventions)
+- [Deployment](#deployment)
 
----
 
 ## Tech Stack
 
-| Area | Technology |
-|------|-----------|
-| Framework | [Expo](https://expo.dev/) (SDK 54+) |
-| Language | TypeScript |
-| Styling | [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native) |
-| Routing | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based) |
-| State Management | [Jotai](https://jotai.org/) atoms |
-| Persistent Storage | [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) |
-| Lists | [@shopify/flash-list](https://shopify.github.io/flash-list/) |
-| Animations | [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) |
-| Push Notifications | `@react-native-firebase/messaging` + `expo-notifications` |
-| Icons | [lucide-react-native](https://lucide.dev/) |
-| WebView | [react-native-webview](https://github.com/react-native-webview/react-native-webview) |
-| Audio | [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/) |
-| Speech-to-Text | [expo-speech-recognition](https://github.com/jamsch/expo-speech-recognition) |
+| Area               | Technology                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| Framework          | [Expo](https://expo.dev/) (SDK 54+)                                                  |
+| Language           | TypeScript                                                                           |
+| Styling            | [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)            |
+| Routing            | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based)               |
+| State Management   | [Jotai](https://jotai.org/) atoms                                                    |
+| Persistent Storage | [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv)                   |
+| Lists              | [@shopify/flash-list](https://shopify.github.io/flash-list/)                         |
+| Animations         | [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/)       |
+| Push Notifications | `@react-native-firebase/messaging` + `expo-notifications`                            |
+| Icons              | [lucide-react-native](https://lucide.dev/)                                           |
+| WebView            | [react-native-webview](https://github.com/react-native-webview/react-native-webview) |
+| Audio              | [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/)                       |
+| Speech-to-Text     | [expo-speech-recognition](https://github.com/jamsch/expo-speech-recognition)         |
 
----
 
 ## Getting Started
 
@@ -83,7 +81,6 @@ npm run lint      # Lint the codebase
 npm run format    # Format the codebase
 ```
 
----
 
 ## Environment Variables
 
@@ -123,7 +120,6 @@ EXPO_PUBLIC_ENABLE_FIREBASE=true
 
 > **Important:** `EXPO_PUBLIC_PATIENTS_URL` is required for the Patients screen WebView to load. Set it to the URL of the deployed patients web module, or `http://localhost:3000` for local development.
 
----
 
 ## Project Structure
 
@@ -226,7 +222,6 @@ drg-mobile/
 └── .env                        # Environment variables (never commit)
 ```
 
----
 
 ## Screen-by-Screen Guide
 
@@ -238,13 +233,11 @@ The first screen rendered. It reads `isAuthenticated` from `AuthContext` and `ha
 - Authenticated but onboarding not seen → `/onboarding`
 - Authenticated & onboarding done → `/(tabs)`
 
----
 
 ### `app/login.tsx` — Login Screen
 
 Username/password login form that calls `useLogin()` from `AuthContext`. On success the token is stored in MMKV and the user is routed to `/(tabs)`.
 
----
 
 ### `app/(tabs)/index.tsx` — Home Screen
 
@@ -255,7 +248,6 @@ Feature card dashboard. Tapping a card navigates to:
 - **News** → `/news`
 - and other sections
 
----
 
 ### `app/(tabs)/reports_list.tsx` — Reports List
 
@@ -266,7 +258,6 @@ Fetches patient reports from the GraphQL API. Supports:
 - Ingestion status tracking (via `ingestionAtom`)
 - Navigation to the report viewer
 
----
 
 ### `app/(tabs)/scribe.tsx` — AI Scribe (Session List)
 
@@ -279,7 +270,6 @@ Lists all recorded Scribe sessions (stored persistently via `persistentScribeSes
 
 Tapping a session card navigates to `scribe-detail`.
 
----
 
 ### `app/scribe-detail.tsx` — Scribe Session Detail
 
@@ -289,7 +279,6 @@ Tapping a session card navigates to `scribe-detail`.
 - **Transcribe Recording** button → navigates to `scribe-transcription`
 - **Delete Session** button → removes the audio file and deletes the session from the atom
 
----
 
 ### `app/scribe-transcription.tsx` — Scribe Transcription
 
@@ -301,27 +290,30 @@ Transcribes the saved audio using `expo-speech-recognition`:
 - **Re-transcribe** button to discard and re-run
 - **Copy** and **Share** actions on the completed transcript
 
----
 
-### `app/patients.tsx` — Patients WebView Screen
+### `app/extensions.tsx` — Extensions & Remote Config
 
-Loads the patients web module (`EXPO_PUBLIC_PATIENTS_URL`) inside a full-screen `react-native-webview`. See the **WebView Integration** section for details.
+Loads a remote-configured web module. Unlike the Patients screen (which uses environment variables), this screen dynamically fetches its configuration:
 
----
+- **Source URL**: Fetched from `https://nandiraju.github.io/drg-app-config/config.json`.
+- **Loading State**: Displays a centered `ActivityIndicator` while the config is being retrieved.
+- **Fallback**: Defaults to `https://demos.doctorg.ai` if the config fetch fails.
+- **Theme Sync**: Automatically passes the app's `colorScheme` to the loaded web app.
+- **Auth Bridge**: Injects the current user's token upon successful load.
+
 
 ### `app/(tabs)/settings.tsx` — Settings
 
-| Setting | Behaviour |
-|---------|-----------|
-| My Profile | Navigates to `/profile` |
-| Change Password | Navigates to `/reset-password` with `userMasterId` param |
-| Dark / Light Mode | Toggles `useThemeSync` / persisted theme atom |
-| Push Notifications | Requests/checks `expo-notifications` permission |
-| Delete Account | Confirmation alert → `useLogout()` |
-| Show Onboarding | Resets `hasSeenOnboardingAtom` → `/onboarding` |
-| Sign Out | `useLogout()` → `router.replace('/login?logout=true')` |
+| Setting            | Behaviour                                                |
+| ------------------ | -------------------------------------------------------- |
+| My Profile         | Navigates to `/profile`                                  |
+| Change Password    | Navigates to `/reset-password` with `userMasterId` param |
+| Dark / Light Mode  | Toggles `useThemeSync` / persisted theme atom            |
+| Push Notifications | Requests/checks `expo-notifications` permission          |
+| Delete Account     | Confirmation alert → `useLogout()`                       |
+| Show Onboarding    | Resets `hasSeenOnboardingAtom` → `/onboarding`           |
+| Sign Out           | `useLogout()` → `router.replace('/login?logout=true')`   |
 
----
 
 ## WebView Integration — Patients Screen
 
@@ -347,21 +339,17 @@ When the WebView finishes loading, the following JavaScript is injected in a sin
 
 ```js
 // 1. Authenticate the web app
-window.initPatientWebApp({ token: "<JWT>", patients: [] });
+window.initPatientWebApp({ token: '<JWT>', patients: [] });
 
 // 2. Set the initial theme
 window.setAppTheme('dark' | 'light');
 
 // 3. Expose navigation functions to the web app
-window.navigateBack = function() {
-  window.ReactNativeWebView.postMessage(
-    JSON.stringify({ type: 'navigate', target: 'back' })
-  );
+window.navigateBack = function () {
+  window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'navigate', target: 'back' }));
 };
-window.navigateHome = function() {
-  window.ReactNativeWebView.postMessage(
-    JSON.stringify({ type: 'navigate', target: 'home' })
-  );
+window.navigateHome = function () {
+  window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'navigate', target: 'home' }));
 };
 ```
 
@@ -370,17 +358,19 @@ window.navigateHome = function() {
 A `useEffect` watches NativeWind's `colorScheme`. Whenever the user changes the device theme while the screen is active, the new scheme is injected:
 
 ```js
-if (window.setAppTheme) { window.setAppTheme('dark'); }  // or 'light'
+if (window.setAppTheme) {
+  window.setAppTheme('dark');
+} // or 'light'
 ```
 
 ### Message handling (`handleMessage`)
 
 Messages from the web app are parsed as JSON:
 
-| `type` | `target` | React Native action |
-|--------|----------|---------------------|
-| `navigate` | `back` | `router.back()` or `router.replace('/(tabs)')` if no history |
-| `navigate` | `home` | `router.replace('/(tabs)')` |
+| `type`     | `target` | React Native action                                          |
+| ---------- | -------- | ------------------------------------------------------------ |
+| `navigate` | `back`   | `router.back()` or `router.replace('/(tabs)')` if no history |
+| `navigate` | `home`   | `router.replace('/(tabs)')`                                  |
 
 ### Header
 
@@ -392,7 +382,6 @@ The native header is **disabled** for the `patients` route in `app/_layout.tsx`:
 
 A `SafeAreaView` wraps the WebView to handle device insets (status bar etc.) correctly, with a background colour that matches the current theme (`#111827` dark / `#FDF5E6` light).
 
----
 
 ## Authentication Flow
 
@@ -403,23 +392,21 @@ A `SafeAreaView` wraps the WebView to handle device insets (status bar etc.) cor
 5. 401 responses redirect the user back to `/login?logout=true`
 6. **Logout** — `useLogout()` calls the revoke-token endpoint, then navigates to login
 
----
 
 ## State Management
 
 State is managed with **Jotai** atoms, persisted via **react-native-mmkv**:
 
-| Atom (store file) | Persisted | Purpose |
-|-------------------|-----------|---------|
-| `themeAtom` (`stores/theme.ts`) | ✅ | `'light' \| 'dark'` user preference |
-| `hasSeenOnboardingAtom` (`stores/onboarding.ts`) | ✅ | Whether onboarding has been shown |
-| `persistentScribeSessionsAtom` (`stores/scribe.ts`) | ✅ | All recorded Scribe sessions + transcripts |
-| `ingestionAtom` (`stores/ingestion.ts`) | ❌ | In-memory ingestion status for reports |
-| Various API data atoms (`stores/ApiData.ts`) | ❌ | Shared in-memory API results |
+| Atom (store file)                                   | Persisted | Purpose                                    |
+| --------------------------------------------------- | --------- | ------------------------------------------ |
+| `themeAtom` (`stores/theme.ts`)                     | ✅        | `'light' \| 'dark'` user preference        |
+| `hasSeenOnboardingAtom` (`stores/onboarding.ts`)    | ✅        | Whether onboarding has been shown          |
+| `persistentScribeSessionsAtom` (`stores/scribe.ts`) | ✅        | All recorded Scribe sessions + transcripts |
+| `ingestionAtom` (`stores/ingestion.ts`)             | ❌        | In-memory ingestion status for reports     |
+| Various API data atoms (`stores/ApiData.ts`)        | ❌        | Shared in-memory API results               |
 
 The `useThemeSync` hook (`hooks/useThemeSync.ts`) is the single source of truth for reading and toggling the app theme — it keeps NativeWind's `colorScheme` and the Jotai `themeAtom` in sync.
 
----
 
 ## Services & API Layer
 
@@ -429,16 +416,15 @@ All network calls go through `services/fetchClient.ts`, which:
 - Attaches the `Authorization: Bearer` header
 - Intercepts `401` responses and redirects to login
 
-| Service file | What it does |
-|-------------|-------------|
-| `services/users.ts` | `authenticateUser`, `getUserDetail`, `revokeToken`, `resetPassword` |
-| `services/patients.ts` | GraphQL queries for patient list and detail |
-| `services/storage.ts` | Upload config, presigned S3 URLs |
-| `services/rag.ts` | RAG / AI document search (WebSocket or HTTP) |
-| `services/elevenlabs.ts` | ElevenLabs voice agent integration |
-| `services/config.ts` | Axios base config |
+| Service file             | What it does                                                        |
+| ------------------------ | ------------------------------------------------------------------- |
+| `services/users.ts`      | `authenticateUser`, `getUserDetail`, `revokeToken`, `resetPassword` |
+| `services/patients.ts`   | GraphQL queries for patient list and detail                         |
+| `services/storage.ts`    | Upload config, presigned S3 URLs                                    |
+| `services/rag.ts`        | RAG / AI document search (WebSocket or HTTP)                        |
+| `services/elevenlabs.ts` | ElevenLabs voice agent integration                                  |
+| `services/config.ts`     | Axios base config                                                   |
 
----
 
 ## Theming & Color Palette
 
@@ -472,7 +458,6 @@ Colors are defined centrally in `constants/colors.ts`.
 | Success / green | (via `colors.common.success`) |
 | Warning / amber | (via `colors.common.warning`) |
 
----
 
 ## Development Conventions
 
@@ -482,8 +467,38 @@ Colors are defined centrally in `constants/colors.ts`.
 - **New atoms:** Add them in `stores/` and use `atomWithMMKV` (see existing patterns) for persistence.
 - **New API calls:** Add a function to the relevant service file and call it from the screen via `useEffect` or event handler.
 
----
 
-## Removing IPA / APK build artifacts
+## Deployment
 
-Build outputs (`.ipa`, `.apk`, `.aab`) should never be committed. Ensure they are listed in `.gitignore`.
+### Full Clean Build
+
+Before preparing for production, it is recommended to perform a clean build to ensure all native dependencies and assets are correctly synchronized:
+
+```bash
+# 1. Install/Update dependencies
+npm install
+
+# 2. Clean and regenerate native projects
+npx expo prebuild --clean
+
+# 3. Export production bundles
+npx expo export -p ios -p android --output-dir dist-production --clear
+```
+
+### Production Build (Local Architecture)
+
+To build the application binaries (`.apk` or `.ipa`) locally using EAS CLI:
+
+#### Android
+
+```bash
+eas build --platform android --profile production --local
+```
+
+#### iOS
+
+```bash
+eas build --platform ios --profile production --local
+```
+
+> **Note:** Local builds require a properly configured development environment (Android Studio / Xcode) and the EAS CLI installed globally.

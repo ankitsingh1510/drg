@@ -4,7 +4,16 @@ import { Image as ExpoImage } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useHeaderHeight } from '@react-navigation/elements';
-import { CalendarDays, ClipboardList, CogIcon, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import { useAtom } from 'jotai';
+import {
+  CalendarDays,
+  ClipboardList,
+  Dna,
+  Microscope,
+  Puzzle,
+  TestTube2,
+  TrendingUp,
+} from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +22,7 @@ import HScroller from '@/components/navigation/HScroller';
 import { SimpleButton } from '@/components/navigation/SimpleButton';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
+import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 import { formatDate } from '@/util/helpers';
 
 const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
@@ -23,14 +33,18 @@ export default function LandingScreen() {
   const headerHeight = useHeaderHeight();
   const date = useMemo(() => formatDate(), []);
 
-  const clinicalButtons = useMemo(
-    () => [
+  const [showPatientsButton] = useAtom(showPatientsButtonAtom);
+  const [showExtensionsButton] = useAtom(showExtensionsButtonAtom);
+
+  const clinicalButtons = useMemo(() => {
+    const buttons = [
       {
         icon: ClipboardList,
         heading: 'Patients',
         color: '#006400',
         sub: 'Patients Recent labs & imaging',
         onPress: () => router.push('/patients' as any),
+        hidden: !showPatientsButton,
       },
       {
         icon: TestTube2,
@@ -47,15 +61,16 @@ export default function LandingScreen() {
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_MTB_URL || ''),
       },
       {
-        icon: CogIcon,
-        heading: 'Settings',
-        color: '#E5575E',
-        sub: 'Profile & App Preferences',
-        onPress: () => router.push('/(tabs)/settings' as any),
+        icon: Puzzle,
+        heading: 'Extensions',
+        color: '#8B5CF6',
+        sub: 'Manage 1Cell AI Extensions',
+        onPress: () => router.push('/extensions' as any),
+        hidden: !showExtensionsButton,
       },
-    ],
-    []
-  );
+    ];
+    return buttons.filter(btn => !btn.hidden);
+  }, [showPatientsButton, showExtensionsButton]);
 
   const educationButtons = useMemo(
     () => [
