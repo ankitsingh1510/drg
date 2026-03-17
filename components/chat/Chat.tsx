@@ -193,6 +193,9 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
         reconnectionAttempts: 5,
         timeout: 20000,
         query: { userId: userId || '', documentId },
+        extraHeaders: {
+          Authorization: authorizationHeader,
+        },
         auth: {
           authorization: authorizationHeader,
           sessionId: sessionId.current,
