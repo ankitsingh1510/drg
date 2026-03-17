@@ -4,6 +4,7 @@ import {
   AppState,
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Switch,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -23,6 +25,7 @@ import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { hasSeenOnboardingAtom } from '@/stores/onboarding';
+import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 
 type SettingCardProps = {
   icon: React.ReactNode;
@@ -64,6 +67,12 @@ const Settings = () => {
   const headerHeight = useHeaderHeight();
   const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false);
   const appState = useRef(AppState.currentState);
+  const lastTapRef = useRef<number>(0);
+  const tapCountRef = useRef<number>(0);
+  const tapTimerRef = useRef<any>(null);
+
+  const [, setShowPatientsButton] = useAtom(showPatientsButtonAtom);
+  const [showExtensionsButton, setShowExtensionsButton] = useAtom(showExtensionsButtonAtom);
 
   const isDarkMode = theme === 'dark';
 
@@ -305,7 +314,8 @@ const Settings = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 8,
+                gap: 18,
+                marginTop: 10,
                 paddingVertical: 10,
                 backgroundColor: isDarkMode ? '#7f1d1d' : '#fee2e2',
                 borderRadius: 12,
@@ -317,6 +327,53 @@ const Settings = () => {
               <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>Sign Out</Text>
             </View>
           </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View
+          entering={FadeInUp.delay((settingsData.length + 1) * 150)
+            .duration(600)
+            .springify()}
+        >
+          <Pressable
+            onPress={() => {
+              const now = Date.now();
+              const TAP_DELAY = 300; // Slightly shorter for better feel
+
+              if (now - lastTapRef.current < TAP_DELAY) {
+                tapCountRef.current += 1;
+              } else {
+                tapCountRef.current = 1;
+              }
+              lastTapRef.current = now;
+
+              if (tapTimerRef.current) {
+                clearTimeout(tapTimerRef.current);
+              }
+
+              tapTimerRef.current = setTimeout(() => {
+                if (tapCountRef.current === 2) {
+                  setShowPatientsButton(prev => !prev);
+                  Alert.alert(
+                    'System Info',
+                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}`
+                  );
+                } else if (tapCountRef.current >= 3) {
+                  setShowExtensionsButton(prev => !prev);
+                  Alert.alert(
+                    'System Info',
+                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}\nExtensions: ${!showExtensionsButton ? 'Enabled' : 'Disabled'}`
+                  );
+                }
+                tapCountRef.current = 0;
+              }, TAP_DELAY);
+            }}
+            className="mb-8 mt-4 items-center justify-center opacity-60"
+          >
+            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">Dr.G AI Assistant</Text>
+            <Text className="text-[10px] text-gray-400 dark:text-gray-500">
+              Version {Constants.expoConfig?.version || '1.1.5'}
+            </Text>
+          </Pressable>
         </Animated.View>
 
         <View className="h-6" />
