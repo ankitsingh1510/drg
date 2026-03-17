@@ -188,7 +188,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
       const authorizationHeader = `Bearer ${cleanToken}`;
 
       const socket = io(baseUrl, {
-        path: '/api/v1/drg/rag/socket/',
+        path: '/drg/rag/socket/',
         autoConnect: false,
         reconnectionAttempts: 5,
         timeout: 20000,
