@@ -18,6 +18,7 @@ import { useAtom } from 'jotai';
 import { Bell, ChevronRight, HelpCircle, Lock, LogOut, Moon, Sun, Trash2, User } from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import IconNavBar from '@/components/navigation/IconNavBar';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
@@ -255,7 +256,7 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView style={{ flex: 1, marginTop: -30 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         className="flex-1"

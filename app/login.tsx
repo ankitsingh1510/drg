@@ -159,8 +159,8 @@ export default function LoginScreen() {
       // Get upload config
       const config = await storageAPI.getUploadConfig();
       setTargetLocation(config?.data?.targetLocation || null);
-      // Navigate to home tabs
-      router.replace('/(tabs)' as any);
+      // Navigate to home
+      setTimeout(() => router.replace('/home' as any), 0);
     } catch (error) {
       console.error('Error completing MFA login:', error);
       throw error;

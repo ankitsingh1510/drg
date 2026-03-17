@@ -114,7 +114,7 @@ export default function ForgotPasswordScreen() {
                       color: isDark ? '#D1D5DB' : '#6B7280',
                     }}
                   >
-                    We&apos;ve sent a password reset link to{'\n'}
+                    We've sent a password reset link to{'\n'}
                     <Text className="font-semibold">{email}</Text>
                   </Text>
                   <Text
@@ -131,7 +131,7 @@ export default function ForgotPasswordScreen() {
                       color: isDark ? '#9CA3AF' : '#9CA3AF',
                     }}
                   >
-                    If you don&apos;t see the email, check your spam or junk folder.
+                    If you don't see the email, check your spam or junk folder.
                   </Text>
                 </View>
               ) : (
@@ -158,7 +158,7 @@ export default function ForgotPasswordScreen() {
                         color: isDark ? '#D1D5DB' : '#6B7280',
                       }}
                     >
-                      Enter your email address and we&apos;ll send you a link to reset your password.
+                      Enter your email address and we'll send you a link to reset your password.
                     </Text>
                   </View>
 
