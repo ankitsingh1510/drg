@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
 import { useAtomValue } from 'jotai';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-
+import { colors } from '@/constants/colors';
 import { imagesAtom, newsAtom } from '@/stores/ApiData';
 
 type NewsCardProps = {
@@ -78,7 +78,6 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
     </Animated.View>
   );
 });
-NewsItem.displayName = 'NewsItem';
 
 const NewsCard = ({ count }: NewsCardProps) => {
   const news = useAtomValue(newsAtom);
@@ -94,18 +93,18 @@ const NewsCard = ({ count }: NewsCardProps) => {
     return images.results[randomIndex].urls.small;
   }, [images]);
 
+  if (!news || news.length === 0) {
+    return <Text className="mt-10 text-center text-gray-400">No news available.</Text>;
+  }
+
+  const data = count === -1 ? news : news.slice(0, count);
+
   const renderItem = useCallback(
     ({ item, index }: any) => (
       <NewsItem item={item} index={index} onPress={handleClick} imageFallback={getRandomImage()} />
     ),
     [handleClick, getRandomImage]
   );
-
-  if (!news || news.length === 0) {
-    return <Text className="mt-10 text-center text-gray-400">No news available.</Text>;
-  }
-
-  const data = count === -1 ? news : news.slice(0, count);
 
   return (
     <View className="flex-1">

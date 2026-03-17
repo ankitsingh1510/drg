@@ -2,11 +2,19 @@ import React from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
 import { Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import IconNavBar from '../navigation/IconNavBar';
+
+interface User {
+  name: string;
+  lname: string;
+}
 
 interface PatientHeaderProps {
+  user?: User | null;
   totalCount: number;
   query: string;
   onSearch: (text: string) => void;
+  onLogout?: () => void;
 }
 
 export function PatientHeader({ totalCount, query, onSearch }: PatientHeaderProps) {
@@ -15,12 +23,26 @@ export function PatientHeader({ totalCount, query, onSearch }: PatientHeaderProp
 
   return (
     <View
-      className="bg-[#FDF5E6] px-5 pb-3 pt-3 dark:bg-gray-900"
+      className="bg-[#FDF5E6] px-5 pb-4 dark:bg-gray-900"
       style={{
         borderBottomWidth: 1,
         borderBottomColor: isDark ? '#1f2937' : '#f1f5f9',
       }}
     >
+      <View className="mb-6 flex-row items-center justify-between">
+        <View className="flex-1">
+          <Text className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white">Orders</Text>
+          <View className="mt-1 flex-row items-center gap-2">
+            <View className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {totalCount > 0 ? `${totalCount} active cases` : 'No cases assigned'}
+            </Text>
+          </View>
+        </View>
+        <IconNavBar />
+      </View>
+
+      {/* Search and Filter Row */}
       <View className="flex-row items-center">
         <View className="h-12 flex-1 flex-row items-center rounded-full border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
           <View className="items-center justify-center">
