@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!payload) {
           console.log('Invalid or expired token. Please log in again.');
           // await AsyncStorage.removeItem('token');
-          storage.remove('token');
+          storage.delete('token');
           setIsLoading(false);
           return;
         }
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error('Error initializing auth:', error);
         // await AsyncStorage.removeItem('token');
-        storage.remove('token');
+        storage.delete('token');
       } finally {
         setIsLoading(false);
       }

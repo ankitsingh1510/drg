@@ -91,7 +91,7 @@ export default function ResetPasswordScreen() {
       });
 
       if (response?.success === true || response?.status === 200 || response?.status === 201) {
-        storage.remove('token');
+        storage.delete('token');
         toast.success('Password Updated', 'Please sign in with your new password.');
         logout();
         return;

@@ -279,29 +279,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="patients"
                 options={{
-                  headerShown: true,
-                  title: 'Patients',
-                  headerLeft: () => (
-                    <TouchableOpacity
-                      onPress={() => router.back()}
-                      hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                      style={{
-                        // marginLeft: Platform.OS === 'ios' ? -1 : 0,
-                        padding: 4,
-                      }}
-                    >
-                      <Ionicons name="chevron-back" size={26} color={theme === 'dark' ? '#f9fafb' : '#111827'} />
-                    </TouchableOpacity>
-                  ),
-                  headerShadowVisible: false,
-                  headerStyle: {
-                    backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',
-                  },
-                  headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
-                  headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
-                    fontSize: 18,
-                  },
+                  headerShown: false,
                 }}
               />
             </Stack>
