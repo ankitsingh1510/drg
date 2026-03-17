@@ -4,6 +4,31 @@ A React Native mobile application built with Expo for the **Dr.G / 1Cell AI** he
 
 ---
 
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#project-structure)
+- [Screen-by-Screen Guide](#screen-by-screen-guide)
+  - [Entry / Redirect](#appindextsx--entry--redirect)
+  - [Login Screen](#applogintsx--login-screen)
+  - [Home Screen](#apptabsindextsx--home-screen)
+  - [Reports List](#apptabsreports_listtsx--reports-list)
+  - [AI Scribe (Session List)](#apptabsscribetsx--ai-scribe-session-list)
+  - [Scribe Session Detail](#appscribe-detailtsx--scribe-session-detail)
+  - [Scribe Transcription](#appscribe-transcriptiontsx--scribe-transcription)
+  - [Patients WebView Screen](#apppatientstsxpatients-webview-screen)
+  - [Settings](#apptabssettingstsx--settings)
+- [WebView Integration — Patients Screen](#webview-integration--patients-screen)
+- [Authentication Flow](#authentication-flow)
+- [State Management](#state-management)
+- [Services & API Layer](#services--api-layer)
+- [Theming & Color Palette](#theming--color-palette)
+- [Development Conventions](#development-conventions)
+
+---
+
 ## Tech Stack
 
 | Area | Technology |
