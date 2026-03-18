@@ -2,9 +2,6 @@ import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type ESignatureData } from '../types/types';
 import { apiFetch } from './fetchClient';
 
-// TODO: move these back to env vars before merging
-const LOCAL_GQL_URL = 'http://192.192.16.187:3301/graphql';
-
 class StorageAPI {
   baseUrl: string;
   gqlUrl: string;

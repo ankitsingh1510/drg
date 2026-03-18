@@ -139,7 +139,7 @@ drg-mobile/
 │   ├── scribe-transcription.tsx# Live transcription of a Scribe session
 │   └── (tabs)/                 # Bottom-tab navigator group
 │       ├── _layout.tsx         # Tab bar config & shared header options
-│       ├── index.tsx           # Home screen (feature cards)
+│       ├── home.tsx            # Home screen (feature cards)
 │       ├── reports_list.tsx    # Patient reports list
 │       ├── scribe.tsx          # AI Scribe – session list & new recording modal
 │       └── settings.tsx        # Settings (theme, notifications, logout, etc.)
