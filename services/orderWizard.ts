@@ -2,9 +2,6 @@ import RNBlobUtil from 'react-native-blob-util';
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { apiFetch } from './fetchClient';
 
-// TODO: move these back to env vars before merging
-const LOCAL_GQL_URL = 'http://192.192.16.187:3301/graphql';
-
 export interface RecommendAnswers {
   answers: Record<string, string | string[]>;
 }
