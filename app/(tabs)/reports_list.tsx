@@ -110,22 +110,31 @@ export default function ReportsList() {
   const handleViewReport = useCallback(
     async (patient: Patient) => {
       try {
-        if (!patient.full_report_path) {
+        const assayIds = patient.assayResultIds;
+        const testDetailsResponse = await patientsAPI.fetchTestsDetails({
+          assayIds,
+        });
+
+        const latestPatientRecord = (testDetailsResponse.data || [])[0];
+
+        if (!latestPatientRecord || !latestPatientRecord.full_report_path) {
           Alert.alert('Error', 'Report path not available for this patient.');
           return;
         }
-        const blobPath = patient.full_report_path;
-        const documentId = patient.hasOwnProperty('documentId') ? patient.documentId : null;
+        const blobPath = latestPatientRecord.full_report_path;
+        const documentId = latestPatientRecord.hasOwnProperty('documentId') ? latestPatientRecord.documentId : null;
         const signedUrl = await storageAPI.getSignedUrl(blobPath);
-        const ingested_file_path = patient.hasOwnProperty('ingested_file_path') ? patient.ingested_file_path : null;
+        const ingested_file_path = latestPatientRecord.hasOwnProperty('ingested_file_path')
+          ? latestPatientRecord.ingested_file_path
+          : null;
         let ingestionStatus = null;
         let htmlPath = null;
-        if (patient.full_report_html_paths?.length) {
-          const p = patient.full_report_html_paths[0];
+        if (latestPatientRecord.full_report_html_paths?.length) {
+          const p = latestPatientRecord.full_report_html_paths[0];
           htmlPath = p.substring(0, p.lastIndexOf('/'));
         }
-        const reportIngestionStatus: IngestionStatus = patient.hasOwnProperty('drg_ingestion_status')
-          ? (patient.drg_ingestion_status as IngestionStatus)
+        const reportIngestionStatus: IngestionStatus = latestPatientRecord.hasOwnProperty('drg_ingestion_status')
+          ? (latestPatientRecord.drg_ingestion_status as IngestionStatus)
           : null;
 
         let samePath: boolean;
@@ -153,9 +162,9 @@ export default function ReportsList() {
           pathname: '/reports' as any,
           params: {
             pdfUrl: encodeURIComponent(signedUrl),
-            patientName: patient.patientName,
+            patientName: latestPatientRecord.patientName,
             documentId: documentId,
-            assayResultIds: patient.assayResultIds,
+            assayResultIds: latestPatientRecord.assayResultIds,
             ingestionStatus,
           },
         });
