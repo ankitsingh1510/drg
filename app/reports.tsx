@@ -32,6 +32,7 @@ import { configAPI } from '@/services/config';
 import { ragAPI } from '@/services/rag';
 import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { hasSeenNotificationPermission, setFcmToken, setHasSeenNotificationPermission } from '@/stores/mmkv';
+import { setActiveReportAtom } from '@/stores/report';
 import { IngestionStatus } from '@/types/types';
 import { toast } from '@/util/toast';
 
@@ -145,6 +146,7 @@ export default function Reports() {
   }>();
   const addIngestionId = useSetAtom(addIngestionIdAtom);
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
+  const setActiveReport = useSetAtom(setActiveReportAtom);
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
   const [currentIngestionStatus, setCurrentIngestionStatus] = useState<IngestionStatus | undefined>(ingestionStatus);
@@ -159,6 +161,24 @@ export default function Reports() {
   const [showVideoAvatar, setShowVideoAvatar] = useState(true);
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!assayResultIds) return;
+
+    setActiveReport({
+      pdfUrl: pdfUrl,
+      patientName: patientName,
+      documentId: documentId,
+      assayResultIds,
+      ingestionStatus,
+    });
+  }, [assayResultIds, documentId, ingestionStatus, patientName, pdfUrl, setActiveReport]);
+
+  useEffect(() => {
+    return () => {
+      setActiveReport(null);
+    };
+  }, [setActiveReport]);
 
   useEffect(() => {
     Notifications.getPermissionsAsync().then(({ status }) => {
