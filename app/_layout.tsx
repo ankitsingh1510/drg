@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { Appearance, LogBox, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { LogBox, Platform, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
-import { router, Stack, useLocalSearchParams, usePathname } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   Poppins_400Regular,
@@ -11,10 +11,9 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
-import { Ionicons } from '@expo/vector-icons';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -26,6 +25,7 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
 import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
+import { activeReportAtom } from '@/stores/report';
 import { toast } from '@/util/toast';
 import '../global.css';
 
@@ -79,8 +79,7 @@ Notifications.setNotificationHandler({
 
 export default function RootLayout() {
   const removeIngestionId = useSetAtom(removeIngestionIdAtom);
-  const pathname = usePathname();
-  const localSearchParams = useLocalSearchParams();
+  const activeReport = useAtomValue(activeReportAtom);
   useEffect(() => {
     if (__DEV__) startNetworkLogging();
   }, []);
@@ -94,18 +93,18 @@ export default function RootLayout() {
     const responseListener = Notifications.addNotificationResponseReceivedListener(async response => {
       const notificationPayload: any = JSON.parse(response.notification.request.content.data.payload as any);
       if (notificationPayload && notificationPayload?.type == 'ingestion' && notificationPayload?.status == 'success') {
-        const { assay_ids, documentId, full_report_path, patientName } = notificationPayload;
-        if (assay_ids === localSearchParams.assayResultIds) {
+        const { assayIds, documentId, full_report_path, patientName } = notificationPayload;
+        if (assayIds === activeReport?.assayResultIds) {
           toast.info('Already viewing the report.');
         } else {
           const signedUrl = await storageAPI.getSignedUrl(full_report_path);
-          router.push({
+          router.replace({
             pathname: '/reports' as any,
             params: {
               pdfUrl: encodeURIComponent(signedUrl),
-              patientName: patientName,
-              documentId: documentId,
-              assayResultIds: assay_ids,
+              patientName,
+              documentId,
+              assayResultIds: assayIds,
               ingestionStatus: 'ingested',
             },
           });
@@ -134,7 +133,7 @@ export default function RootLayout() {
       unsubscribe();
       responseListener.remove();
     };
-  }, []);
+  }, [activeReport?.assayResultIds, removeIngestionId]);
 
   useEffect(() => {
     if (!Device.isDevice || !isFirebaseEnabled) {

@@ -5,6 +5,7 @@ interface FetchTestsDetailsParams {
   page?: number;
   count?: number;
   searchQuery?: string;
+  assayIds?: string;
 }
 
 export interface Patient {
@@ -60,7 +61,7 @@ class PatientsAPI {
   }
 
   async fetchTestsDetails(params: FetchTestsDetailsParams): Promise<FetchTestsDetailsResponse> {
-    const { page = 1, count = 10, searchQuery } = params;
+    const { page = 1, count = 10, searchQuery, assayIds } = params;
 
     const reqParams: GQLRequestParams = {
       query: `query fetchTestsDetailsForDrG($fetchTestsDetailsForDrGModel: JSON!) {
@@ -73,6 +74,7 @@ class PatientsAPI {
             page,
             count,
           },
+          ...(assayIds ? { filters: `assay_id=${assayIds}` } : {}),
           search: searchQuery || '',
           restrictByRole: true,
           workflowName: 'ICARE_WORKFLOW',
