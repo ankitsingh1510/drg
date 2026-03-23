@@ -110,61 +110,39 @@ export default function ReportsList() {
   const handleViewReport = useCallback(
     async (patient: Patient) => {
       try {
-        const assayIds = patient.assayResultIds;
-        const testDetailsResponse = await patientsAPI.fetchTestsDetails({
-          assayIds,
-        });
+        const assayResultAttributes = await patientsAPI.getAssayResultAttributes(patient.assayResultId);
+        console.log('GetAssayResultAttributes response:', assayResultAttributes);
+        const fullReportPath =
+          assayResultAttributes?.manual_full_report_storage_id ??
+          assayResultAttributes?.released_full_report_path ??
+          assayResultAttributes?.full_report_finalized_path;
 
-        const latestPatientRecord = (testDetailsResponse.data || [])[0];
-
-        if (!latestPatientRecord || !latestPatientRecord.full_report_path) {
-          Alert.alert('Error', 'Report path not available for this patient.');
+        if (!fullReportPath) {
+          Alert.alert('Report unavailable', 'No full report path found for this sample.');
           return;
         }
-        const blobPath = latestPatientRecord.full_report_path;
-        const documentId = latestPatientRecord.hasOwnProperty('documentId') ? latestPatientRecord.documentId : null;
-        const signedUrl = await storageAPI.getSignedUrl(blobPath);
-        const ingested_file_path = latestPatientRecord.hasOwnProperty('ingested_file_path')
-          ? latestPatientRecord.ingested_file_path
-          : null;
-        let ingestionStatus = null;
-        let htmlPath = null;
-        if (latestPatientRecord.full_report_html_paths?.length) {
-          const p = latestPatientRecord.full_report_html_paths[0];
-          htmlPath = p.substring(0, p.lastIndexOf('/'));
-        }
-        const reportIngestionStatus: IngestionStatus = latestPatientRecord.hasOwnProperty('drg_ingestion_status')
-          ? (latestPatientRecord.drg_ingestion_status as IngestionStatus)
-          : null;
+        const documentId = assayResultAttributes.hasOwnProperty('documentId') ? assayResultAttributes.documentId : null;
+        const signedUrl = await storageAPI.getSignedUrl(fullReportPath);
 
-        let samePath: boolean;
-        if (htmlPath) {
-          samePath = htmlPath === ingested_file_path;
-        } else {
-          samePath = ingested_file_path === patient.full_report_path;
-        }
-        if (samePath) {
-          if (reportIngestionStatus === 'ingested') {
-            ingestionStatus = 'ingested';
-            removeIngestionId(patient.assayResultIds);
-          } else if (reportIngestionStatus === 'ingesting') {
-            ingestionStatus = 'ingesting';
-          } else if (reportIngestionStatus === 'failed') {
-            removeIngestionId(patient.assayResultIds);
-          }
-        } else if (!samePath && reportIngestionStatus === 'ingesting') {
+        let ingestionStatus: IngestionStatus = assayResultAttributes.hasOwnProperty('drg_ingestion_status')
+          ? (assayResultAttributes.drg_ingestion_status as IngestionStatus)
+          : '';
+        if (ingestionStatus === 'ingested') {
+          ingestionStatus = 'ingested';
+          removeIngestionId(patient.assayResultIds);
+        } else if (ingestionStatus === 'ingesting') {
           ingestionStatus = 'ingesting';
-        } else if (!samePath) {
-          ingestionStatus = '';
+        } else if (ingestionStatus === 'failed') {
+          removeIngestionId(patient.assayResultIds);
         }
 
         router.push({
           pathname: '/reports' as any,
           params: {
             pdfUrl: encodeURIComponent(signedUrl),
-            patientName: latestPatientRecord.patientName,
+            patientName: patient.patientName,
             documentId: documentId,
-            assayResultIds: latestPatientRecord.assayResultIds,
+            assayResultIds: patient.assayResultIds,
             ingestionStatus,
           },
         });

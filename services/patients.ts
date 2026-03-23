@@ -90,6 +90,26 @@ class PatientsAPI {
       throw error;
     }
   }
+
+  async getAssayResultAttributes(assayResultId: number): Promise<any> {
+    if (!Number.isFinite(assayResultId)) {
+      throw new Error('Invalid assayResultId provided.');
+    }
+
+    const reqParams: GQLRequestParams = {
+      query: `query GetAssayResultAttributes {
+        getAssayResultAttributes(assayResultId: ${assayResultId})
+      }`,
+    };
+
+    try {
+      const response = await this.getGQLResponse(reqParams);
+      return response.data.getAssayResultAttributes?.data || null;
+    } catch (error) {
+      console.error('Error fetching assay result attributes:', error);
+      throw error;
+    }
+  }
 }
 
 export const patientsAPI = new PatientsAPI();
