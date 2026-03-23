@@ -13,7 +13,7 @@ import {
 } from '@expo-google-fonts/poppins';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { startNetworkLogging } from 'react-native-network-logger';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -23,7 +23,6 @@ import { AuthProvider } from '@/context/AuthContext';
 import NetworkChecker from '@/hooks/NetworkChecker';
 import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
-import { removeIngestionIdAtom } from '@/stores/ingestion';
 import { setFcmToken } from '@/stores/mmkv';
 import { activeReportAtom } from '@/stores/report';
 import { toast } from '@/util/toast';
@@ -78,7 +77,6 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
-  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const activeReport = useAtomValue(activeReportAtom);
   useEffect(() => {
     if (__DEV__) startNetworkLogging();
@@ -113,11 +111,6 @@ export default function RootLayout() {
     });
 
     const unsubscribe = onMessage(messaging(), async remoteMessage => {
-      const notificationPayload: any = JSON.parse(remoteMessage.data.payload as any);
-      if (notificationPayload && notificationPayload?.type == 'ingestion') {
-        const { assayIds } = notificationPayload;
-        removeIngestionId(assayIds);
-      }
       await Notifications.scheduleNotificationAsync({
         content: {
           title: remoteMessage.notification?.title,
@@ -133,7 +126,7 @@ export default function RootLayout() {
       unsubscribe();
       responseListener.remove();
     };
-  }, [activeReport?.assayResultIds, removeIngestionId]);
+  }, [activeReport?.assayResultIds]);
 
   useEffect(() => {
     if (!Device.isDevice || !isFirebaseEnabled) {
