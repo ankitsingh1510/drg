@@ -3,22 +3,17 @@ import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } fro
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
-import { useAtomValue, useSetAtom } from 'jotai';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
-import { addIngestionIdAtom, getIngestionIdsAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { IngestionStatus } from '@/types/types';
 
 export default function ReportsList() {
   const { user } = useAuth();
   const router = useRouter();
-  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
-  const addIngestionId = useSetAtom(addIngestionIdAtom);
-  const ingestionIds = useAtomValue(getIngestionIdsAtom);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -30,56 +25,37 @@ export default function ReportsList() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
 
-  const fetchPatients = useCallback(
-    async (pageNum: number, searchQuery: string, append = false) => {
-      try {
-        const response = await patientsAPI.fetchTestsDetails({
-          page: pageNum,
-          count: 10,
-          searchQuery: searchQuery,
-        });
-        setTotalCount(response.totalCount);
+  const fetchPatients = useCallback(async (pageNum: number, searchQuery: string, append = false) => {
+    try {
+      const response = await patientsAPI.fetchTestsDetails({
+        page: pageNum,
+        count: 10,
+        searchQuery: searchQuery,
+      });
+      setTotalCount(response.totalCount);
 
-        // Process ingestion status for each patient
-        (response.data || []).forEach((patient: Patient) => {
-          const assayResultId = patient.assayResultIds;
-          const ingestionStatus = patient.drg_ingestion_status as IngestionStatus;
-
-          // If status is ingesting, add to tracker
-          if (ingestionStatus === 'ingesting') {
-            addIngestionId(assayResultId);
-          }
-
-          // If assay_result_id exists in atom and status is ingested or failed, remove from atom
-          if (ingestionIds.has(assayResultId) && (ingestionStatus === 'ingested' || ingestionStatus === 'failed')) {
-            removeIngestionId(assayResultId);
-          }
-        });
-
-        if (append) {
-          setPatients(prev => [...prev, ...(response.data || [])]);
-          setPage(pageNum);
-        } else {
-          setPatients(response.data || []);
-          setPage(pageNum);
-        }
-
-        setHasMore((response.data || []).length === 10);
-      } catch (error: any) {
-        if (!append) {
-          setPatients([]);
-        }
-        console.error('Error fetching patients:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
-        Alert.alert('Error', errorMessage);
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-        setLoadingMore(false);
+      if (append) {
+        setPatients(prev => [...prev, ...(response.data || [])]);
+        setPage(pageNum);
+      } else {
+        setPatients(response.data || []);
+        setPage(pageNum);
       }
-    },
-    [addIngestionId, ingestionIds, removeIngestionId]
-  );
+
+      setHasMore((response.data || []).length === 10);
+    } catch (error: any) {
+      if (!append) {
+        setPatients([]);
+      }
+      console.error('Error fetching patients:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch patient data. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+      setLoadingMore(false);
+    }
+  }, []);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
@@ -110,61 +86,37 @@ export default function ReportsList() {
   const handleViewReport = useCallback(
     async (patient: Patient) => {
       try {
-        const assayIds = patient.assayResultIds;
-        const testDetailsResponse = await patientsAPI.fetchTestsDetails({
-          assayIds,
-        });
+        const assayResultAttributes = await patientsAPI.getAssayResultAttributes(patient.assayResultId);
+        const fullReportPath =
+          assayResultAttributes?.manual_full_report_storage_id ??
+          assayResultAttributes?.released_full_report_path ??
+          assayResultAttributes?.full_report_finalized_path;
 
-        const latestPatientRecord = (testDetailsResponse.data || [])[0];
-
-        if (!latestPatientRecord || !latestPatientRecord.full_report_path) {
-          Alert.alert('Error', 'Report path not available for this patient.');
+        if (!fullReportPath) {
+          Alert.alert('Report unavailable', 'No full report path found for this sample.');
           return;
         }
-        const blobPath = latestPatientRecord.full_report_path;
-        const documentId = latestPatientRecord.hasOwnProperty('documentId') ? latestPatientRecord.documentId : null;
-        const signedUrl = await storageAPI.getSignedUrl(blobPath);
-        const ingested_file_path = latestPatientRecord.hasOwnProperty('ingested_file_path')
-          ? latestPatientRecord.ingested_file_path
-          : null;
-        let ingestionStatus = null;
-        let htmlPath = null;
-        if (latestPatientRecord.full_report_html_paths?.length) {
-          const p = latestPatientRecord.full_report_html_paths[0];
-          htmlPath = p.substring(0, p.lastIndexOf('/'));
-        }
-        const reportIngestionStatus: IngestionStatus = latestPatientRecord.hasOwnProperty('drg_ingestion_status')
-          ? (latestPatientRecord.drg_ingestion_status as IngestionStatus)
-          : null;
+        const documentId = assayResultAttributes.hasOwnProperty('documentId') ? assayResultAttributes.documentId : null;
+        const signedUrl = await storageAPI.getSignedUrl(fullReportPath);
 
-        let samePath: boolean;
-        if (htmlPath) {
-          samePath = htmlPath === ingested_file_path;
-        } else {
-          samePath = ingested_file_path === patient.full_report_path;
-        }
-        if (samePath) {
-          if (reportIngestionStatus === 'ingested') {
-            ingestionStatus = 'ingested';
-            removeIngestionId(patient.assayResultIds);
-          } else if (reportIngestionStatus === 'ingesting') {
-            ingestionStatus = 'ingesting';
-          } else if (reportIngestionStatus === 'failed') {
-            removeIngestionId(patient.assayResultIds);
-          }
-        } else if (!samePath && reportIngestionStatus === 'ingesting') {
+        let ingestionStatus: IngestionStatus = assayResultAttributes.hasOwnProperty('drg_ingestion_status')
+          ? (assayResultAttributes.drg_ingestion_status as IngestionStatus)
+          : '';
+        if (ingestionStatus === 'ingested') {
+          ingestionStatus = 'ingested';
+        } else if (ingestionStatus === 'ingesting') {
           ingestionStatus = 'ingesting';
-        } else if (!samePath) {
-          ingestionStatus = '';
+        } else if (ingestionStatus === 'failed') {
+          ingestionStatus = 'failed';
         }
 
         router.push({
           pathname: '/reports' as any,
           params: {
             pdfUrl: encodeURIComponent(signedUrl),
-            patientName: latestPatientRecord.patientName,
+            patientName: patient.patientName,
             documentId: documentId,
-            assayResultIds: latestPatientRecord.assayResultIds,
+            assayResultIds: patient.assayResultIds,
             ingestionStatus,
           },
         });

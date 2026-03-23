@@ -3,21 +3,35 @@ import { Platform, View } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const TAB_BAR_HEIGHT = 84; // Increased height for better touch targets and aesthetics
-// const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 84 : 64;
+const TAB_BAR_BASE_HEIGHT = Platform.select({
+  ios: 50,
+  default: 56,
+});
+const TAB_BAR_TOP_PADDING = 8;
+const TAB_BAR_MIN_BOTTOM_PADDING = Platform.select({
+  ios: 12,
+  default: 8,
+});
+const TAB_BAR_ITEM_VERTICAL_PADDING = Platform.select({
+  ios: 4,
+  default: 0,
+});
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, TAB_BAR_MIN_BOTTOM_PADDING!);
 
   const tabBarStyle = {
     backgroundColor: isDark ? '#111827' : '#FFFFFF',
     borderTopColor: isDark ? '#1f2937' : '#e5e7eb',
     borderTopWidth: 1,
-    height: TAB_BAR_HEIGHT,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 8,
-    paddingTop: 8,
+    height: TAB_BAR_BASE_HEIGHT + TAB_BAR_TOP_PADDING + bottomPadding,
+    paddingBottom: bottomPadding,
+    paddingTop: TAB_BAR_TOP_PADDING,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: isDark ? 0.3 : 0.08,
@@ -60,7 +74,9 @@ export default function TabLayout() {
           marginTop: 0,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: TAB_BAR_ITEM_VERTICAL_PADDING,
         },
       }}
     >
