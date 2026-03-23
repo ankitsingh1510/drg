@@ -3,4 +3,4 @@ export type ESignatureData = {
   password: string;
 };
 
-export type IngestionStatus = 'ingesting' | 'ingested' | 'failed';
+export type IngestionStatus = 'ingesting' | 'ingested' | 'failed' | '' | null;
