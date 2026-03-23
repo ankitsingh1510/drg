@@ -30,7 +30,6 @@ import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { configAPI } from '@/services/config';
 import { ragAPI } from '@/services/rag';
-import { addIngestionIdAtom, removeIngestionIdAtom } from '@/stores/ingestion';
 import { hasSeenNotificationPermission, setFcmToken, setHasSeenNotificationPermission } from '@/stores/mmkv';
 import { setActiveReportAtom } from '@/stores/report';
 import { IngestionStatus } from '@/types/types';
@@ -144,8 +143,6 @@ export default function Reports() {
     assayResultIds: string;
     ingestionStatus: IngestionStatus;
   }>();
-  const addIngestionId = useSetAtom(addIngestionIdAtom);
-  const removeIngestionId = useSetAtom(removeIngestionIdAtom);
   const setActiveReport = useSetAtom(setActiveReportAtom);
   const [docId, setDocId] = useState(documentId);
   const [loading, setLoading] = useState(true);
@@ -223,7 +220,7 @@ export default function Reports() {
     return () => {
       unsubscribe();
     };
-  }, [assayResultIds, removeIngestionId, setDocId]);
+  }, [assayResultIds, setDocId]);
   const handleChatWithDrG = () => {
     setShowInteraction({ isVisible: true, mode: 'chat' });
   };
@@ -248,7 +245,6 @@ export default function Reports() {
 
   const proceedWithIngestion = async () => {
     toast.success('Analyzing Report. This may take some time...', undefined, 2000);
-    addIngestionId(assayResultIds);
     setCurrentIngestionStatus('ingesting');
 
     try {
@@ -256,7 +252,6 @@ export default function Reports() {
       toast.success(res.message, undefined, 3000);
     } catch (error) {
       console.log('Error while analyzing report:', error);
-      removeIngestionId(assayResultIds);
       setCurrentIngestionStatus('failed');
     }
   };
