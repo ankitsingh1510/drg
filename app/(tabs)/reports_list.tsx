@@ -87,7 +87,6 @@ export default function ReportsList() {
     async (patient: Patient) => {
       try {
         const assayResultAttributes = await patientsAPI.getAssayResultAttributes(patient.assayResultId);
-        console.log('GetAssayResultAttributes response:', assayResultAttributes);
         const fullReportPath =
           assayResultAttributes?.manual_full_report_storage_id ??
           assayResultAttributes?.released_full_report_path ??
