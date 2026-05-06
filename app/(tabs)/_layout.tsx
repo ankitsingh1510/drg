@@ -55,7 +55,7 @@ export default function TabLayout() {
     ),
     headerTintColor: isDark ? '#f9fafb' : '#111827',
     headerTitleStyle: {
-      fontFamily: 'Poppins_600SemiBold',
+      fontFamily: 'Outfit_600SemiBold',
       fontSize: 20,
     },
     headerShadowVisible: false,
@@ -70,7 +70,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontFamily: 'Poppins_500Medium',
+          fontFamily: 'Outfit_500Medium',
           marginTop: 0,
         },
         tabBarItemStyle: {
@@ -83,7 +83,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          ...sharedHeaderOptions,
+          headerShown: false,
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} size={23} color={color} />
