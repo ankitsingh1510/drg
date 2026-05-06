@@ -1,91 +1,88 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Alert, BackHandler, ScrollView, Text, View } from 'react-native';
-import { Image as ExpoImage } from 'expo-image';
+import { Alert, BackHandler, ScrollView, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import {
-  CalendarDays,
-  ClipboardList,
-  Dna,
-  Microscope,
-  Puzzle,
-  TestTube2,
-  TrendingUp,
-} from 'lucide-react-native';
+import { ClipboardList, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
-import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { HeadingDivider } from '@/components/navigation/HeadingDivider';
-import HScroller from '@/components/navigation/HScroller';
-import { SimpleButton } from '@/components/navigation/SimpleButton';
+import ClinicalTimeline from '@/ClinicalTimeline';
+import AppText from '@/components/ui/AppText';
+import { type HomeItem, HomeSection } from '@/components/ui/HomeScreenCard';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
 import { useAuth } from '@/context/AuthContext';
 import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
-import { formatDate } from '@/util/helpers';
 
 const openInBrowser = (url: string) => WebBrowser.openBrowserAsync(url);
+
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning,';
+  if (hour < 17) return 'Good afternoon,';
+  return 'Good evening,';
+};
 
 export default function LandingScreen() {
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
   const headerHeight = useHeaderHeight();
-  const date = useMemo(() => formatDate(), []);
 
   const [showPatientsButton] = useAtom(showPatientsButtonAtom);
   const [showExtensionsButton] = useAtom(showExtensionsButtonAtom);
 
-  const clinicalButtons = useMemo(() => {
-    const buttons = [
+  const clinicalItems: HomeItem[] = useMemo(() => {
+    const items = [
       {
-        icon: ClipboardList,
-        heading: 'Patients',
-        color: '#006400',
-        sub: 'Patients Recent labs & imaging',
-        onPress: () => router.push('/patients' as any),
-        hidden: !showPatientsButton,
+        id: 'patient',
+        label: 'Patient',
+        subtitle: 'Recent labs & images',
+        icon: <ClipboardList size={24} color="#fff" />,
+        color: '#538BF4',
+        onPress: () => router.push('/Patients/patientList' as any),
+        comingSoon: false,
+        hidden: false,
       },
       {
-        icon: TestTube2,
-        heading: 'Order Tests',
-        color: '#5C7AC6',
-        sub: '1Cell.Ai Tests and Panels',
-        onPress: () => router.push('/tests' as any),
+        id: 'orders',
+        label: 'Orders',
+        subtitle: 'Recent orders & updates',
+        icon: <TestTube2 size={24} color="#fff" />,
+        color: '#4ED0D9',
+        onPress: () => router.push('/orderList' as any),
+        comingSoon: false,
+        hidden: false,
       },
       {
-        icon: Dna,
-        heading: 'MTB',
-        color: '#91A3B0',
-        sub: 'Case discussions & insights',
+        id: 'mtb',
+        label: 'MTB',
+        subtitle: 'Case discussion & Insights',
+        icon: <Dna size={24} color="#fff" />,
+        color: '#A576F4',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_MTB_URL || ''),
-      },
-      {
-        icon: Puzzle,
-        heading: 'Extensions',
-        color: '#8B5CF6',
-        sub: 'Manage 1Cell AI Extensions',
-        onPress: () => router.push('/extensions' as any),
-        hidden: !showExtensionsButton,
+        comingSoon: true,
+        hidden: false,
       },
     ];
-    return buttons.filter(btn => !btn.hidden);
-  }, [showPatientsButton, showExtensionsButton]);
+    return items.filter((item: any) => !item.hidden) as HomeItem[];
+  }, [showPatientsButton]);
 
-  const educationButtons = useMemo(
+  const educationItems: HomeItem[] = useMemo(
     () => [
       {
-        icon: Microscope,
-        heading: 'Publications',
-        color: '#445278',
-        sub: '1Cell.Ai Posters & publications',
+        id: 'publications',
+        label: 'Publication',
+        subtitle: 'Poster & Publications',
+        icon: <Microscope size={24} color="#fff" />,
+        color: '#F8A03C',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_PUBLICATIONS_URL || ''),
       },
       {
-        icon: TrendingUp,
-        heading: 'Trends',
-        color: '#738BD6',
-        sub: 'Latest around Genomics & NGS',
+        id: 'trends',
+        label: 'Trends',
+        subtitle: 'Latest around Genomics & NGS',
+        icon: <TrendingUp size={24} color="#fff" />,
+        color: '#36B879',
         onPress: () => router.push('/news' as any),
       },
     ],
@@ -108,75 +105,20 @@ export default function LandingScreen() {
   );
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight }}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <View className="px-6 pt-1">
-            <Text className="text-2xl font-semibold text-gray-900 dark:text-white">
-              Hello, {user?.name} {user?.lname}
-            </Text>
-            <View className="mb-6 mt-1 flex-row items-center">
-              <CalendarDays size={20} color={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'} />
-              <Text className="ml-2 text-base text-gray-500 dark:text-gray-400">{date}</Text>
-            </View>
+          <View className="px-6 pb-6 pt-4">
+            <AppText className="text-base text-gray-500 dark:text-gray-400">{getGreeting()}</AppText>
+            <AppText className="text-2xl text-gray-900 dark:text-white">
+              Dr. {user?.name} {user?.lname}
+            </AppText>
           </View>
-          <HScroller />
-          <View className="mt-6 h-3"></View>
-          <HeadingDivider hideRightIcon iconName="albums-outline" title="Clinical Workspace" />
 
-          <View className="flex-row flex-wrap justify-evenly gap-5 p-5">
-            {clinicalButtons.map((item, idx) => (
-              <Animated.View
-                key={idx}
-                className="w-[46%]"
-                entering={FadeInUp.delay(idx * 100)
-                  .duration(600)
-                  .springify()}
-              >
-                <SimpleButton
-                  icon={item.icon}
-                  heading={item.heading}
-                  iconContainerColor={item.color}
-                  subheading={item.sub}
-                  onPress={item.onPress}
-                />
-              </Animated.View>
-            ))}
-          </View>
-          <View className="mt-2 h-1"></View>
-          <HeadingDivider hideRightIcon iconName="book-outline" title="Education & Research" />
+          <HomeSection title="Clinical Workspace" headerIcon="flask-outline" items={clinicalItems} />
+          <HomeSection title="Education & Research" headerIcon="book-outline" items={educationItems} />
 
-          <View className="mb-8 flex-row flex-wrap justify-evenly gap-5 p-5">
-            {educationButtons.map((item, idx) => (
-              <Animated.View
-                key={idx}
-                className="w-[46%]"
-                entering={FadeInUp.delay((clinicalButtons.length + idx) * 100)
-                  .duration(600)
-                  .springify()}
-              >
-                <SimpleButton
-                  icon={item.icon}
-                  heading={item.heading}
-                  iconContainerColor={item.color}
-                  subheading={item.sub}
-                  onPress={item.onPress}
-                />
-              </Animated.View>
-            ))}
-          </View>
-          <HeadingDivider hideRightIcon iconName="bulb-outline" title="Tip of the day" />
           <TipOfTheDay />
-          <View className="mt-2 h-1"></View>
-          <View className="flex-1 items-center justify-center px-6">
-            <ExpoImage
-              source={require('@/assets/dr1.webp')}
-              contentFit="contain"
-              style={{ height: 150, width: '100%' }}
-              className="rounded-3xl"
-              transition={300}
-            />
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

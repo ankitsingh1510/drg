@@ -324,7 +324,7 @@ const Settings = () => {
               }}
             >
               <LogOut size={18} color="#dc2626" strokeWidth={2} />
-              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>Sign Out</Text>
+              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Outfit_600SemiBold' }}>Sign Out</Text>
             </View>
           </TouchableOpacity>
         </Animated.View>

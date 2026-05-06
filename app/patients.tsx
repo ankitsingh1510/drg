@@ -25,12 +25,12 @@ export default function PatientsScreen() {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.type === 'navigate' && data.target === 'home') {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/home');
       } else if (data.type === 'navigate' && data.target === 'back') {
         if (router.canGoBack()) {
           router.back();
         } else {
-          router.replace('/(tabs)');
+          router.replace('/(tabs)/home');
         }
       }
     } catch (e) {

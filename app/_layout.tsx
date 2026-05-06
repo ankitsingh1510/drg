@@ -1,16 +1,10 @@
 import React, { useEffect } from 'react';
-import { LogBox, Platform, View } from 'react-native';
+import { LogBox, Platform, Text, View } from 'react-native';
 import * as Device from 'expo-device';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { useAtomValue } from 'jotai';
@@ -150,21 +144,6 @@ export default function RootLayout() {
     }
   }, [theme, colorScheme, setColorScheme]);
 
-  const [loaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-  });
-
-  // Don't return null while fonts are loading. Returning null prevents the
-  // root navigator from mounting which can cause navigation calls (from
-  // AuthContext) to error with "navigate before mounting". Render the
-  // layout immediately and allow fonts to apply once ready.
-  if (!loaded) {
-    console.log('Fonts not loaded yet — rendering layout to allow navigation to mount');
-  }
-
   return (
     <SafeAreaProvider>
       <AuthProvider>
@@ -190,7 +169,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -208,7 +187,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -227,7 +206,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -245,7 +224,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -263,7 +242,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}

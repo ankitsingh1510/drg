@@ -160,7 +160,7 @@ export default function ResetPasswordScreen() {
                 </View>
                 <Text
                   style={{
-                    fontFamily: 'Poppins_700Bold',
+                    fontFamily: 'Outfit_700Bold',
                     fontSize: 22,
                     color: isDark ? '#f9fafb' : '#111827',
                     marginBottom: 6,
@@ -170,7 +170,7 @@ export default function ResetPasswordScreen() {
                 </Text>
                 <Text
                   style={{
-                    fontFamily: 'Poppins_400Regular',
+                    fontFamily: 'Outfit_400Regular',
                     fontSize: 14,
                     color: isDark ? '#9ca3af' : '#6b7280',
                     textAlign: 'center',
@@ -282,9 +282,7 @@ export default function ResetPasswordScreen() {
                 {isSubmitting ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={{ color: '#fff', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>
-                    Update Password
-                  </Text>
+                  <Text style={{ color: '#fff', fontSize: 16, fontFamily: 'Outfit_600SemiBold' }}>Update Password</Text>
                 )}
               </TouchableOpacity>
             </View>
