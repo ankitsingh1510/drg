@@ -323,8 +323,10 @@ const Settings = () => {
                 borderColor: isDarkMode ? '#991b1b' : '#fecaca',
               }}
             >
-              <LogOut size={18} color="#dc2626" strokeWidth={2} />
-              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Outfit_600SemiBold' }}>Sign Out</Text>
+              <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />
+              <Text style={{ color: isDarkMode ? '#fff' : '#7f1d1d', fontSize: 16, fontFamily: 'Outfit_600SemiBold' }}>
+                Sign Out
+              </Text>
             </View>
           </TouchableOpacity>
         </Animated.View>

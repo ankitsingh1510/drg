@@ -74,13 +74,6 @@ export default function TipOfTheDay() {
     setRefreshKey(prev => prev + 1);
   }, [getRandomTip]);
 
-  // Dynamic tip on screen focus
-  useFocusEffect(
-    useCallback(() => {
-      handleNextTip();
-    }, [handleNextTip])
-  );
-
   return (
     <View
       className="mx-4 mb-4 rounded-2xl border p-4"
