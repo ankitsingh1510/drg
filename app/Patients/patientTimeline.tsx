@@ -6,15 +6,6 @@ import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
 
-
-
-
-
-
-
-
-
-
 // Shared data type
 export type BadgeType = 'LAB_REPORT' | 'IMAGING_REPORT' | 'GENOMIC_TESTING';
 
@@ -25,7 +16,7 @@ export interface TimelineEntry {
   title: string;
   provider: string;
   aiSummary: string;
-  isGold?: boolean;
+  itemColor?: string;
 }
 
 const dummyTimeline: TimelineEntry[] = [
@@ -37,7 +28,7 @@ const dummyTimeline: TimelineEntry[] = [
     provider: 'Dr. Vijay Solanki',
     aiSummary:
       '38-year-old Mumbai patient with locally advanced breast cancer; multiple genomic tests requested using liquid and tissue samples by Dr. Vijay Solanki.',
-    isGold: true,
+    itemColor: '#DAA520',
   },
   {
     id: '2',
@@ -47,7 +38,37 @@ const dummyTimeline: TimelineEntry[] = [
     provider: 'Dr. Vijay Solanki',
     aiSummary:
       '38-year-old Mumbai patient with locally advanced breast cancer; multiple genomic tests requested using liquid and tissue samples by Dr. Vijay Solanki.',
-    isGold: false,
+    itemColor: '#5C7AC6',
+  },
+  {
+    id: '3',
+    date: '03, APRIL 2026',
+    badgeType: 'IMAGING_REPORT',
+    title: 'PET REPORT',
+    provider: 'Dr. Vijay Solanki',
+    aiSummary:
+      '38-year-old Mumbai patient with locally advanced breast cancer; multiple genomic tests requested using liquid and tissue samples by Dr. Vijay Solanki.',
+    itemColor: '#5C7AC6',
+  },
+  {
+    id: '4',
+    date: '03, APRIL 2026',
+    badgeType: 'LAB_REPORT',
+    title: 'ICARE REPORT',
+    provider: 'Dr. Vijay Solanki',
+    aiSummary:
+      '38-year-old Mumbai patient with locally advanced breast cancer; multiple genomic tests requested using liquid and tissue samples by Dr. Vijay Solanki.',
+    itemColor: '#DAA520',
+  },
+  {
+    id: '5',
+    date: '03, APRIL 2026',
+    badgeType: 'IMAGING_REPORT',
+    title: 'PET REPORT',
+    provider: 'Dr. Vijay Solanki',
+    aiSummary:
+      '38-year-old Mumbai patient with locally advanced breast cancer; multiple genomic tests requested using liquid and tissue samples by Dr. Vijay Solanki.',
+    itemColor: '#5C7AC6',
   },
 ];
 
@@ -81,7 +102,10 @@ export default function PatientTimeline() {
           <ChevronLeft size={24} color={colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <AppText className="text-lg font-semibold text-gray-800 dark:text-white">Patient Timeline</AppText>
-        <TouchableOpacity className="h-8 w-8 items-center justify-center">
+        <TouchableOpacity
+          className="h-8 w-8 items-center justify-center"
+          onPress={() => router.push({ pathname: '/Patients/allReports', params: { patientId } })}
+        >
           <Copy size={20} color={colors.text} strokeWidth={2} />
         </TouchableOpacity>
       </View>
@@ -113,17 +137,16 @@ export default function PatientTimeline() {
         <View className="px-4">
           {dummyTimeline.map((item, index) => {
             const isLast = index === dummyTimeline.length - 1;
-            const itemColor = item.isGold ? colors.gold : colors.gray;
 
             return (
               <View key={item.id} className="flex-row">
                 {/* Left Spine */}
                 <View className="mt-0.5 w-8 items-center">
                   <View
-                    className="z-10 h-4 w-4 items-center justify-center rounded-full border-2"
-                    style={{ borderColor: itemColor, backgroundColor: itemColor + '30' }}
+                    className="z-10 h-6 w-6 items-center justify-center rounded-full border"
+                    style={{ borderColor: item.itemColor, backgroundColor: item.itemColor + '30' }}
                   >
-                    <View className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: itemColor }} />
+                    <View className="h-3 w-3 rounded-full" style={{ backgroundColor: item.itemColor }} />
                   </View>
                   {!isLast && (
                     <View className="mt-1 min-h-[40px] w-[2px] flex-1" style={{ backgroundColor: colors.border }} />
@@ -141,13 +164,13 @@ export default function PatientTimeline() {
 
                   <TouchableOpacity
                     className="overflow-hidden rounded-xl border bg-white dark:bg-[#0F2235]"
-                    style={{ borderColor: itemColor }}
+                    style={{ borderColor: item.itemColor }}
                     onPress={() => router.push({ pathname: '/Patients/eventDetails', params: { eventId: item.id } })}
                     activeOpacity={0.8}
                   >
                     <View className="flex-row items-center justify-between p-3.5">
                       <AppText className="flex-1 text-sm font-bold text-gray-800 dark:text-white">{item.title}</AppText>
-                      <ChevronRight size={20} color={itemColor} strokeWidth={2.2} />
+                      <ChevronRight size={20} color={item.itemColor} strokeWidth={2.2} />
                     </View>
 
                     <View className="flex-row items-center gap-2.5 bg-gray-50 p-3 dark:bg-[#1A3050]">
