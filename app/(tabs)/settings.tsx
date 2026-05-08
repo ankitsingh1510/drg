@@ -6,7 +6,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
@@ -43,8 +42,7 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      style={styles.card}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 dark:bg-gray-800"
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
@@ -218,7 +216,6 @@ const Settings = () => {
             true: colors.common.info,
           }}
           thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
-          style={{ alignSelf: 'center' }}
         />
       ),
     },
@@ -236,7 +233,6 @@ const Settings = () => {
             true: colors.common.success,
           }}
           thumbColor={pushNotificationsEnabled ? '#16a34a' : '#f3f4f6'}
-          style={{ alignSelf: 'center' }}
           ios_backgroundColor={colors.light.border}
         />
       ),
@@ -265,7 +261,7 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: -30 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="-mt-8 flex-1 bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         className="flex-1"
@@ -297,34 +293,19 @@ const Settings = () => {
               ])
             }
             activeOpacity={0.8}
-            style={{
-              marginHorizontal: 20,
-              marginBottom: 8,
-              borderRadius: 12,
-              overflow: 'hidden',
-              shadowColor: '#dc2626',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 6,
-              elevation: 3,
-            }}
+            className="mx-5 mb-2 overflow-hidden rounded-xl shadow-md"
           >
             <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 18,
-                marginTop: 10,
-                paddingVertical: 10,
-                backgroundColor: isDarkMode ? '#7f1d1d' : '#fee2e2',
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDarkMode ? '#991b1b' : '#fecaca',
-              }}
+              className={
+                `mt-2.5 flex-row items-center justify-center gap-4 rounded-xl border py-2.5 ` +
+                (isDarkMode ? 'border-red-900 bg-red-900' : 'border-red-200 bg-red-100')
+              }
             >
               <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />
-              <Text style={{ color: isDarkMode ? '#fff' : '#7f1d1d', fontSize: 16, fontFamily: 'Outfit_600SemiBold' }}>
+              <Text
+                className={isDarkMode ? 'text-base text-white' : 'text-base text-red-900'}
+                style={{ fontFamily: 'Outfit_600SemiBold' }}
+              >
                 Sign Out
               </Text>
             </View>
@@ -385,13 +366,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({
-  card: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-});

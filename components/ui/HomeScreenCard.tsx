@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
-import Animated, { FadeInRight, FadeInUp, FadeOutLeft } from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
