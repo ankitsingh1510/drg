@@ -94,7 +94,10 @@ export default function EventDetails() {
             <AppText className="text-sm font-semibold text-gray-800 dark:text-white">{item.fileName}</AppText>
             <AppText className="mt-0.5 text-xs text-[#6B7280]">{item.fileSubtitle}</AppText>
           </View>
-          <TouchableOpacity className="flex-row items-center gap-1.5 rounded-md border border-gray-400 px-3 py-1.5">
+          <TouchableOpacity
+            className="flex-row items-center gap-1.5 rounded-md border border-gray-400 px-3 py-1.5"
+            // onPress={() => router.push('/reports')} // Need to add report screen and its props
+          >
             <Eye size={14} color={colors.textSecondary} strokeWidth={2} />
             <AppText className="text-xs font-semibold text-gray-500 dark:text-[#8BA5C0]">View</AppText>
           </TouchableOpacity>

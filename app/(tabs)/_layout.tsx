@@ -90,7 +90,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="reports_list"
         options={{
           ...sharedHeaderOptions,
@@ -99,7 +99,7 @@ export default function TabLayout() {
             <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={23} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="scribe"
         options={{

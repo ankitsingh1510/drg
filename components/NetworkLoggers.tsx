@@ -19,7 +19,7 @@ const NetworkLoggers = () => {
         <Pressable
           onPress={openLogger}
           style={{
-            bottom: insets.bottom + 24,
+            bottom: insets.bottom + 100,
             right: 24,
           }}
           className="absolute z-50 rounded-full bg-red-600 px-4 py-2"
