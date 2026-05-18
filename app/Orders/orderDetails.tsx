@@ -5,6 +5,7 @@ import { ChevronLeft, FileText } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
+import { colors } from '@/constants/colors';
 
 type OrderStatus = 'PLACED' | 'ACCESSION' | 'RELEASED';
 
@@ -129,11 +130,24 @@ const getProgressWidth = (status: OrderStatus): `${number}%` => {
   }
 };
 
+const getProgressColor = (status: OrderStatus): string => {
+  switch (status) {
+    case 'PLACED':
+      return colors.common.primary;
+    case 'ACCESSION':
+      return colors.common.info;
+    case 'RELEASED':
+      return colors.common.success;
+    default:
+      return colors.common.primary;
+  }
+};
+
 const OrderDetailCard = ({ order, isDark }: { order: OrderDetail; isDark: boolean }) => {
   const isReleased = order.status === 'RELEASED';
 
   return (
-    <View className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#1A3050] dark:bg-[#0F2235]">
+    <View className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#374151] dark:bg-[#1f2937]">
       <AppText className="font-outfit-semibold text-base text-gray-900 dark:text-white">{order.testName}</AppText>
       <AppText className="mb-4 text-xs text-gray-500 dark:text-[#8BA5C0]">{order.sampleType}</AppText>
 
@@ -145,8 +159,8 @@ const OrderDetailCard = ({ order, isDark }: { order: OrderDetail; isDark: boolea
 
       <View className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
         <View
-          className="h-full rounded-full bg-[#1B2D4E] dark:bg-[#27AE60]"
-          style={{ width: getProgressWidth(order.status) }}
+          className="h-full rounded-full"
+          style={{ width: getProgressWidth(order.status), backgroundColor: getProgressColor(order.status) }}
         />
       </View>
 
@@ -158,11 +172,11 @@ const OrderDetailCard = ({ order, isDark }: { order: OrderDetail; isDark: boolea
 
       {isReleased && (
         <TouchableOpacity
-          className="ml-auto flex-row items-center gap-2 rounded-2xl bg-[#1B2D4E] px-5 py-3"
+          className="ml-auto flex-row items-center gap-2 rounded-2xl bg-[#1A365D] px-5 py-3"
           activeOpacity={0.8}
           onPress={() => {}}
         >
-          <FileText size={16} color="#FFFFFF" />
+          <FileText size={16} color="#ffffff" />
           <AppText className="text-sm text-white">View Report</AppText>
         </TouchableOpacity>
       )}
@@ -170,7 +184,7 @@ const OrderDetailCard = ({ order, isDark }: { order: OrderDetail; isDark: boolea
   );
 };
 
-export default function OrderList() {
+export default function OrderDetails() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const params = useLocalSearchParams<{ patientId: string; patientName: string; age: string; gender: string }>();
@@ -186,10 +200,10 @@ export default function OrderList() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#0B1929]">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#111827]">
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={isDark ? '#0B1929' : '#FDF5E6'}
+        backgroundColor={isDark ? '#111827' : '#FDF5E6'}
       />
 
       <View className="flex-row items-center justify-between px-4 py-3">
@@ -210,7 +224,7 @@ export default function OrderList() {
           </AppText>
         </View>
         <View className="items-end">
-          <AppText className="text-2xl dark:text-white">{String(orders.length).padStart(2, '0')}</AppText>
+          <AppText className="text-xl dark:text-white">{String(orders.length).padStart(2, '0')}</AppText>
           <AppText className="mt-0.5 text-sm dark:text-[#8BA5C0]">Clinical Tests Ordered</AppText>
         </View>
       </View>
