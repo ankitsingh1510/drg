@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Linking, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { MessagesSquare } from 'lucide-react-native';
@@ -76,7 +77,7 @@ export default function TabLayout() {
 
   useEffect(() => {
     scale.value = withRepeat(
-      withSequence(withTiming(1.2, { duration: 1000 }), withTiming(0.9, { duration: 1000 })),
+      withSequence(withTiming(1.1, { duration: 900 }), withTiming(0.9, { duration: 900 })),
       -1, // infinite
       true // reverse on repeat
     );
@@ -156,14 +157,15 @@ export default function TabLayout() {
       <LandingScreen />
       <Animated.View entering={FadeInDown.delay(1000).springify()} style={styles.chatBot}>
         <TouchableOpacity
-          style={styles.chatIcon}
+          // style={styles.chatIcon}
           activeOpacity={0.8}
           onPress={() => {
-            Linking.openURL('https://wa.me/919022137932');
+            Linking.openURL('https://wa.me/919022137932?text=I%20need%20help');
           }}
         >
           <Animated.View style={animatedStyle}>
-            <MessagesSquare size={28} color="white" />
+            {/* <MessagesSquare size={28} color="white" /> */}
+            <Image source={require('../../assets/wp.png')} style={{ width: 60, height: 60 }} contentFit="contain" />
           </Animated.View>
         </TouchableOpacity>
       </Animated.View>
@@ -182,7 +184,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.common.primary,
+    backgroundColor: colors.common.success,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

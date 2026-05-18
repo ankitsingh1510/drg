@@ -5,17 +5,18 @@ import {
   BackHandler,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
+  ScrollView,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
 import { colors } from '@/constants/colors';
@@ -31,11 +32,11 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaModal, setShowMfaModal] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setTargetLocation } = useAuth();
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const params = useLocalSearchParams();
 
   useEffect(() => {
@@ -67,10 +68,24 @@ export default function LoginScreen() {
   }, []);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
-      return;
+    let valid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError('Email ID is required');
+      valid = false;
+    } else if (!emailRegex.test(email.trim())) {
+      setEmailError('Please enter a valid email address');
+      valid = false;
+    } else {
+      setEmailError('');
     }
+    if (!password) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else {
+      setPasswordError('');
+    }
+    if (!valid) return;
 
     try {
       setIsLoading(true);
@@ -186,150 +201,129 @@ export default function LoginScreen() {
 
   if (isLoading) {
     return (
-      <View
-        className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900"
-        style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
-      >
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
         <ActivityIndicator size="large" color={colors.common.primary} />
-        <Text className="mt-4 text-lg font-outfit-medium text-slate-600 dark:text-gray-300">Securing Session...</Text>
+        <Text className="mt-4 font-outfit-medium text-lg text-slate-600 dark:text-gray-300">Securing Session...</Text>
       </View>
     );
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
+      <StatusBar barStyle="light-content" backgroundColor="#1E2D50" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
-          edges={['left', 'right', 'bottom']}
-        >
-          <View className="flex-1">
+        <SafeAreaView className="flex-1 bg-[#1E2D50]" edges={['top']}>
+          <View className="flex-1 bg-[#1E2D50]">
             {/* Top Hero Section */}
-            <View className="h-[40%] w-full overflow-hidden">
-              <ExpoImage
-                source={{
-                  uri: 'https://images.unsplash.com/photo-1614935151651-0dec300bb4bd?q=80&w=1000&auto=format&fit=crop',
-                }}
-                style={{ width: '100%', height: '100%' }}
-                contentFit="cover"
-                transition={500}
-              />
-              <View className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDF5E6] to-transparent dark:from-gray-900" />
-              <View className="absolute left-6 top-[25%]">
-                <Text className="text-4xl font-outfit-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
-                  Dr. G
-                </Text>
-                <Text className="mt-1 text-lg font-outfit-medium text-gray-600 shadow-lg shadow-md dark:text-gray-100">
-                  Intelligent Clinical Assistant
-                </Text>
-              </View>
+            <View className="px-7 pb-10 pt-9">
+              <Text className="mb-2 font-outfit-extrabold text-3xl text-white">Welcome to DrG</Text>
+              <Text className="font-outfit text-base leading-6 text-[#A8BFDF]">
+                Access patient reports &amp; clinical insights{'\n'}in one place
+              </Text>
             </View>
 
-            {/* Login Form Container */}
-            <View className="-mt-12 flex-1 rounded-t-[40px] bg-[#FDF5E6] px-8 pt-8 dark:bg-gray-900">
-              <View className="mb-8 items-center">
-                <View className="mb-4 h-20 w-20 overflow-hidden rounded-2xl bg-white p-2 shadow-sm dark:bg-gray-800">
-                  <ExpoImage
-                    source={require('@/assets/images/DrG-logo.png')}
-                    style={{ width: '100%', height: '100%' }}
-                    contentFit="contain"
-                  />
-                </View>
-                <Text className="text-3xl font-outfit-extrabold text-gray-900 dark:text-gray-100" numberOfLines={1}>
-                  Welcome Back
-                </Text>
-                <Text className="mt-1 text-base text-gray-500 dark:text-gray-400">
-                  Please enter your details to sign in
-                </Text>
+            {/* Login Form Card */}
+            <ScrollView
+              className="flex-1 rounded-t-3xl bg-white"
+              contentContainerClassName="px-6 pt-8 pb-10"
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Email Field */}
+              <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Email</Text>
+              <View
+                className={`rounded-xl border-[1.5px] bg-white ${emailError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+              >
+                <TextInput
+                  className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  placeholder="Enter your email id"
+                  placeholderTextColor="#9CA3AF"
+                  value={email}
+                  onChangeText={text => {
+                    setEmail(text);
+                    if (text) setEmailError('');
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
+              {emailError ? (
+                <Text className="mb-3 font-outfit text-xs text-red-500">{emailError}</Text>
+              ) : (
+                <View className="mb-4" />
+              )}
 
-              <View className="space-y-5">
-                {/* Email Input */}
-                <View className="flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
-                  <Ionicons
-                    name="mail-outline"
-                    size={20}
-                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      paddingVertical: 16,
-                      paddingHorizontal: 12,
-                      color: isDark ? 'white' : 'black',
-                    }}
-                    placeholder="Email Address"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-
-                {/* Password Input */}
-                <View className="mt-5 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      paddingVertical: 16,
-                      paddingHorizontal: 12,
-                      color: isDark ? 'white' : 'black',
-                    }}
-                    placeholder="Password"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(s => !s)}
-                    accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    <Ionicons
-                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                      size={22}
-                      color={isDark ? colors.dark.textTertiary : '#9CA3AF'}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Forgot Password Link */}
-                <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mt-4 items-end">
-                  <Text className="text-sm font-outfit-medium" style={{ color: colors.common.primary }}>
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Login Button */}
+              {/* Password Field */}
+              <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Password</Text>
+              <View
+                className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+              >
+                <TextInput
+                  className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  placeholder="Enter your password"
+                  placeholderTextColor="#9CA3AF"
+                  value={password}
+                  onChangeText={text => {
+                    setPassword(text);
+                    if (text) setPasswordError('');
+                  }}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
                 <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="mt-10 overflow-hidden rounded-2xl shadow-xl shadow-blue-500/30"
-                  onPress={handleLogin}
-                  disabled={isLoading}
+                  onPress={() => setShowPassword(s => !s)}
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                  className="px-3"
                 >
-                  <View className="items-center py-4" style={{ backgroundColor: colors.common.primary }}>
-                    <Text className="text-lg font-outfit-bold uppercase tracking-wider text-white">
-                      {isLoading ? 'Processing...' : 'Login Now'}
-                    </Text>
-                  </View>
+                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#9CA3AF" />
                 </TouchableOpacity>
-
-                {/* Footer Quote or Branding */}
-                <View className="mb-10 mt-auto items-center">
-                  <Text className="text-xs text-gray-400 dark:text-gray-600">
-                    Powered by 1Cell.Ai • Precision Genomics
-                  </Text>
-                </View>
               </View>
+              {passwordError ? (
+                <Text className="mb-2 font-outfit text-xs text-red-500">{passwordError}</Text>
+              ) : (
+                <View className="mb-2" />
+              )}
+
+              {/* Forgot Password */}
+              <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
+                <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
+
+              {/* Login Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={handleLogin}
+                disabled={isLoading}
+                className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
+              >
+                <Text className="font-outfit-bold text-base tracking-wide text-white">
+                  {isLoading ? 'Processing...' : 'Log In'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Contact Support */}
+              <View className="mb-6 items-center">
+                <Text className="font-outfit text-sm text-gray-500">
+                  Need help accessing your account?{' '}
+                  <Text
+                    className="font-outfit-semibold"
+                    style={{ color: colors.common.info }}
+                    onPress={() => Linking.openURL('mailto:support@1cell.ai')}
+                  >
+                    Contact Support
+                  </Text>
+                </Text>
+              </View>
+            </ScrollView>
+            {/* Footer */}
+            <View className="bg-white pb-10">
+              <Text className="text-center font-outfit text-xs text-gray-400">
+                Secure access for registered medical professionals only
+              </Text>
             </View>
           </View>
 

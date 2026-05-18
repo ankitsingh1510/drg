@@ -108,17 +108,17 @@ const StatusBadge = ({ status, isDark }: { status: OrderStatus; isDark: boolean 
 const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isDark: boolean }) => {
   return (
     <TouchableOpacity
-      className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#1A3050] dark:bg-[#0F2235]"
+      className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#374151] dark:bg-[#1f2937]"
       activeOpacity={0.8}
       onPress={() =>
         router.push({
-          pathname: '/Orders/orderList',
+          pathname: '/Orders/orderDetails',
           params: { patientId: patient.id, patientName: patient.patientName, age: patient.age, gender: patient.gender },
         })
       }
     >
       <View className="mb-1 flex-row items-center justify-between">
-        <AppText className="text-lg font-outfit-semibold text-gray-900 dark:text-white">{patient.patientName}</AppText>
+        <AppText className="font-outfit-semibold text-lg text-gray-900 dark:text-white">{patient.patientName}</AppText>
         <ChevronRight size={20} color={isDark ? '#8BA5C0' : '#9CA3AF'} />
       </View>
       <AppText className="mb-2 text-xs text-gray-500 dark:text-[#8BA5C0]">
@@ -128,7 +128,7 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
       <View className="flex-row flex-wrap gap-4">
         {patient.orders.map((order, idx) => (
           <View key={idx} className="min-w-[30%] items-center justify-center">
-            <AppText className="text-sm font-outfit-medium text-gray-700 dark:text-gray-300">{order.testName}</AppText>
+            <AppText className="font-outfit-medium text-sm text-gray-700 dark:text-gray-300">{order.testName}</AppText>
             <StatusBadge status={order.status} isDark={isDark} />
           </View>
         ))}
@@ -149,22 +149,22 @@ export default function AllOrders() {
   const filtered = patients.filter(p => p.patientName.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#0B1929]">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#111827]">
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
-        backgroundColor={isDark ? '#0B1929' : '#FDF5E6'}
+        backgroundColor={isDark ? '#111827' : '#FDF5E6'}
       />
 
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="text-xl font-outfit-semibold text-[#0F2D37] dark:text-white">Orders List</AppText>
+        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Orders List</AppText>
         <View className="w-8" />
       </View>
 
       <View className="mb-6 px-4">
-        <View className="h-12 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-[#1A3050] dark:bg-[#0F2235]">
+        <View className="h-12 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-[#374151] dark:bg-[#1f2937]">
           <Search size={20} color="#9CA3AF" style={{ marginRight: 8 }} />
           <TextInput
             className="flex-1 font-outfit text-sm text-gray-800 dark:text-white"

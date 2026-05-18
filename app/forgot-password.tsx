@@ -4,6 +4,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
@@ -12,7 +13,6 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { usersAPI } from '@/services/users';
@@ -22,8 +22,6 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const router = useRouter();
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -42,10 +40,6 @@ export default function ForgotPasswordScreen() {
       if (response) {
         setSubmitted(true);
         toast.success('Success', 'Password reset link has been sent to your email');
-        // Auto navigate after 2 seconds
-        // setTimeout(() => {
-        //   handleBackToLogin();
-        // }, 2000);
       } else {
         throw new Error('Failed to send reset link');
       }
@@ -63,168 +57,84 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
+      <StatusBar barStyle="light-content" backgroundColor="#1E2D50" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: isDark ? colors.dark.background : '#FDF5E6',
-          }}
-          edges={['left', 'right', 'bottom']}
-        >
-          <View className="flex-1">
-            {/* Header */}
-            <View className="flex-row items-center justify-between px-6 py-4">
-              <TouchableOpacity onPress={handleBackToLogin} className="rounded-full p-2">
-                <Ionicons name="arrow-back" size={24} color={isDark ? '#F3F4F6' : '#1F2937'} />
+        <SafeAreaView className="flex-1 bg-[#1E2D50]" edges={['top']}>
+          <View className="flex-1 bg-[#1E2D50]">
+            <View className="px-7 pb-10 pt-4">
+              <TouchableOpacity onPress={handleBackToLogin} className="mb-5 self-start rounded-full p-1">
+                <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
               </TouchableOpacity>
-              <Text
-                className="text-lg font-outfit-semibold"
-                style={{
-                  color: isDark ? '#F3F4F6' : '#1F2937',
-                }}
-              >
-                Reset Password
+              <Text className="mb-2 font-outfit-extrabold text-3xl text-white">
+                {submitted ? 'Check Your Email' : 'Reset Password'}
               </Text>
-              <View style={{ width: 40 }} />
+              <Text className="font-outfit text-base leading-6 text-[#A8BFDF]">
+                {submitted ? `We've sent a reset link to ${email}` : "Enter your email and we'll send you a reset link"}
+              </Text>
             </View>
 
-            {/* Content */}
-            <View className="flex-1 justify-center px-6 py-8">
+            <View className="flex-1 rounded-t-3xl bg-white px-6 pb-10 pt-8">
               {submitted ? (
-                // Success State
                 <View className="flex-1 items-center justify-center">
-                  <View
-                    className="mb-6 items-center justify-center rounded-full p-6"
-                    style={{ backgroundColor: colors.common.primary + '20' }}
-                  >
-                    <Ionicons name="checkmark-circle" size={64} color={colors.common.primary} />
+                  <View className="mb-6 items-center justify-center rounded-full bg-[#1E2D50]/10 p-6">
+                    <Ionicons name="checkmark-circle" size={64} color="#1E2D50" />
                   </View>
-                  <Text
-                    className="text-center text-2xl font-outfit-bold"
-                    style={{
-                      color: isDark ? '#F3F4F6' : '#1F2937',
-                    }}
-                  >
-                    Check Your Email
-                  </Text>
-                  <Text
-                    className="mt-4 text-center text-base leading-6"
-                    style={{
-                      color: isDark ? '#D1D5DB' : '#6B7280',
-                    }}
-                  >
-                    We've sent a password reset link to{'\n'}
-                    <Text className="font-outfit-semibold">{email}</Text>
-                  </Text>
-                  <Text
-                    className="mt-6 text-center text-sm leading-6"
-                    style={{
-                      color: isDark ? '#D1D5DB' : '#6B7280',
-                    }}
-                  >
+
+                  <Text className="mb-3 font-outfit-bold text-2xl text-gray-900">Email Sent!</Text>
+                  <Text className="mb-1 text-center font-outfit text-sm leading-6 text-gray-500">
                     Click the link in the email to reset your password.
                   </Text>
-                  <Text
-                    className="mt-6 text-center text-xs"
-                    style={{
-                      color: isDark ? '#9CA3AF' : '#9CA3AF',
-                    }}
-                  >
-                    If you don't see the email, check your spam or junk folder.
+                  <Text className="mb-10 text-center font-outfit text-xs text-gray-400">
+                    If you don't see it, check your spam or junk folder.
                   </Text>
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={handleBackToLogin}
+                    className="w-full items-center rounded-xl bg-[#1E2D50] py-4"
+                  >
+                    <Text className="font-outfit-bold text-base tracking-wide text-white">Back to Log In</Text>
+                  </TouchableOpacity>
                 </View>
               ) : (
-                // Input State
                 <View>
-                  <View className="mb-8 items-center">
-                    <View
-                      className="mb-4 items-center justify-center rounded-full p-4"
-                      style={{ backgroundColor: colors.common.primary + '15' }}
-                    >
-                      <Ionicons name="key-outline" size={40} color={colors.common.primary} />
-                    </View>
-                    <Text
-                      className="text-center text-2xl font-outfit-bold"
-                      style={{
-                        color: isDark ? '#F3F4F6' : '#1F2937',
-                      }}
-                    >
-                      Password Reset
-                    </Text>
-                    <Text
-                      className="mt-3 text-center text-base"
-                      style={{
-                        color: isDark ? '#D1D5DB' : '#6B7280',
-                      }}
-                    >
-                      Enter your email address and we'll send you a link to reset your password.
-                    </Text>
+                  <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Email Address</Text>
+                  <View className="mb-1 rounded-xl border-[1.5px] border-gray-200 bg-white">
+                    <TextInput
+                      className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                      placeholder="Enter your email id"
+                      placeholderTextColor="#9CA3AF"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!isLoading}
+                      autoFocus
+                    />
                   </View>
+                  <View className="mb-8" />
 
-                  {/* Email Input */}
-                  <View className="relative mb-8 mt-8">
-                    <Text
-                      className="mb-2 text-sm font-outfit-medium"
-                      style={{
-                        color: isDark ? '#F3F4F6' : '#1F2937',
-                      }}
-                    >
-                      Email Address
-                    </Text>
-                    <View className="flex-row items-center rounded-xl border border-gray-200 bg-white px-4 dark:border-gray-600 dark:bg-gray-700">
-                      <Ionicons name="mail-outline" size={20} color={isDark ? '#9CA3AF' : '#9CA3AF'} />
-                      <TextInput
-                        style={{
-                          flex: 1,
-                          paddingVertical: 12,
-                          paddingHorizontal: 12,
-                          color: isDark ? 'white' : 'black',
-                        }}
-                        placeholder="your.email@example.com"
-                        placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        editable={!isLoading}
-                        autoFocus
-                      />
-                    </View>
-                  </View>
-
-                  {/* Send Button */}
                   <TouchableOpacity
-                    activeOpacity={0.8}
+                    activeOpacity={0.85}
                     onPress={handleSendResetLink}
                     disabled={isLoading || !isValidEmail}
-                    className={`overflow-hidden rounded-xl py-4 ${isLoading || !isValidEmail ? 'opacity-60' : ''}`}
-                    style={{
-                      backgroundColor: colors.common.primary,
-                    }}
+                    className={`mb-4 items-center rounded-xl bg-[#1E2D50] py-4 ${isLoading || !isValidEmail ? 'opacity-50' : ''}`}
                   >
-                    <View className="flex-row items-center justify-center">
-                      {isLoading ? (
-                        <>
-                          <ActivityIndicator size="small" color="#FFFFFF" />
-                          <Text className="ml-2 text-center font-outfit-semibold text-white">Sending...</Text>
-                        </>
-                      ) : (
-                        <Text className="text-center font-outfit-semibold text-white">Send Reset Link</Text>
-                      )}
-                    </View>
+                    {isLoading ? (
+                      <View className="flex-row items-center">
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                        <Text className="ml-2 font-outfit-bold text-base tracking-wide text-white">Sending...</Text>
+                      </View>
+                    ) : (
+                      <Text className="font-outfit-bold text-base tracking-wide text-white">{'Send ResetLink'}</Text>
+                    )}
                   </TouchableOpacity>
 
-                  {/* Back to Login */}
-                  <TouchableOpacity onPress={handleBackToLogin} className="mt-4">
-                    <Text
-                      className="text-center text-sm font-outfit-medium"
-                      style={{
-                        color: colors.common.primary,
-                      }}
-                    >
-                      Back to Login
+                  <TouchableOpacity onPress={handleBackToLogin} className="items-center py-2">
+                    <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                      Back to Log In
                     </Text>
                   </TouchableOpacity>
                 </View>
