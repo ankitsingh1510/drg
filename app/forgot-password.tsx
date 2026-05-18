@@ -79,7 +79,7 @@ export default function ForgotPasswordScreen() {
                 <Ionicons name="arrow-back" size={24} color={isDark ? '#F3F4F6' : '#1F2937'} />
               </TouchableOpacity>
               <Text
-                className="text-lg font-semibold"
+                className="text-lg font-outfit-semibold"
                 style={{
                   color: isDark ? '#F3F4F6' : '#1F2937',
                 }}
@@ -101,7 +101,7 @@ export default function ForgotPasswordScreen() {
                     <Ionicons name="checkmark-circle" size={64} color={colors.common.primary} />
                   </View>
                   <Text
-                    className="text-center text-2xl font-bold"
+                    className="text-center text-2xl font-outfit-bold"
                     style={{
                       color: isDark ? '#F3F4F6' : '#1F2937',
                     }}
@@ -115,7 +115,7 @@ export default function ForgotPasswordScreen() {
                     }}
                   >
                     We've sent a password reset link to{'\n'}
-                    <Text className="font-semibold">{email}</Text>
+                    <Text className="font-outfit-semibold">{email}</Text>
                   </Text>
                   <Text
                     className="mt-6 text-center text-sm leading-6"
@@ -145,7 +145,7 @@ export default function ForgotPasswordScreen() {
                       <Ionicons name="key-outline" size={40} color={colors.common.primary} />
                     </View>
                     <Text
-                      className="text-center text-2xl font-bold"
+                      className="text-center text-2xl font-outfit-bold"
                       style={{
                         color: isDark ? '#F3F4F6' : '#1F2937',
                       }}
@@ -165,7 +165,7 @@ export default function ForgotPasswordScreen() {
                   {/* Email Input */}
                   <View className="relative mb-8 mt-8">
                     <Text
-                      className="mb-2 text-sm font-medium"
+                      className="mb-2 text-sm font-outfit-medium"
                       style={{
                         color: isDark ? '#F3F4F6' : '#1F2937',
                       }}
@@ -208,10 +208,10 @@ export default function ForgotPasswordScreen() {
                       {isLoading ? (
                         <>
                           <ActivityIndicator size="small" color="#FFFFFF" />
-                          <Text className="ml-2 text-center font-semibold text-white">Sending...</Text>
+                          <Text className="ml-2 text-center font-outfit-semibold text-white">Sending...</Text>
                         </>
                       ) : (
-                        <Text className="text-center font-semibold text-white">Send Reset Link</Text>
+                        <Text className="text-center font-outfit-semibold text-white">Send Reset Link</Text>
                       )}
                     </View>
                   </TouchableOpacity>
@@ -219,7 +219,7 @@ export default function ForgotPasswordScreen() {
                   {/* Back to Login */}
                   <TouchableOpacity onPress={handleBackToLogin} className="mt-4">
                     <Text
-                      className="text-center text-sm font-medium"
+                      className="text-center text-sm font-outfit-medium"
                       style={{
                         color: colors.common.primary,
                       }}

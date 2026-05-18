@@ -50,18 +50,18 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
           />
           {/* Rank Badge */}
           <View className="absolute left-4 top-4 h-8 w-8 items-center justify-center rounded-full bg-blue-500/90 shadow-sm">
-            <Text className="text-sm font-bold text-white">{index + 1}</Text>
+            <Text className="text-sm font-outfit-bold text-white">{index + 1}</Text>
           </View>
         </View>
 
         <View className="p-5">
           <View className="mb-2">
-            <Text className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+            <Text className="text-[10px] font-outfit-medium text-gray-400 dark:text-gray-500">
               {item.pubDate || 'Just now'}
             </Text>
           </View>
 
-          <Text numberOfLines={2} className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <Text numberOfLines={2} className="mb-2 text-xl font-outfit-bold tracking-tight text-gray-900 dark:text-gray-100">
             {item.title}
           </Text>
 
@@ -70,7 +70,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
           </Text>
 
           <View className="mt-4 flex-row items-center border-t border-gray-100 pt-4 dark:border-gray-700/50">
-            <Text className="text-xs font-semibold text-blue-500 dark:text-blue-400">Read full article</Text>
+            <Text className="text-xs font-outfit-semibold text-blue-500 dark:text-blue-400">Read full article</Text>
             <View className="ml-2 h-1 w-1 rounded-full bg-blue-200 dark:bg-blue-800" />
           </View>
         </View>

@@ -214,7 +214,7 @@ export default function ScribeScreen() {
             <TextInput
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="ml-2 flex-1 text-base font-medium text-gray-800 dark:text-gray-100"
+              className="ml-2 flex-1 text-base font-outfit-medium text-gray-800 dark:text-gray-100"
               placeholder="Search sessions, patients, phone…"
               placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
               style={{
@@ -228,7 +228,7 @@ export default function ScribeScreen() {
           </View>
         </View>
         <View className="mt-2 flex-row items-center justify-between px-1">
-          <Text className="text-xs font-bold uppercase tracking-widest text-gray-400">
+          <Text className="text-xs font-outfit-bold uppercase tracking-widest text-gray-400">
             {filteredSessions.length} Total Sessions
           </Text>
         </View>
@@ -263,19 +263,19 @@ export default function ScribeScreen() {
                 <View className="flex-1">
                   <View className="flex-row items-center gap-2">
                     <User size={16} color="#daa521" />
-                    <Text className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    <Text className="text-xl font-outfit-bold tracking-tight text-gray-900 dark:text-white">
                       {item.patientName || 'Untitled Session'}
                     </Text>
                   </View>
                   <View className="mt-3 flex-row items-center gap-2">
                     <Phone size={14} color="#9ca3af" />
-                    <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <Text className="text-sm font-outfit-medium text-gray-500 dark:text-gray-400">
                       {item.phoneNumber || 'No phone'}
                     </Text>
                   </View>
                   <View className="mt-4 flex-row items-center gap-2 rounded-xl bg-gray-50 px-3 py-1.5 dark:bg-gray-900/50">
                     <Calendar size={12} color="#9ca3af" />
-                    <Text className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
+                    <Text className="text-[11px] font-outfit-bold uppercase tracking-widest text-gray-400">
                       {new Date(item.timestamp).toLocaleDateString()} at{' '}
                       {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
@@ -290,7 +290,7 @@ export default function ScribeScreen() {
           ListEmptyComponent={
             <View className="mt-20 items-center justify-center">
               <Mic size={48} color="#9ca3af" strokeWidth={1} />
-              <Text className="mt-4 font-medium text-gray-400">No sessions found</Text>
+              <Text className="mt-4 font-outfit-medium text-gray-400">No sessions found</Text>
             </View>
           }
           showsVerticalScrollIndicator={false}
@@ -304,7 +304,7 @@ export default function ScribeScreen() {
           className="flex-row items-center justify-center rounded-full bg-[#daa521] px-10 py-5 shadow-lg shadow-[#daa521]/30 active:scale-95 active:opacity-90"
         >
           <Mic size={24} color="white" />
-          <Text className="ml-3 text-xl font-bold text-white">New Scribe</Text>
+          <Text className="ml-3 text-xl font-outfit-bold text-white">New Scribe</Text>
         </Pressable>
       </View>
 
@@ -323,7 +323,7 @@ export default function ScribeScreen() {
               style={{ paddingTop: Math.max(insets.top, 60) }}
               className="flex-row items-center justify-between bg-white/30 px-6 pb-6 dark:bg-gray-800/30"
             >
-              <Text className="text-2xl font-bold text-gray-900 dark:text-white">New Session</Text>
+              <Text className="text-2xl font-outfit-bold text-gray-900 dark:text-white">New Session</Text>
               {!showDashboard && (
                 <Pressable
                   onPress={() => setModalVisible(false)}
@@ -340,7 +340,7 @@ export default function ScribeScreen() {
                   {!showDashboard ? (
                     <View className="space-y-6">
                       <View>
-                        <Text className="mb-2 ml-1 text-sm font-bold uppercase tracking-widest text-gray-400">
+                        <Text className="mb-2 ml-1 text-sm font-outfit-bold uppercase tracking-widest text-gray-400">
                           Patient Name
                         </Text>
                         <View className="h-16 flex-row items-center rounded-[24px] border border-gray-200 bg-white px-5 dark:border-gray-700 dark:bg-gray-800">
@@ -365,7 +365,7 @@ export default function ScribeScreen() {
                       </View>
 
                       <View className="mt-4">
-                        <Text className="mb-2 ml-1 text-sm font-bold uppercase tracking-widest text-gray-400">
+                        <Text className="mb-2 ml-1 text-sm font-outfit-bold uppercase tracking-widest text-gray-400">
                           Phone Number
                         </Text>
                         <View className="h-16 flex-row items-center rounded-[24px] border border-gray-200 bg-white px-5 dark:border-gray-700 dark:bg-gray-800">
@@ -400,7 +400,7 @@ export default function ScribeScreen() {
                           >
                             {hasConsented && <Check size={18} color="white" />}
                           </View>
-                          <Text className="ml-3 text-base font-semibold text-gray-700 dark:text-gray-300">
+                          <Text className="ml-3 text-base font-outfit-semibold text-gray-700 dark:text-gray-300">
                             User has consented recording
                           </Text>
                         </Pressable>
@@ -424,7 +424,7 @@ export default function ScribeScreen() {
                           className={`h-16 w-full flex-row items-center justify-center rounded-full py-5 active:scale-95 ${hasConsented ? 'bg-[#daa521]' : 'bg-gray-300 dark:bg-gray-700'}`}
                         >
                           <Mic size={24} color="white" />
-                          <Text className="ml-3 text-xl font-bold text-white">Start Recording</Text>
+                          <Text className="ml-3 text-xl font-outfit-bold text-white">Start Recording</Text>
                         </Pressable>
                       </View>
                     </View>
@@ -443,7 +443,7 @@ export default function ScribeScreen() {
                         </Animated.View>
                       </View>
 
-                      <Text className="text-3xl font-bold text-gray-900 dark:text-white">
+                      <Text className="text-3xl font-outfit-bold text-gray-900 dark:text-white">
                         {isPaused ? 'Recording Paused' : isTransitional ? 'Processing...' : 'Recording...'}
                       </Text>
                       <Text className="mt-2 text-lg text-gray-500 dark:text-gray-400">
@@ -460,12 +460,12 @@ export default function ScribeScreen() {
                             {isPaused ? (
                               <>
                                 <Mic size={20} color="white" />
-                                <Text className="ml-2 text-lg font-bold text-white">Resume Recording</Text>
+                                <Text className="ml-2 text-lg font-outfit-bold text-white">Resume Recording</Text>
                               </>
                             ) : (
                               <>
                                 <Pause size={20} color="#6b7280" />
-                                <Text className="ml-2 text-lg font-bold text-gray-600 dark:text-gray-300">
+                                <Text className="ml-2 text-lg font-outfit-bold text-gray-600 dark:text-gray-300">
                                   Pause Recording
                                 </Text>
                               </>
@@ -480,7 +480,7 @@ export default function ScribeScreen() {
                             className="h-16 flex-row items-center justify-center rounded-full bg-red-500 active:opacity-80"
                           >
                             <Square size={20} color="white" />
-                            <Text className="ml-2 text-lg font-bold text-white">Stop and Save</Text>
+                            <Text className="ml-2 text-lg font-outfit-bold text-white">Stop and Save</Text>
                           </Pressable>
                         </View>
                       </View>

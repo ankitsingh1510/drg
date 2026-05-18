@@ -49,7 +49,7 @@ export default function TestsScreen() {
         className="mb-4 flex-row items-center justify-between px-5"
       >
         <View className="flex-1">
-          <Text className="text-2xl font-bold text-slate-900 dark:text-gray-100">Tests</Text>
+          <Text className="text-2xl font-outfit-bold text-slate-900 dark:text-gray-100">Tests</Text>
         </View>
         <IconNavBar />
       </Animated.View> */}
@@ -59,16 +59,16 @@ export default function TestsScreen() {
           <View className="flex-row items-center justify-between px-5 py-6">
             <View className="flex-1">
               <View className="mb-2 items-center justify-center self-start rounded-full border border-white/30 bg-white/20 px-5 py-1">
-                <Text className="text-xs font-semibold text-white">AI-POWERED</Text>
+                <Text className="text-xs font-outfit-semibold text-white">AI-POWERED</Text>
               </View>
-              <Text className="text-xl font-bold text-white">Find the Right Test</Text>
+              <Text className="text-xl font-outfit-bold text-white">Find the Right Test</Text>
               <Text className="text-m mb-1 mb-4 text-white">Get AI-based test recommendations.</Text>
               <TouchableOpacity
                 className="flex-row items-center gap-1 self-start rounded-xl bg-white px-6 py-3"
                 onPress={() => setWizardVisible(true)}
               >
                 <Ionicons name="sparkles" size={18} color="#2958C2" />
-                <Text className="px-1 font-bold" style={{ color: '#2958C2' }}>
+                <Text className="px-1 font-outfit-bold" style={{ color: '#2958C2' }}>
                   Test Suggestion Wizard
                 </Text>
               </TouchableOpacity>
@@ -86,7 +86,7 @@ export default function TestsScreen() {
 
       {/* Browse Tests */}
       <View className="mb-3 px-4">
-        <Text className="text-sm font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+        <Text className="text-sm font-outfit-bold uppercase tracking-wider text-gray-600 dark:text-gray-400">
           BROWSE DIAGNOSTIC TESTS
         </Text>
       </View>

@@ -104,7 +104,7 @@ export default function AllReports() {
         <TouchableOpacity className="h-8 w-8 justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={localColors.text} strokeWidth={2} />
         </TouchableOpacity>
-        <AppText className="text-lg font-semibold text-gray-800 dark:text-white">Patient Reports</AppText>
+        <AppText className="text-lg font-outfit-semibold text-gray-800 dark:text-white">Patient Reports</AppText>
         <View className="h-8 w-8" />
       </View>
 
@@ -113,7 +113,7 @@ export default function AllReports() {
           <View key={cat.id} className="mb-6 px-4">
             <View className="mb-3 flex-row items-center gap-2">
               <FileText size={16} color={cat.color} strokeWidth={1.8} />
-              <AppText className="text-base font-semibold" style={{ color: cat.color }}>
+              <AppText className="text-base font-outfit-semibold" style={{ color: cat.color }}>
                 {cat.category}
               </AppText>
             </View>

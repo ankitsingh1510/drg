@@ -16,16 +16,16 @@ export default function ProfileHeader({ firstName, lastName, organizationName }:
       className="justify-left mb-8 mt-2 flex-row items-center gap-6 rounded-3xl bg-white p-7 dark:bg-gray-800"
     >
       <View className="h-16 w-16 items-center justify-center rounded-full bg-blue-500 shadow-sm shadow-blue-400">
-        <Text className="text-2xl font-bold tracking-tighter text-white">
+        <Text className="text-2xl font-outfit-bold tracking-tighter text-white">
           {firstInitial}
           {lastInitial}
         </Text>
       </View>
       <View className="flex-1">
-        <Text className="text-2xl font-bold tracking-tight text-gray-800 dark:text-gray-100" numberOfLines={1}>
+        <Text className="text-2xl font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100" numberOfLines={1}>
           {firstName} {lastName}
         </Text>
-        <Text className="text-base font-medium text-gray-500 dark:text-gray-400">
+        <Text className="text-base font-outfit-medium text-gray-500 dark:text-gray-400">
           {organizationName || 'User Account'}
         </Text>
       </View>

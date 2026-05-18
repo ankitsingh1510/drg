@@ -290,7 +290,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
       <View key={question.id} className="mb-6">
         {/* Question Title */}
         <View className="mb-3 flex-row items-start justify-between">
-          <Text className="flex-1 text-base font-semibold text-slate-900 dark:text-gray-100">{question.title}</Text>
+          <Text className="flex-1 text-base font-outfit-semibold text-slate-900 dark:text-gray-100">{question.title}</Text>
           {question.subtitle && (
             <Text className="ml-2 text-sm text-blue-500 dark:text-blue-400">{question.subtitle}</Text>
           )}
@@ -366,7 +366,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   activeOpacity={0.7}
                 >
                   <Text
-                    className={`text-sm font-medium ${
+                    className={`text-sm font-outfit-medium ${
                       isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'
                     }`}
                   >
@@ -393,7 +393,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
             >
               <Ionicons name="chevron-back" size={24} color={isDark ? '#fff' : '#000'} />
             </TouchableOpacity>
-            <Text className="flex-1 text-center text-xl font-bold text-slate-900 dark:text-gray-100">Order Wizard</Text>
+            <Text className="flex-1 text-center text-xl font-outfit-bold text-slate-900 dark:text-gray-100">Order Wizard</Text>
 
             <TouchableOpacity
               onPress={handleClose}
@@ -414,7 +414,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   }}
                 />
               </View>
-              <Text className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              <Text className="text-sm font-outfit-semibold text-gray-600 dark:text-gray-400">
                 {answeredQuestions} / {totalQuestions}
               </Text>
             </View>
@@ -430,7 +430,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
           <View className="flex-1 items-center justify-center px-8">
             <Text className="mb-4 text-center text-base text-red-600 dark:text-red-400">{error}</Text>
             <TouchableOpacity onPress={() => setError(null)} className="rounded-lg bg-blue-500 px-6 py-3">
-              <Text className="font-semibold text-white">Try Again</Text>
+              <Text className="font-outfit-semibold text-white">Try Again</Text>
             </TouchableOpacity>
           </View>
         ) : result ? (
@@ -445,7 +445,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
             <ScrollView className="flex-1 px-3" showsVerticalScrollIndicator={false}>
               <View className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-800">
                 <View className="mb-3 flex-row items-center justify-between">
-                  <Text className="text-s font-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
+                  <Text className="text-s font-outfit-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
                     Upload Records
                   </Text>
                   <Text className="text-sm text-blue-600 dark:text-blue-400">upload files</Text>
@@ -465,12 +465,12 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   {uploading ? (
                     <View className="items-center">
                       <ActivityIndicator size="large" color={'#2563eb'} className="mb-3" />
-                      <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">Processing...</Text>
+                      <Text className="text-base font-outfit-semibold text-gray-700 dark:text-gray-300">Processing...</Text>
                     </View>
                   ) : uploadedFileName ? (
                     <View className="items-center px-4">
                       <Ionicons name="checkmark-circle" size={48} color="#10b981" className="mb-3" />
-                      <Text className="text-center text-base font-semibold text-gray-700 dark:text-gray-300">
+                      <Text className="text-center text-base font-outfit-semibold text-gray-700 dark:text-gray-300">
                         Uploaded: {uploadedFileName}
                       </Text>
                       <Text className="mt-2 text-sm text-gray-500 dark:text-gray-400">Tap to upload another</Text>
@@ -478,7 +478,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   ) : (
                     <View className="items-center">
                       <Ionicons name="cloud-upload-outline" size={64} color={isDark ? '#9ca3af' : '#6b7280'} />
-                      <Text className="mt-4 text-lg font-semibold text-gray-700 dark:text-gray-300">
+                      <Text className="mt-4 text-lg font-outfit-semibold text-gray-700 dark:text-gray-300">
                         Tap to upload documents
                       </Text>
                       <Text className="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -491,7 +491,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
 
               <View className="my-4 flex-row items-center">
                 <View className="h-[1px] flex-1 bg-gray-300 dark:bg-gray-600" />
-                <Text className="mx-4 text-sm font-semibold text-gray-500 dark:text-gray-400">OR</Text>
+                <Text className="mx-4 text-sm font-outfit-semibold text-gray-500 dark:text-gray-400">OR</Text>
                 <View className="h-[1px] flex-1 bg-gray-300 dark:bg-gray-600" />
               </View>
 
@@ -502,7 +502,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                     className="mb-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800"
                   >
                     {/* Section Header */}
-                    <Text className="text-s mb-4 font-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
+                    <Text className="text-s mb-4 font-outfit-bold uppercase tracking-wide text-gray-700 dark:text-gray-500">
                       {sectionName}
                     </Text>
 
@@ -521,7 +521,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   className="flex-[4] justify-center rounded-xl border-2 border-gray-300 bg-white py-3.5 dark:border-gray-600 dark:bg-gray-700"
                   activeOpacity={0.7}
                 >
-                  <Text className="text-center text-base font-semibold text-gray-700 dark:text-gray-200">
+                  <Text className="text-center text-base font-outfit-semibold text-gray-700 dark:text-gray-200">
                     Clear All
                   </Text>
                 </TouchableOpacity>
@@ -536,7 +536,7 @@ export default function OrderWizard({ visible, onClose }: OrderWizardProps) {
                   disabled={uploading}
                 >
                   <Ionicons name="sparkles" size={20} color="#fff" style={{ marginRight: 8 }} />
-                  <Text className={`text-base font-semibold text-white`}>Get Suggestions</Text>
+                  <Text className={`text-base font-outfit-semibold text-white`}>Get Suggestions</Text>
                 </TouchableOpacity>
               </View>
             </View>

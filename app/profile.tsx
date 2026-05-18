@@ -289,7 +289,7 @@ const Profile = () => {
         <View style={{ backgroundColor: lightBg }} className="h-10 w-10 items-center justify-center rounded-2xl">
           {icon}
         </View>
-        <Text className="flex-1 text-lg font-bold tracking-tight text-gray-800 dark:text-gray-100">{sectionName}</Text>
+        <Text className="flex-1 text-lg font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100">{sectionName}</Text>
       </View>
     );
   };
@@ -347,7 +347,7 @@ const Profile = () => {
             >
               <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
             </Pressable>
-            <Text className="text-xl font-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
+            <Text className="text-xl font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
           </View>
           <IconNavBar />
         </View> */}

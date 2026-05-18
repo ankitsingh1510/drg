@@ -85,7 +85,7 @@ export default function PatientList() {
         </View>
         <AppText className="mb-1 text-sm text-blue-500">{p.test}</AppText>
 
-        <AppText className="text-base font-semibold text-gray-500 dark:text-[#8BA5C0]">Ai Summary</AppText>
+        <AppText className="text-base font-outfit-semibold text-gray-500 dark:text-[#8BA5C0]">Ai Summary</AppText>
         <AppText className="text-sm text-[#1E3A5F] dark:text-gray-200" numberOfLines={2}>
           {p.ai_summary}
         </AppText>

@@ -191,7 +191,7 @@ export default function LoginScreen() {
         style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
       >
         <ActivityIndicator size="large" color={colors.common.primary} />
-        <Text className="mt-4 text-lg font-medium text-slate-600 dark:text-gray-300">Securing Session...</Text>
+        <Text className="mt-4 text-lg font-outfit-medium text-slate-600 dark:text-gray-300">Securing Session...</Text>
       </View>
     );
   }
@@ -216,10 +216,10 @@ export default function LoginScreen() {
               />
               <View className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDF5E6] to-transparent dark:from-gray-900" />
               <View className="absolute left-6 top-[25%]">
-                <Text className="text-4xl font-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
+                <Text className="text-4xl font-outfit-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
                   Dr. G
                 </Text>
-                <Text className="mt-1 text-lg font-medium text-gray-600 shadow-lg shadow-md dark:text-gray-100">
+                <Text className="mt-1 text-lg font-outfit-medium text-gray-600 shadow-lg shadow-md dark:text-gray-100">
                   Intelligent Clinical Assistant
                 </Text>
               </View>
@@ -235,7 +235,7 @@ export default function LoginScreen() {
                     contentFit="contain"
                   />
                 </View>
-                <Text className="text-3xl font-extrabold text-gray-900 dark:text-gray-100" numberOfLines={1}>
+                <Text className="text-3xl font-outfit-extrabold text-gray-900 dark:text-gray-100" numberOfLines={1}>
                   Welcome Back
                 </Text>
                 <Text className="mt-1 text-base text-gray-500 dark:text-gray-400">
@@ -304,7 +304,7 @@ export default function LoginScreen() {
 
                 {/* Forgot Password Link */}
                 <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mt-4 items-end">
-                  <Text className="text-sm font-medium" style={{ color: colors.common.primary }}>
+                  <Text className="text-sm font-outfit-medium" style={{ color: colors.common.primary }}>
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
@@ -317,7 +317,7 @@ export default function LoginScreen() {
                   disabled={isLoading}
                 >
                   <View className="items-center py-4" style={{ backgroundColor: colors.common.primary }}>
-                    <Text className="text-lg font-bold uppercase tracking-wider text-white">
+                    <Text className="text-lg font-outfit-bold uppercase tracking-wider text-white">
                       {isLoading ? 'Processing...' : 'Login Now'}
                     </Text>
                   </View>

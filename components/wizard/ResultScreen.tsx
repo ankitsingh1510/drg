@@ -109,15 +109,15 @@ export function ResultScreen({ suggestedTests, answeredQuestionsCount, onClose, 
           <View className="mr-3 h-6 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
             <Ionicons name="checkmark-circle-outline" size={20} color="#10b981" />
           </View>
-          <Text className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Based on analysis of <Text className="font-bold">{answeredQuestionsCount} clinical parameters.</Text>
+          <Text className="flex-1 text-sm font-outfit-medium text-gray-700 dark:text-gray-300">
+            Based on analysis of <Text className="font-outfit-bold">{answeredQuestionsCount} clinical parameters.</Text>
           </Text>
         </View>
 
         {/* Recommendations Header */}
         <View className="mb-4 flex-row items-center">
           <Ionicons name="sparkles" size={22} color="#eab308" style={{ marginRight: 8 }} />
-          <Text className="text-sm font-bold uppercase tracking-widest text-yellow-600 dark:text-yellow-500">
+          <Text className="text-sm font-outfit-bold uppercase tracking-widest text-yellow-600 dark:text-yellow-500">
             Recommendations
           </Text>
         </View>
@@ -140,23 +140,23 @@ export function ResultScreen({ suggestedTests, answeredQuestionsCount, onClose, 
                     <View className="flex-row items-center justify-between">
                       {test.testVariant ? (
                         <View className="rounded-full bg-white/90 px-3 py-1">
-                          <Text className="text-xs font-bold text-blue-600">{test.testVariant}</Text>
+                          <Text className="text-xs font-outfit-bold text-blue-600">{test.testVariant}</Text>
                         </View>
                       ) : (
                         <View className="rounded-full bg-white/20 px-3 py-1">
-                          <Text className="text-xs font-bold text-white">NA</Text>
+                          <Text className="text-xs font-outfit-bold text-white">NA</Text>
                         </View>
                       )}
                       <View className="flex-row items-center rounded-full bg-white/90 px-3 py-1.5">
                         <Ionicons name="checkmark-circle" size={14} color={conf.iconColor} style={{ marginRight: 4 }} />
-                        <Text className="text-xs font-bold" style={{ color: conf.iconColor }}>
+                        <Text className="text-xs font-outfit-bold" style={{ color: conf.iconColor }}>
                           {conf.label}
                         </Text>
                       </View>
                     </View>
 
                     {/* Test Name at bottom */}
-                    <Text className="text-3xl font-extrabold text-white shadow">{test.testName}</Text>
+                    <Text className="text-3xl font-outfit-extrabold text-white shadow">{test.testName}</Text>
                   </View>
                 </ImageBackground>
               </View>
@@ -180,7 +180,7 @@ export function ResultScreen({ suggestedTests, answeredQuestionsCount, onClose, 
                   className="mt-2 flex-row items-center"
                   activeOpacity={0.7}
                 >
-                  <Text className="mr-1 text-sm font-semibold text-yellow-600 dark:text-yellow-500">
+                  <Text className="mr-1 text-sm font-outfit-semibold text-yellow-600 dark:text-yellow-500">
                     View Detailed Recommendation
                   </Text>
                   <Ionicons name="chevron-forward" size={16} color="#ca8a04" />

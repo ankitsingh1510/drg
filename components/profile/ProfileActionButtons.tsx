@@ -28,7 +28,7 @@ export default function ProfileActionButtons({
           className="h-12 flex-row items-center justify-center gap-2 rounded-full bg-blue-500 px-10 shadow-sm active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700"
         >
           <Edit2 size={18} color="#ffffff" strokeWidth={2.5} />
-          <Text className="text-base font-bold text-white">Edit Profile</Text>
+          <Text className="text-base font-outfit-bold text-white">Edit Profile</Text>
         </TouchableOpacity>
       </View>
     );
@@ -47,7 +47,7 @@ export default function ProfileActionButtons({
         ) : (
           <>
             <X size={18} color={isDarkMode ? '#e5e7eb' : '#374151'} strokeWidth={2.5} />
-            <Text className="text-base font-bold text-gray-700 dark:text-gray-200">Cancel</Text>
+            <Text className="text-base font-outfit-bold text-gray-700 dark:text-gray-200">Cancel</Text>
           </>
         )}
       </TouchableOpacity>
@@ -62,7 +62,7 @@ export default function ProfileActionButtons({
         ) : (
           <>
             <Save size={18} color="#ffffff" strokeWidth={2.5} />
-            <Text className="text-base font-bold text-white">Save</Text>
+            <Text className="text-base font-outfit-bold text-white">Save</Text>
           </>
         )}
       </TouchableOpacity>

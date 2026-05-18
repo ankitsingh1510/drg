@@ -24,7 +24,7 @@ const NetworkLoggers = () => {
           }}
           className="absolute z-50 rounded-full bg-red-600 px-4 py-2"
         >
-          <Text className="font-semibold text-white">LOGS</Text>
+          <Text className="font-outfit-semibold text-white">LOGS</Text>
         </Pressable>
       )}
 
@@ -36,9 +36,9 @@ const NetworkLoggers = () => {
             }}
             className="flex-row items-center justify-between border-b border-gray-200 px-5 pb-3 dark:border-gray-700"
           >
-            <Text className="text-base font-semibold text-gray-900 dark:text-white">Network Logs</Text>
+            <Text className="text-base font-outfit-semibold text-gray-900 dark:text-white">Network Logs</Text>
             <Pressable onPress={closeLogger}>
-              <Text className="font-semibold text-red-600">Close</Text>
+              <Text className="font-outfit-semibold text-red-600">Close</Text>
             </Pressable>
           </View>
 
