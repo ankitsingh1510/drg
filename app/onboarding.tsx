@@ -86,7 +86,7 @@ export default function OnboardingScreen() {
                 </View>
               </View>
 
-              <Text className={`mb-4 text-center text-3xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+              <Text className={`mb-4 text-center text-3xl font-outfit-bold ${isDark ? 'text-white' : 'text-black'}`}>
                 {currentItem.title}
               </Text>
 
@@ -114,7 +114,7 @@ export default function OnboardingScreen() {
               {currentIndex > 0 ? (
                 <TouchableOpacity onPress={handleBack} className="flex-row items-center rounded-2xl px-6 py-4">
                   <ChevronLeft size={20} color={isDark ? colors.dark.textSecondary : colors.light.textSecondary} />
-                  <Text className={`ml-1 font-semibold ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>Back</Text>
+                  <Text className={`ml-1 font-outfit-semibold ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>Back</Text>
                 </TouchableOpacity>
               ) : (
                 <View className="w-20" />
@@ -125,7 +125,7 @@ export default function OnboardingScreen() {
                 className="bg-primary flex-row items-center rounded-2xl px-8 py-4 shadow-lg active:scale-95"
                 style={{ backgroundColor: colors.common.primary }}
               >
-                <Text className="mr-2 text-lg font-bold text-white">
+                <Text className="mr-2 text-lg font-outfit-bold text-white">
                   {currentIndex === ONBOARDING_DATA.length - 1 ? 'Get Started' : 'Next'}
                 </Text>
                 <ChevronRight size={20} color="white" />

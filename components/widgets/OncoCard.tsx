@@ -31,14 +31,14 @@ export default function OncoCard({ item }: Props) {
           {item.badge && (
             <View className="absolute left-4 top-4">
               <View className="rounded-full bg-amber-400 px-4 py-1">
-                <Text className="text-xs font-bold text-gray-900">{item.badge}</Text>
+                <Text className="text-xs font-outfit-bold text-gray-900">{item.badge}</Text>
               </View>
             </View>
           )}
 
           {/* Title */}
           <View className="absolute bottom-0 left-0 right-0 p-4">
-            <Text className="text-3xl font-bold text-white">{item.title}</Text>
+            <Text className="text-3xl font-outfit-bold text-white">{item.title}</Text>
           </View>
         </ImageBackground>
       </View>
@@ -52,7 +52,7 @@ export default function OncoCard({ item }: Props) {
             <View className="flex-row gap-2">
               {item.sampleTypes.map((type, index) => (
                 <View key={index} className="rounded-lg bg-gray-100 px-3 py-2 dark:bg-gray-700">
-                  <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">{type}</Text>
+                  <Text className="text-sm font-outfit-medium text-gray-700 dark:text-gray-300">{type}</Text>
                 </View>
               ))}
             </View>
@@ -61,7 +61,7 @@ export default function OncoCard({ item }: Props) {
           )}
 
           <View className="flex-row items-center">
-            <Text className="mr-1 text-base font-semibold text-amber-500">View details</Text>
+            <Text className="mr-1 text-base font-outfit-semibold text-amber-500">View details</Text>
             <Ionicons name="chevron-forward" size={18} color="#F59E0B" />
           </View>
         </View>

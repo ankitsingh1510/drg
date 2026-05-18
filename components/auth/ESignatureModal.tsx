@@ -70,7 +70,7 @@ export default function ESignatureModal({
             Please provide your credentials to confirm this profile update
           </Text>
           {/* <View className="mb-4">
-            <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+            <Text className="mb-2 text-sm font-outfit-medium text-gray-600 dark:text-gray-400">
               Username <Text className="text-red-500">*</Text>
             </Text>
             <TextInput
@@ -84,7 +84,7 @@ export default function ESignatureModal({
           </View> */}
 
           <View className="mb-4">
-            <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+            <Text className="mb-2 text-sm font-outfit-medium text-gray-600 dark:text-gray-400">
               Password <Text className="text-red-500">*</Text>
             </Text>
 
@@ -114,7 +114,7 @@ export default function ESignatureModal({
           </View>
 
           {/* <View className="mb-6">
-            <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+            <Text className="mb-2 text-sm font-outfit-medium text-gray-600 dark:text-gray-400">
               Reason for Change <Text className="text-red-500">*</Text>
               <Text className="text-xs text-gray-500"> (min. 6 characters)</Text>
             </Text>
@@ -134,7 +134,7 @@ export default function ESignatureModal({
               onPress={handleCancel}
               className="flex-1 rounded-lg border border-gray-300 bg-white py-3 active:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:active:bg-gray-600"
             >
-              <Text className="text-center font-semibold text-gray-700 dark:text-gray-200">Cancel</Text>
+              <Text className="text-center font-outfit-semibold text-gray-700 dark:text-gray-200">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleConfirm}
@@ -146,7 +146,7 @@ export default function ESignatureModal({
               }`}
             >
               <Text
-                className={`text-center font-semibold ${isValid() ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`text-center font-outfit-semibold ${isValid() ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}
               >
                 Confirm
               </Text>

@@ -21,7 +21,7 @@ export default function ProfileCheckboxField({
   return (
     <View key={field.name} className="mb-5 flex-row items-center justify-between">
       <View className="flex-1">
-        <Text className="text-sm font-medium text-gray-800 dark:text-gray-100">{field.displayLabel}</Text>
+        <Text className="text-sm font-outfit-medium text-gray-800 dark:text-gray-100">{field.displayLabel}</Text>
         {field.description && (
           <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">{field.description}</Text>
         )}

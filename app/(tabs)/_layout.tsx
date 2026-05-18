@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
+import LandingScreen from './home';
 
 const TAB_BAR_BASE_HEIGHT = Platform.select({
   ios: 50,
@@ -93,7 +94,7 @@ export default function TabLayout() {
 
   return (
     <>
-      <Tabs
+      {/* <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle,
@@ -121,7 +122,7 @@ export default function TabLayout() {
             ),
           }}
         />
-        {/* <Tabs.Screen
+        <Tabs.Screen
         name="reports_list"
         options={{
           ...sharedHeaderOptions,
@@ -130,7 +131,7 @@ export default function TabLayout() {
             <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={23} color={color} />
           ),
         }}
-      /> */}
+        />
         <Tabs.Screen
           name="scribe"
           options={{
@@ -151,7 +152,8 @@ export default function TabLayout() {
             ),
           }}
         />
-      </Tabs>
+      </Tabs> */}
+      <LandingScreen />
       <Animated.View entering={FadeInDown.delay(1000).springify()} style={styles.chatBot}>
         <TouchableOpacity
           style={styles.chatIcon}
@@ -172,7 +174,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   chatBot: {
     position: 'absolute',
-    bottom: 112,
+    bottom: 62,
     right: 32,
     zIndex: 99,
   },

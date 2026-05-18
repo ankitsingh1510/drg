@@ -27,7 +27,7 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
               </View>
             </View>
 
-            <Text className="mb-2 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
+            <Text className="mb-2 text-center text-2xl font-outfit-semibold text-gray-800 dark:text-gray-100">
               Get notified when your report is ready
             </Text>
             <Text className="mb-6 text-center text-base text-gray-600 dark:text-gray-400">
@@ -40,13 +40,13 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
                 onPress={() => onClose(false)}
                 className="flex-1 rounded-lg border border-gray-300 bg-white py-3 dark:border-gray-600 dark:bg-gray-700"
               >
-                <Text className="text-center font-semibold text-gray-700 dark:text-gray-200">Not Now</Text>
+                <Text className="text-center font-outfit-semibold text-gray-700 dark:text-gray-200">Not Now</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => onClose(true)}
                 className="flex-1 rounded-lg bg-blue-500 py-3 dark:bg-blue-600"
               >
-                <Text className="text-center font-semibold text-white">Enable Notifications</Text>
+                <Text className="text-center font-outfit-semibold text-white">Enable Notifications</Text>
               </TouchableOpacity>
             </View>
           </View>

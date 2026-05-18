@@ -562,7 +562,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
               className="mr-2 h-2 w-2 rounded-full"
               style={{ backgroundColor: isConnected ? '#10b981' : isConnecting ? '#f59e0b' : '#ef4444' }}
             />
-            <Text className="text-lg font-semibold" style={{ color: isDark ? colors.dark.text : colors.light.text }}>
+            <Text className="text-lg font-outfit-semibold" style={{ color: isDark ? colors.dark.text : colors.light.text }}>
               Chat with Dr.G
             </Text>
           </View>
@@ -634,7 +634,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
                 />
               ))}
             </View>
-            <Text className="ml-3 text-[13px] font-medium" style={{ color: colors.common.primary }}>
+            <Text className="ml-3 text-[13px] font-outfit-medium" style={{ color: colors.common.primary }}>
               Listening...
             </Text>
           </View>

@@ -317,7 +317,7 @@ export default function Reports() {
           <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
-          <Text className="text-lg font-bold text-gray-800 dark:text-gray-100" numberOfLines={1} ellipsizeMode="tail">
+          <Text className="text-lg font-outfit-bold text-gray-800 dark:text-gray-100" numberOfLines={1} ellipsizeMode="tail">
             {patientName}
           </Text>
         </View>
@@ -366,7 +366,7 @@ export default function Reports() {
           {/* Page indicator */}
           {!loading && numPages > 0 && (
             <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-2">
-              <Text className="text-sm font-semibold text-white">
+              <Text className="text-sm font-outfit-semibold text-white">
                 {currentPage} / {numPages}
               </Text>
             </View>
@@ -433,7 +433,7 @@ export default function Reports() {
                     onPress={handleTalkToDrG}
                   >
                     <Feather name="video" size={20} color="white" strokeWidth={2.5} />
-                    <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Talk</Text>
+                    <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">Talk</Text>
                   </TouchableOpacity>
                 </ReAnimated.View>
               )}
@@ -445,7 +445,7 @@ export default function Reports() {
                   onPress={handleChatWithDrG}
                 >
                   <Ionicons name="chatbubbles" size={20} color="white" />
-                  <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">Chat</Text>
+                  <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">Chat</Text>
                 </TouchableOpacity>
               </ReAnimated.View>
             </View>
@@ -458,22 +458,22 @@ export default function Reports() {
                 className="flex-row items-center justify-center rounded-full bg-slate-100 px-10 py-4 dark:bg-slate-800"
               >
                 <ActivityIndicator size="small" color={isDark ? '#fff' : colors.common.primary} />
-                <Text className="ml-3 text-base font-extrabold uppercase tracking-tight text-slate-500 dark:text-slate-400">
-                  Analyzing Report
+                <Text className="ml-3 text-base font-outfit-extrabold uppercase tracking-tight text-slate-500 dark:text-slate-400">
+                  Analyzing Report...
                 </Text>
               </TouchableOpacity>
             </ReAnimated.View>
           )}
 
           {(currentIngestionStatus === 'failed' || !currentIngestionStatus) && (
-            <ReAnimated.View entering={FadeInUp.delay(400).duration(600).springify()} className="py-2">
+            <ReAnimated.View entering={FadeInUp.delay(400).duration(600).springify()} className="w-[100%] py-2">
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="flex-row items-center justify-center rounded-full bg-blue-600 px-10 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
+                className="flex-row items-center justify-center rounded-xl bg-blue-600 px-10 py-4 shadow-lg shadow-blue-300 dark:shadow-none"
                 onPress={handleIngestReport}
               >
                 <MaterialIcons name="analytics" size={22} color="white" />
-                <Text className="ml-2 text-base font-extrabold uppercase tracking-tight text-white">
+                <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">
                   Analyze Report
                 </Text>
               </TouchableOpacity>
@@ -502,12 +502,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     backgroundColor: '#f5f5f5',
+    borderRadius: 6,
   },
   pdfView: {
     backgroundColor: 'gray',
     marginHorizontal: 5,
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 6,
+    padding: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

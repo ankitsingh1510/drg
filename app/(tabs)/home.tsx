@@ -1,16 +1,25 @@
 import React, { useCallback, useMemo } from 'react';
-import { Alert, BackHandler, ScrollView, View } from 'react-native';
+import { Alert, BackHandler, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import { ClipboardList, Dna, Microscope, TestTube2, TrendingUp } from 'lucide-react-native';
+import {
+  ClipboardList,
+  Dna,
+  LucideColumnsSettings,
+  Microscope,
+  Settings,
+  TestTube2,
+  TrendingUp,
+  User,
+} from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ClinicalTimeline from '@/ClinicalTimeline';
 import AppText from '@/components/ui/AppText';
 import { type HomeItem, HomeSection } from '@/components/ui/HomeScreenCard';
 import TipOfTheDay from '@/components/widgets/Tipoftheday';
+import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 
@@ -27,7 +36,8 @@ export default function LandingScreen() {
   const { user } = useAuth();
   const { colorScheme } = useColorScheme();
   const headerHeight = useHeaderHeight();
-
+  const isDark = colorScheme === 'dark';
+  const greeting = useMemo(() => getGreeting(), []);
   const [showPatientsButton] = useAtom(showPatientsButtonAtom);
   const [showExtensionsButton] = useAtom(showExtensionsButtonAtom);
 
@@ -39,7 +49,7 @@ export default function LandingScreen() {
         subtitle: 'Recent labs & images',
         icon: <ClipboardList size={24} color="#fff" />,
         color: '#538BF4',
-        onPress: () => router.push('/Patients/patientList' as any),
+        onPress: () => router.push('/reports_list' as any),
         comingSoon: false,
         hidden: false,
       },
@@ -49,7 +59,7 @@ export default function LandingScreen() {
         subtitle: 'Recent orders & updates',
         icon: <TestTube2 size={24} color="#fff" />,
         color: '#4ED0D9',
-        onPress: () => router.push('/orderList' as any),
+        onPress: () => router.push('/Orders/allOrders' as any),
         comingSoon: false,
         hidden: false,
       },
@@ -108,11 +118,23 @@ export default function LandingScreen() {
     <SafeAreaView style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight }}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <View className="px-6 pb-6 pt-4">
-            <AppText className="text-base text-gray-500 dark:text-gray-400">{getGreeting()}</AppText>
-            <AppText className="text-2xl text-gray-900 dark:text-white">
-              Dr. {user?.name} {user?.lname}
-            </AppText>
+          <View className="flex-row items-center justify-between">
+            <View className="px-6 pb-6 pt-4">
+              <AppText className="text-base text-gray-500 dark:text-gray-400">{greeting}</AppText>
+              <AppText className="text-2xl text-gray-900 dark:text-white">
+                Dr. {user?.name} {user?.lname}
+              </AppText>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push('/settings' as any)}
+              className="mx-4 mb-4 rounded-2xl border p-3"
+              style={{
+                backgroundColor: isDark ? colors.dark.cardBackground : colors.light.cardBackground,
+                borderColor: isDark ? '#374151' : '#EBEBEB',
+              }}
+            >
+              <User size={28} color={colorScheme === 'dark' ? '#fff' : colors.common.accent} strokeWidth={1.3} />
+            </TouchableOpacity>
           </View>
 
           <HomeSection title="Clinical Workspace" headerIcon="flask-outline" items={clinicalItems} />

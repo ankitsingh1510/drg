@@ -6,6 +6,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  StatusBar,
   Switch,
   Text,
   TouchableOpacity,
@@ -16,10 +17,22 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import { Bell, ChevronRight, HelpCircle, Lock, LogOut, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import {
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Lock,
+  LogOut,
+  Moon,
+  Sun,
+  Trash2,
+  User,
+} from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
+import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
@@ -48,8 +61,8 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
 
         <View className="ml-3 flex-1">
-          <Text className="text-lg font-medium text-gray-800 dark:text-gray-100">{title}</Text>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</Text>
+          <AppText className="text-lg font-outfit-medium text-gray-800 dark:text-gray-100">{title}</AppText>
+          <AppText className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</AppText>
         </View>
       </View>
 
@@ -247,7 +260,7 @@ const Settings = () => {
           onPress={confirmDeleteAccount}
           className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
         >
-          <Text className="text-sm font-semibold text-white">Delete</Text>
+          <AppText className="text-sm font-outfit-semibold text-white">Delete</AppText>
         </TouchableOpacity>
       ),
     },
@@ -261,10 +274,22 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView className="-mt-8 flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? '#0B1929' : '#FDF5E6'}
+      />
+
+      <View className="flex-row items-center justify-between px-4 py-4">
+        <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
+          <ChevronLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <AppText className="text-xl dark:text-white">Settings</AppText>
+        <View className="w-8" />
+      </View>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        className="flex-1"
+        className="flex-1 pt-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: headerHeight }}
       >
@@ -302,12 +327,12 @@ const Settings = () => {
               }
             >
               <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />
-              <Text
+              <AppText
                 className={isDarkMode ? 'text-base text-white' : 'text-base text-red-900'}
                 style={{ fontFamily: 'Outfit_600SemiBold' }}
               >
                 Sign Out
-              </Text>
+              </AppText>
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -352,10 +377,10 @@ const Settings = () => {
             }}
             className="mb-8 mt-4 items-center justify-center opacity-60"
           >
-            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">Dr.G AI Assistant</Text>
-            <Text className="text-[10px] text-gray-400 dark:text-gray-500">
+            <AppText className="text-xs font-outfit-medium text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
+            <AppText className="text-[10px] text-gray-400 dark:text-gray-500">
               Version {Constants.expoConfig?.version || '1.1.5'}
-            </Text>
+            </AppText>
           </Pressable>
         </Animated.View>
 
