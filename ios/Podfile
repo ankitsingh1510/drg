@@ -60,5 +60,18 @@ target 'drg' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => ccache_enabled?(podfile_properties),
     )
+
+    # Workaround for Xcode 26+ (Apple Clang 21): fmt 11.0.2 FMT_STRING consteval errors.
+    # See: https://github.com/expo/expo/issues/44229
+    fmt_base = File.join(installer.sandbox.pod_dir('fmt'), 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      File.chmod(0644, fmt_base)
+      content = File.read(fmt_base)
+      patched = content.gsub(/#\s*define FMT_USE_CONSTEVAL 1/, '# define FMT_USE_CONSTEVAL 0')
+      if patched != content
+        File.write(fmt_base, patched)
+        puts '✅ Patched fmt/base.h: disabled FMT_USE_CONSTEVAL'
+      end
+    end
   end
 end

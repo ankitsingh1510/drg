@@ -9,7 +9,6 @@ import {
   Platform,
   ScrollView,
   StatusBar,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -19,6 +18,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
+import { AppText } from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
 import { storageAPI } from '@/services/storage';
@@ -94,14 +94,23 @@ export default function LoginScreen() {
       if (response && response.token) {
         const token = response.token;
         const tokenPayload = decryptToken(token);
-        const isDrgUser = tokenPayload.assignedApplications.some(app => app.name.toLowerCase() === 'drg');
-        if (!isDrgUser) {
-          setIsLoading(false);
-          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
-          return;
-        }
         if (!tokenPayload) {
           throw new Error('Invalid token received');
+        }
+        const isMfaPending =
+          tokenPayload.user_type === 'localUser' &&
+          (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
+          !tokenPayload.isMfaVerified;
+        if (!isMfaPending && tokenPayload.assignedApplications) {
+          const isDrgUser = tokenPayload.assignedApplications.some((app: any) => app.name.toLowerCase() === 'drg');
+          if (!isDrgUser) {
+            setIsLoading(false);
+            Alert.alert(
+              'Access Denied',
+              'You do not have access to this application. Please contact an administrator.'
+            );
+            return;
+          }
         }
         if (tokenPayload.force_password_change === 1) {
           // Store token temporarily for the change password request
@@ -112,11 +121,7 @@ export default function LoginScreen() {
             pathname: '/reset-password' as any,
             params: { userMasterId: tokenPayload.sub },
           });
-        } else if (
-          tokenPayload.user_type === 'localUser' &&
-          (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
-          !tokenPayload.isMfaVerified
-        ) {
+        } else if (isMfaPending) {
           // Store token temporarily in storage for API calls
           storage.set('token', token);
           const otpResponse = await usersAPI.sendMfaOtp('email');
@@ -151,6 +156,14 @@ export default function LoginScreen() {
       const payload = decryptToken(verifiedToken);
       if (!payload) {
         throw new Error('Invalid token');
+      }
+      if (payload.assignedApplications) {
+        const isDrgUser = payload.assignedApplications.some((app: any) => app.name.toLowerCase() === 'drg');
+        if (!isDrgUser) {
+          setIsLoading(false);
+          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
+          return;
+        }
       }
       setToken(verifiedToken);
       // Fetch user details using the verified token
@@ -203,7 +216,9 @@ export default function LoginScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
         <ActivityIndicator size="large" color={colors.common.primary} />
-        <Text className="mt-4 font-outfit-medium text-lg text-slate-600 dark:text-gray-300">Securing Session...</Text>
+        <AppText weight="medium" className="mt-4 text-lg text-slate-600 dark:text-gray-300">
+          Securing Session...
+        </AppText>
       </View>
     );
   }
@@ -216,10 +231,12 @@ export default function LoginScreen() {
           <View className="flex-1 bg-[#1E2D50]">
             {/* Top Hero Section */}
             <View className="px-7 pb-10 pt-9">
-              <Text className="mb-2 font-outfit-extrabold text-3xl text-white">Welcome to DrG</Text>
-              <Text className="font-outfit text-base leading-6 text-[#A8BFDF]">
+              <AppText weight="extrabold" className="mb-2 text-3xl text-white">
+                Welcome to DrG
+              </AppText>
+              <AppText weight="regular" className="text-base leading-6 text-[#A8BFDF]">
                 Access patient reports &amp; clinical insights{'\n'}in one place
-              </Text>
+              </AppText>
             </View>
 
             {/* Login Form Card */}
@@ -230,7 +247,9 @@ export default function LoginScreen() {
               showsVerticalScrollIndicator={false}
             >
               {/* Email Field */}
-              <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Email</Text>
+              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                Email
+              </AppText>
               <View
                 className={`rounded-xl border-[1.5px] bg-white ${emailError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
@@ -249,13 +268,15 @@ export default function LoginScreen() {
                 />
               </View>
               {emailError ? (
-                <Text className="mb-3 font-outfit text-xs text-red-500">{emailError}</Text>
+                <AppText className="mb-3 text-xs text-red-500">{emailError}</AppText>
               ) : (
                 <View className="mb-4" />
               )}
 
               {/* Password Field */}
-              <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Password</Text>
+              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                Password
+              </AppText>
               <View
                 className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
@@ -281,16 +302,16 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
               {passwordError ? (
-                <Text className="mb-2 font-outfit text-xs text-red-500">{passwordError}</Text>
+                <AppText className="mb-2 text-xs text-red-500">{passwordError}</AppText>
               ) : (
                 <View className="mb-2" />
               )}
 
               {/* Forgot Password */}
               <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
-                <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                <AppText weight="semibold" className="text-sm" style={{ color: colors.common.info }}>
                   Forgot Password?
-                </Text>
+                </AppText>
               </TouchableOpacity>
 
               {/* Login Button */}
@@ -300,30 +321,30 @@ export default function LoginScreen() {
                 disabled={isLoading}
                 className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
               >
-                <Text className="font-outfit-bold text-base tracking-wide text-white">
+                <AppText weight="bold" className="text-base tracking-wide text-white">
                   {isLoading ? 'Processing...' : 'Log In'}
-                </Text>
+                </AppText>
               </TouchableOpacity>
 
               {/* Contact Support */}
               <View className="mb-6 items-center">
-                <Text className="font-outfit text-sm text-gray-500">
+                <AppText weight="regular" className="text-sm text-gray-500">
                   Need help accessing your account?{' '}
-                  <Text
-                    className="font-outfit-semibold"
+                  <AppText
+                    weight="semibold"
                     style={{ color: colors.common.info }}
-                    onPress={() => Linking.openURL('mailto:support@1cell.ai')}
+                    onPress={() => Linking.openURL('mailto:product.support@1cell.ai')}
                   >
                     Contact Support
-                  </Text>
-                </Text>
+                  </AppText>
+                </AppText>
               </View>
             </ScrollView>
             {/* Footer */}
             <View className="bg-white pb-10">
-              <Text className="text-center font-outfit text-xs text-gray-400">
+              <AppText weight="regular" className="text-center text-xs text-gray-400">
                 Secure access for registered medical professionals only
-              </Text>
+              </AppText>
             </View>
           </View>
 

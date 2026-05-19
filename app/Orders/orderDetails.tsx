@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, TouchableOpacity, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, FileText } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
@@ -147,8 +147,10 @@ const OrderDetailCard = ({ order, isDark }: { order: OrderDetail; isDark: boolea
   const isReleased = order.status === 'RELEASED';
 
   return (
-    <View className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#374151] dark:bg-[#1f2937]">
-      <AppText className="font-outfit-semibold text-base text-gray-900 dark:text-white">{order.testName}</AppText>
+    <View className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 dark:border-[#374151] dark:bg-[#1f2937]">
+      <AppText weight="semibold" className="text-base text-gray-900 dark:text-white">
+        {order.testName}
+      </AppText>
       <AppText className="mb-4 text-xs text-gray-500 dark:text-[#8BA5C0]">{order.sampleType}</AppText>
 
       <View className="mb-2 flex-row justify-between px-0.5">
@@ -210,7 +212,9 @@ export default function OrderDetails() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Orders Details</AppText>
+        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+          Orders Details
+        </AppText>
         <View className="w-8" />
       </View>
 

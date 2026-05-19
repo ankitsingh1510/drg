@@ -55,13 +55,13 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 shadow-md dark:bg-gray-800"
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl border border-gray-300 bg-white p-5 dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
 
         <View className="ml-3 flex-1">
-          <AppText className="text-lg font-outfit-medium text-gray-800 dark:text-gray-100">{title}</AppText>
+          <AppText className="font-outfit-medium text-lg text-gray-800 dark:text-gray-100">{title}</AppText>
           <AppText className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</AppText>
         </View>
       </View>
@@ -260,7 +260,7 @@ const Settings = () => {
           onPress={confirmDeleteAccount}
           className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
         >
-          <AppText className="text-sm font-outfit-semibold text-white">Delete</AppText>
+          <AppText className="font-outfit-semibold text-sm text-white">Delete</AppText>
         </TouchableOpacity>
       ),
     },
@@ -318,7 +318,7 @@ const Settings = () => {
               ])
             }
             activeOpacity={0.8}
-            className="mx-5 mb-2 overflow-hidden rounded-xl shadow-md"
+            className="mx-5 mb-2 overflow-hidden rounded-xl"
           >
             <View
               className={
@@ -343,41 +343,41 @@ const Settings = () => {
             .springify()}
         >
           <Pressable
-            onPress={() => {
-              const now = Date.now();
-              const TAP_DELAY = 300; // Slightly shorter for better feel
+            // onPress={() => {
+            //   const now = Date.now();
+            //   const TAP_DELAY = 300; // Slightly shorter for better feel
 
-              if (now - lastTapRef.current < TAP_DELAY) {
-                tapCountRef.current += 1;
-              } else {
-                tapCountRef.current = 1;
-              }
-              lastTapRef.current = now;
+            //   if (now - lastTapRef.current < TAP_DELAY) {
+            //     tapCountRef.current += 1;
+            //   } else {
+            //     tapCountRef.current = 1;
+            //   }
+            //   lastTapRef.current = now;
 
-              if (tapTimerRef.current) {
-                clearTimeout(tapTimerRef.current);
-              }
+            //   if (tapTimerRef.current) {
+            //     clearTimeout(tapTimerRef.current);
+            //   }
 
-              tapTimerRef.current = setTimeout(() => {
-                if (tapCountRef.current === 2) {
-                  setShowPatientsButton(prev => !prev);
-                  Alert.alert(
-                    'System Info',
-                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}`
-                  );
-                } else if (tapCountRef.current >= 3) {
-                  setShowExtensionsButton(prev => !prev);
-                  Alert.alert(
-                    'System Info',
-                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}\nExtensions: ${!showExtensionsButton ? 'Enabled' : 'Disabled'}`
-                  );
-                }
-                tapCountRef.current = 0;
-              }, TAP_DELAY);
-            }}
+            //   tapTimerRef.current = setTimeout(() => {
+            //     if (tapCountRef.current === 2) {
+            //       setShowPatientsButton(prev => !prev);
+            //       Alert.alert(
+            //         'System Info',
+            //         `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}`
+            //       );
+            //     } else if (tapCountRef.current >= 3) {
+            //       setShowExtensionsButton(prev => !prev);
+            //       Alert.alert(
+            //         'System Info',
+            //         `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}\nExtensions: ${!showExtensionsButton ? 'Enabled' : 'Disabled'}`
+            //       );
+            //     }
+            //     tapCountRef.current = 0;
+            //   }, TAP_DELAY);
+            // }}
             className="mb-8 mt-4 items-center justify-center opacity-60"
           >
-            <AppText className="text-xs font-outfit-medium text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
+            <AppText className="font-outfit-medium text-xs text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
             <AppText className="text-[10px] text-gray-400 dark:text-gray-500">
               Version {Constants.expoConfig?.version || '1.1.5'}
             </AppText>

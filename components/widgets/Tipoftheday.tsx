@@ -84,7 +84,7 @@ export default function TipOfTheDay() {
     >
       <View className="mb-[14px] flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <AppText className="text-[15px] font-outfit-semibold" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+          <AppText className="font-outfit-semibold text-[15px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
             <Ionicons name={'bulb-outline'} size={15} color={isDark ? colors.dark.text : colors.common.primary} />
             {'  '}
             Tip of the Day
@@ -92,7 +92,7 @@ export default function TipOfTheDay() {
         </View>
         <View className="rounded-[20px] px-2.5 py-1" style={{ backgroundColor: isDark ? '#374151' : '#f3f4f6' }}>
           <AppText
-            className="text-[10px] font-outfit-medium tracking-[0.5px]"
+            className="font-outfit text-[10px] tracking-[0.5px]"
             style={{ color: isDark ? '#d1d5db' : '#374151' }}
           >
             Medical Insight
@@ -114,7 +114,7 @@ export default function TipOfTheDay() {
         </View>
 
         <View className="flex-1">
-          <AppText className="text-base font-outfit-semibold leading-[22px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+          <AppText className="font-outfit text-base leading-[22px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
             {currentTip.tip}
           </AppText>
         </View>

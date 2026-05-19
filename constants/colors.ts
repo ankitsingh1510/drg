@@ -28,6 +28,7 @@ export const colors = {
     error: '#ef4444',
     warning: '#f59e0b',
     info: '#60a5fa',
+    navy: '#1A365D',
   },
 } as const;
 

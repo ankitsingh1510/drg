@@ -78,13 +78,13 @@ const statusBadgeStyle: Record<OrderStatus, { bg: string; text: string; darkBg: 
     darkText: '#a46901',
   },
   'Sample Accession': {
-    bg: '#DBEAFE',
-    text: themeColors.common.info,
+    bg: '#EEF2FF',
+    text: '#4F46E5',
     darkBg: '#1E3A5F',
     darkText: themeColors.common.info,
   },
   'Report Released': {
-    bg: '#D1FAE5',
+    bg: '#ECFDF5',
     text: themeColors.common.success,
     darkBg: '#064E3B',
     darkText: themeColors.common.success,
@@ -108,7 +108,7 @@ const StatusBadge = ({ status, isDark }: { status: OrderStatus; isDark: boolean 
 const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isDark: boolean }) => {
   return (
     <TouchableOpacity
-      className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 shadow-sm dark:border-[#374151] dark:bg-[#1f2937]"
+      className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 dark:border-[#374151] dark:bg-[#1f2937]"
       activeOpacity={0.8}
       onPress={() =>
         router.push({
@@ -118,7 +118,9 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
       }
     >
       <View className="mb-1 flex-row items-center justify-between">
-        <AppText className="font-outfit-semibold text-lg text-gray-900 dark:text-white">{patient.patientName}</AppText>
+        <AppText weight="semibold" className="text-lg text-gray-900 dark:text-white">
+          {patient.patientName}
+        </AppText>
         <ChevronRight size={20} color={isDark ? '#8BA5C0' : '#9CA3AF'} />
       </View>
       <AppText className="mb-2 text-xs text-gray-500 dark:text-[#8BA5C0]">
@@ -128,7 +130,9 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
       <View className="flex-row flex-wrap gap-4">
         {patient.orders.map((order, idx) => (
           <View key={idx} className="min-w-[30%] items-center justify-center">
-            <AppText className="font-outfit-medium text-sm text-gray-700 dark:text-gray-300">{order.testName}</AppText>
+            <AppText weight="medium" className="text-sm text-gray-700 dark:text-gray-300">
+              {order.testName}
+            </AppText>
             <StatusBadge status={order.status} isDark={isDark} />
           </View>
         ))}
@@ -159,7 +163,9 @@ export default function AllOrders() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Orders List</AppText>
+        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+          Orders List
+        </AppText>
         <View className="w-8" />
       </View>
 

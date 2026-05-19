@@ -101,7 +101,9 @@ export default function PatientTimeline() {
         <TouchableOpacity className="h-8 w-8 justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2} />
         </TouchableOpacity>
-        <AppText className="text-lg font-outfit-semibold text-gray-800 dark:text-white">Patient Timeline</AppText>
+        <AppText weight="semibold" className="text-lg text-gray-800 dark:text-white">
+          Patient Timeline
+        </AppText>
         <TouchableOpacity
           className="h-8 w-8 items-center justify-center"
           onPress={() => router.push({ pathname: '/Patients/allReports', params: { patientId } })}
@@ -113,22 +115,32 @@ export default function PatientTimeline() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Patient Info */}
         <View className="flex-row items-center justify-between px-6 py-4">
-          <AppText className="text-base font-outfit-semibold text-gray-800 dark:text-white">Patient Name</AppText>
-          <AppText className="text-[13px] font-outfit-medium text-gray-500 dark:text-[#8BA5C0]">Age: 52 | Male</AppText>
+          <AppText weight="semibold" className="text-base text-gray-800 dark:text-white">
+            Patient Name
+          </AppText>
+          <AppText weight="medium" className="text-[13px] text-gray-500 dark:text-[#8BA5C0]">
+            Age: 52 | Male
+          </AppText>
         </View>
 
         {/* Filters */}
         <View className="mb-6 flex-row gap-2 px-5">
           <TouchableOpacity className="flex-row items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 dark:border-[#1A3050]">
             <Calendar size={14} color={colors.gold} />
-            <AppText className="text-[13px] font-outfit-medium text-gray-500 dark:text-[#8BA5C0]">Date</AppText>
+            <AppText weight="medium" className="text-[13px] text-gray-500 dark:text-[#8BA5C0]">
+              Date
+            </AppText>
           </TouchableOpacity>
           <TouchableOpacity className="flex-row items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 dark:border-[#1A3050]">
-            <AppText className="text-[13px] font-outfit-medium text-gray-500 dark:text-[#8BA5C0]">Sort by</AppText>
+            <AppText weight="medium" className="text-[13px] text-gray-500 dark:text-[#8BA5C0]">
+              Sort by
+            </AppText>
             <ChevronDown size={14} color={colors.textSecondary} />
           </TouchableOpacity>
           <TouchableOpacity className="flex-row items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 dark:border-[#1A3050]">
-            <AppText className="text-[13px] font-outfit-medium text-gray-500 dark:text-[#8BA5C0]">Report type</AppText>
+            <AppText weight="medium" className="text-[13px] text-gray-500 dark:text-[#8BA5C0]">
+              Report type
+            </AppText>
             <ChevronDown size={14} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -156,9 +168,13 @@ export default function PatientTimeline() {
                 {/* Content */}
                 <View className="flex-1 pl-2">
                   <View className="mb-2.5 flex-row items-center gap-2.5">
-                    <AppText className="text-[13px] font-outfit-semibold text-gray-800 dark:text-white">{item.date}</AppText>
+                    <AppText weight="semibold" className="text-[13px] text-gray-800 dark:text-white">
+                      {item.date}
+                    </AppText>
                     <View className="rounded bg-blue-100 px-2 py-0.5">
-                      <AppText className="text-[10px] font-outfit-bold text-blue-600">{getBadgeLabel(item.badgeType)}</AppText>
+                      <AppText weight="bold" className="text-[10px] text-blue-600">
+                        {getBadgeLabel(item.badgeType)}
+                      </AppText>
                     </View>
                   </View>
 
@@ -169,7 +185,9 @@ export default function PatientTimeline() {
                     activeOpacity={0.8}
                   >
                     <View className="flex-row items-center justify-between p-3.5">
-                      <AppText className="flex-1 text-sm font-outfit-bold text-gray-800 dark:text-white">{item.title}</AppText>
+                      <AppText weight="bold" className="flex-1 text-sm text-gray-800 dark:text-white">
+                        {item.title}
+                      </AppText>
                       <ChevronRight size={20} color={item.itemColor} strokeWidth={2.2} />
                     </View>
 
@@ -178,15 +196,17 @@ export default function PatientTimeline() {
                         <UserRound size={16} color={colors.textSecondary} />
                       </View>
                       <View>
-                        <AppText className="text-[10px] font-outfit-bold tracking-widest text-[#9CA3AF]">PROVIDER</AppText>
-                        <AppText className="mt-0.5 text-[13px] font-outfit-medium text-gray-800 dark:text-white">
+                        <AppText weight="bold" className="text-[10px] tracking-widest text-[#9CA3AF]">
+                          PROVIDER
+                        </AppText>
+                        <AppText weight="medium" className="mt-0.5 text-[13px] text-gray-800 dark:text-white">
                           {item.provider}
                         </AppText>
                       </View>
                     </View>
 
                     <View className="p-3.5">
-                      <AppText className="mb-1.5 text-[10px] font-outfit-bold tracking-widest text-[#9CA3AF]">
+                      <AppText weight="bold" className="mb-1.5 text-[10px] tracking-widest text-[#9CA3AF]">
                         AI SUMMARY
                       </AppText>
                       <AppText className="text-[13px] leading-5 text-gray-500 dark:text-[#8BA5C0]" numberOfLines={4}>

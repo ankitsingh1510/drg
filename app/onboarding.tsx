@@ -1,27 +1,30 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
-import { ChevronLeft, ChevronRight, FileText, MessageSquare } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
+import { ArrowRight } from 'lucide-react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { runOnJS, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppText } from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 
 const ONBOARDING_DATA = [
   {
-    title: 'Analyze Reports',
-    description: 'Upload your medical reports and get instant AI-powered summaries and insights tailored for you.',
-    icon: FileText,
-    image: require('@/assets/images/DrG-logo.png'),
+    title: 'Manage Patients Effortlessly',
+    description: 'Access patient reports, track progress, and stay updated—all in one place',
+    image: require('@/assets/onboarding/on.webp'),
   },
   {
-    title: 'Voice & Chat',
-    description: 'Talk or chat with Dr.G to ask questions about your health and get real-time responses anytime.',
-    icon: MessageSquare,
-    image: require('@/assets/images/DrG-logo.png'),
+    title: 'Simplified Report Interpretation',
+    description: 'Understand complex genomic reports with clear, actionable insights',
+    image: require('@/assets/onboarding/on1.webp'),
+  },
+  {
+    title: 'Capture Every Consultation',
+    description: 'Record patient discussions securely and revisit them anytime',
+    image: require('@/assets/onboarding/on2.webp'),
   },
 ];
 
@@ -30,8 +33,6 @@ export default function OnboardingScreen() {
   const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
 
   const handleNext = useCallback(() => {
     if (currentIndex < ONBOARDING_DATA.length - 1) {
@@ -42,6 +43,11 @@ export default function OnboardingScreen() {
       router.replace('/login');
     }
   }, [currentIndex, router, setHasSeenOnboarding]);
+
+  const handleSkip = useCallback(() => {
+    setHasSeenOnboarding(true);
+    router.replace('/login');
+  }, [router, setHasSeenOnboarding]);
 
   const handleBack = useCallback(() => {
     if (currentIndex > 0) {
@@ -65,74 +71,72 @@ export default function OnboardingScreen() {
   );
 
   const currentItem = ONBOARDING_DATA[currentIndex];
-  const Icon = currentItem.icon;
+  const isLast = currentIndex === ONBOARDING_DATA.length - 1;
 
   return (
     <GestureHandlerRootView className="flex-1">
       <GestureDetector gesture={swipeGesture}>
-        {/* bg-[#FDF5E6] dark:bg-gray-900 */}
-        <SafeAreaView className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-[#FDF5E6]'}`}>
-          <View className="flex-1 items-center justify-center px-10">
+        <View className="flex-1">
+          <View className="items-center justify-center overflow-hidden bg-white" style={{ flex: 58 }}>
             <Animated.View
               key={currentIndex}
-              entering={(direction === 'forward' ? SlideInRight : SlideInLeft).duration(400)}
-              exiting={(direction === 'forward' ? SlideOutLeft : SlideOutRight).duration(400)}
-              className="items-center"
+              entering={(direction === 'forward' ? SlideInRight : SlideInLeft).duration(350)}
+              exiting={(direction === 'forward' ? SlideOutLeft : SlideOutRight).duration(350)}
+              className="h-full w-full items-center justify-center"
             >
-              <View className="mb-10 items-center">
-                <Image source={currentItem.image} resizeMode="contain" className="mb-10 h-24 w-24" />
-                <View className={`rounded-full p-8 ${isDark ? 'bg-slate-800/50' : 'bg-gray-100'}`}>
-                  <Icon size={80} color={colors.common.primary} />
-                </View>
-              </View>
-
-              <Text className={`mb-4 text-center text-3xl font-outfit-bold ${isDark ? 'text-white' : 'text-black'}`}>
-                {currentItem.title}
-              </Text>
-
-              <Text className={`text-center text-lg leading-6 ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>
-                {currentItem.description}
-              </Text>
+              <Image source={currentItem.image} resizeMode="contain" className="h-[90%] w-[90%]" />
             </Animated.View>
           </View>
 
-          <View className="p-10">
-            {/* Pagination Dots */}
-            <View className="mb-10 flex-row justify-center gap-2">
+          <SafeAreaView edges={['bottom']} className="bg-[#1A365D] px-7 pb-2 pt-8" style={{ flex: 42 }}>
+            <View className="mb-7 flex-row gap-2">
               {ONBOARDING_DATA.map((_, index) => (
                 <View
                   key={index}
-                  className={`h-2 rounded-full ${
-                    index === currentIndex ? 'bg-primary w-8' : 'w-2'
-                  } ${isDark ? 'bg-neutral-600' : 'bg-gray-300'}`}
-                  style={index === currentIndex ? { backgroundColor: colors.common.primary } : undefined}
+                  className="mt-6 h-1.5 rounded-full"
+                  style={{
+                    width: index === currentIndex ? 36 : 28,
+                    backgroundColor: index === currentIndex ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                  }}
                 />
               ))}
             </View>
 
-            <View className="flex-row items-center justify-between">
-              {currentIndex > 0 ? (
-                <TouchableOpacity onPress={handleBack} className="flex-row items-center rounded-2xl px-6 py-4">
-                  <ChevronLeft size={20} color={isDark ? colors.dark.textSecondary : colors.light.textSecondary} />
-                  <Text className={`ml-1 font-outfit-semibold ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>Back</Text>
+            <Animated.View
+              key={`text-${currentIndex}`}
+              entering={(direction === 'forward' ? SlideInRight : SlideInLeft).duration(350)}
+              exiting={(direction === 'forward' ? SlideOutLeft : SlideOutRight).duration(350)}
+            >
+              <AppText weight="bold" className="mb-3 text-2xl leading-9 text-white">
+                {currentItem.title}
+              </AppText>
+              <AppText weight="regular" className="text-sm leading-6 text-white/60">
+                {currentItem.description}
+              </AppText>
+            </Animated.View>
+
+            <View className="mb-8 mt-auto flex-row items-center justify-between px-2 pt-2">
+              {!isLast ? (
+                <TouchableOpacity onPress={handleSkip} activeOpacity={0.7}>
+                  <AppText weight="medium" className="text-base text-white">
+                    Skip
+                  </AppText>
                 </TouchableOpacity>
               ) : (
-                <View className="w-20" />
+                <View />
               )}
-
-              <TouchableOpacity
-                onPress={handleNext}
-                className="bg-primary flex-row items-center rounded-2xl px-8 py-4 shadow-lg active:scale-95"
-                style={{ backgroundColor: colors.common.primary }}
-              >
-                <Text className="mr-2 text-lg font-outfit-bold text-white">
-                  {currentIndex === ONBOARDING_DATA.length - 1 ? 'Get Started' : 'Next'}
-                </Text>
-                <ChevronRight size={20} color="white" />
-              </TouchableOpacity>
+              <View className="h-20 w-20 rounded-full border-2 border-white">
+                <TouchableOpacity
+                  onPress={handleNext}
+                  activeOpacity={0.85}
+                  className="absolute inset-[4px] items-center justify-center rounded-full bg-white"
+                >
+                  <ArrowRight size={28} color={colors.common.navy} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </SafeAreaView>
+          </SafeAreaView>
+        </View>
       </GestureDetector>
     </GestureHandlerRootView>
   );
