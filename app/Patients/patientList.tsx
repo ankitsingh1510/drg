@@ -6,15 +6,6 @@ import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
 
-
-
-
-
-
-
-
-
-
 export default function PatientList() {
   const [search, setSearch] = useState('');
   const { colorScheme } = useColorScheme();
@@ -85,7 +76,9 @@ export default function PatientList() {
         </View>
         <AppText className="mb-1 text-sm text-blue-500">{p.test}</AppText>
 
-        <AppText className="text-base font-outfit-semibold text-gray-500 dark:text-[#8BA5C0]">Ai Summary</AppText>
+        <AppText weight="semibold" className="text-base text-gray-500 dark:text-[#8BA5C0]">
+          Ai Summary
+        </AppText>
         <AppText className="text-sm text-[#1E3A5F] dark:text-gray-200" numberOfLines={2}>
           {p.ai_summary}
         </AppText>
@@ -103,7 +96,9 @@ export default function PatientList() {
         <TouchableOpacity className="h-8 w-8 justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2} />
         </TouchableOpacity>
-        <AppText className="text-lg text-gray-800 dark:text-white">Patient List</AppText>
+        <AppText weight="semibold" className="text-lg text-gray-800 dark:text-white">
+          Patient List
+        </AppText>
         <View className="w-8" />
       </View>
 

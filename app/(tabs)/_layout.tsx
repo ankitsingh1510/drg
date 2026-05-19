@@ -1,16 +1,18 @@
 import React, { useEffect } from 'react';
-import { Linking, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Linking, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { MessagesSquare } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   FadeInDown,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,6 +95,39 @@ export default function TabLayout() {
     };
   });
 
+  const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+  const BUTTON_SIZE = 60;
+  // Initial position is fixed at the bottom-right corner (bottom: 62, right: 32)
+  const translateX = useSharedValue(SCREEN_W - BUTTON_SIZE - 32);
+  const translateY = useSharedValue(SCREEN_H - BUTTON_SIZE - 62 - (insets.bottom || 0));
+  const startX = useSharedValue(0);
+  const startY = useSharedValue(0);
+  const isDragging = useSharedValue(false);
+
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+      startX.value = translateX.value;
+      startY.value = translateY.value;
+      isDragging.value = true;
+    })
+    .onUpdate(e => {
+      translateX.value = Math.max(0, Math.min(SCREEN_W - BUTTON_SIZE, startX.value + e.translationX));
+      translateY.value = Math.max(0, Math.min(SCREEN_H - BUTTON_SIZE, startY.value + e.translationY));
+    })
+    .onEnd(() => {
+      isDragging.value = false;
+      // Snap to nearest horizontal edge
+      const snapX = translateX.value < SCREEN_W / 2 ? 12 : SCREEN_W - BUTTON_SIZE - 12;
+      translateX.value = withSpring(snapX, { damping: 15, stiffness: 120 });
+    });
+
+  const dragStyle = useAnimatedStyle(() => ({
+    position: 'absolute',
+    left: translateX.value,
+    top: translateY.value,
+    zIndex: 99,
+  }));
+
   return (
     <>
       {/* <Tabs
@@ -155,20 +190,20 @@ export default function TabLayout() {
         />
       </Tabs> */}
       <LandingScreen />
-      <Animated.View entering={FadeInDown.delay(1000).springify()} style={styles.chatBot}>
-        <TouchableOpacity
-          // style={styles.chatIcon}
-          activeOpacity={0.8}
-          onPress={() => {
-            Linking.openURL('https://wa.me/919022137932?text=I%20need%20help');
-          }}
-        >
-          <Animated.View style={animatedStyle}>
-            {/* <MessagesSquare size={28} color="white" /> */}
-            <Image source={require('../../assets/wp.png')} style={{ width: 60, height: 60 }} contentFit="contain" />
-          </Animated.View>
-        </TouchableOpacity>
-      </Animated.View>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View entering={FadeInDown.delay(1000).springify()} style={dragStyle}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              Linking.openURL('https://wa.me/919022137932?text=I%20need%20help');
+            }}
+          >
+            <Animated.View style={animatedStyle}>
+              <Image source={require('../../assets/wp.png')} style={{ width: 60, height: 60 }} contentFit="contain" />
+            </Animated.View>
+          </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
     </>
   );
 }

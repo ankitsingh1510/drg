@@ -44,44 +44,68 @@ export default function EventDetails() {
         <TouchableOpacity className="h-8 w-8 justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={colors.text} strokeWidth={2} />
         </TouchableOpacity>
-        <AppText className="text-lg font-outfit-semibold text-gray-800 dark:text-white">Event Details</AppText>
+        <AppText weight="semibold" className="text-lg text-gray-800 dark:text-white">
+          Event Details
+        </AppText>
         <View className="w-8" />
       </View>
 
       <ScrollView className="px-5 pt-2.5" showsVerticalScrollIndicator={false}>
         {/* Patient Info */}
-        <AppText className="mb-3 text-[13px] font-outfit-bold tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           PATIENT INFO
         </AppText>
         <View className="mb-6 flex-row justify-between">
           <View className="flex-1 gap-2">
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Sample ID: <AppText className="text-xs font-outfit-semibold text-gray-800 dark:text-white">21002</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Sample ID:{' '}
+              <AppText weight="semibold" className="text-xs text-gray-800 dark:text-white">
+                21002
+              </AppText>
             </AppText>
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Assay: <AppText className="text-xs font-outfit-semibold text-gray-800 dark:text-white">OncoIndx L8X</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Assay:{' '}
+              <AppText weight="semibold" className="text-xs text-gray-800 dark:text-white">
+                OncoIndx L8X
+              </AppText>
             </AppText>
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Date: <AppText className="text-xs font-outfit-semibold text-gray-800 dark:text-white">12 Nov 2025</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Date:{' '}
+              <AppText weight="semibold" className="text-xs text-gray-800 dark:text-white">
+                12 Nov 2025
+              </AppText>
             </AppText>
           </View>
           <View className="flex-1 gap-2">
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Accession: <AppText className="text-xs font-outfit-semibold text-gray-800 dark:text-white">25-A04409</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Accession:{' '}
+              <AppText weight="semibold" className="text-xs text-gray-800 dark:text-white">
+                25-A04409
+              </AppText>
             </AppText>
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Age & Gen.: <AppText className="text-xs font-outfit-semibold text-gray-800 dark:text-white">38 | Female</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Age & Gen.:{' '}
+              <AppText weight="semibold" className="text-xs text-gray-800 dark:text-white">
+                38 | Female
+              </AppText>
             </AppText>
-            <AppText className="text-xs font-outfit-medium text-[#6B7280]">
-              Disease: <AppText className="text-xs font-outfit-semibold text-[#4A90D9]">Breast cancer</AppText>
+            <AppText weight="medium" className="text-xs text-[#6B7280]">
+              Disease:{' '}
+              <AppText weight="semibold" className="text-xs text-[#4A90D9]">
+                Breast cancer
+              </AppText>
             </AppText>
           </View>
         </View>
 
         <View className="mb-4 flex-row items-center justify-between">
-          <AppText className="text-lg font-outfit-bold tracking-widest text-gray-800 dark:text-white">{item.title}</AppText>
+          <AppText weight="bold" className="text-lg tracking-widest text-gray-800 dark:text-white">
+            {item.title}
+          </AppText>
           <View className="rounded bg-blue-100 px-2 py-1">
-            <AppText className="text-[10px] font-outfit-bold text-blue-600">LAB REPORT</AppText>
+            <AppText weight="bold" className="text-[10px] text-blue-600">
+              LAB REPORT
+            </AppText>
           </View>
         </View>
 
@@ -91,7 +115,9 @@ export default function EventDetails() {
             <FileText size={18} color={'#0284C7'} strokeWidth={2} />
           </View>
           <View className="flex-1">
-            <AppText className="text-sm font-outfit-semibold text-gray-800 dark:text-white">{item.fileName}</AppText>
+            <AppText weight="semibold" className="text-sm text-gray-800 dark:text-white">
+              {item.fileName}
+            </AppText>
             <AppText className="mt-0.5 text-xs text-[#6B7280]">{item.fileSubtitle}</AppText>
           </View>
           <TouchableOpacity
@@ -99,50 +125,58 @@ export default function EventDetails() {
             // onPress={() => router.push('/reports')} // Need to add report screen and its props
           >
             <Eye size={14} color={colors.textSecondary} strokeWidth={2} />
-            <AppText className="text-xs font-outfit-semibold text-gray-500 dark:text-[#8BA5C0]">View</AppText>
+            <AppText weight="semibold" className="text-xs text-gray-500 dark:text-[#8BA5C0]">
+              View
+            </AppText>
           </TouchableOpacity>
         </View>
 
         {/* AI Summary */}
-        <AppText className="mb-3 mt-4 text-[13px] font-outfit-bold tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 mt-4 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           AI SUMMARY
         </AppText>
         <AppText className="text-sm leading-[22px] text-gray-800 dark:text-white">{item.aiSummary}</AppText>
 
         {/* Patient & Test Summary */}
-        <AppText className="mb-3 mt-6 text-[13px] font-outfit-bold tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 mt-6 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           PATIENT & TEST SUMMARY
         </AppText>
 
-        <AppText className="mb-2 mt-4 text-sm font-outfit-semibold text-gray-800 dark:text-white">Diagnosis</AppText>
+        <AppText weight="semibold" className="mb-2 mt-4 text-sm text-gray-800 dark:text-white">
+          Diagnosis
+        </AppText>
         {item.diagnosis.map((d, i) => (
           <AppText key={i} className="mb-1 pl-2 text-sm leading-[22px] text-gray-800 dark:text-white">
             • {d}
           </AppText>
         ))}
 
-        <AppText className="mb-2 mt-4 text-sm font-outfit-semibold text-gray-800 dark:text-white">Requested Tests</AppText>
+        <AppText weight="semibold" className="mb-2 mt-4 text-sm text-gray-800 dark:text-white">
+          Requested Tests
+        </AppText>
         {item.requestedTests.map((t, i) => (
           <AppText key={i} className="mb-1 pl-2 text-sm leading-[22px] text-gray-800 dark:text-white">
             • {t}
           </AppText>
         ))}
 
-        <AppText className="mb-2 mt-4 text-sm font-outfit-semibold text-gray-800 dark:text-white">Sample Types</AppText>
+        <AppText weight="semibold" className="mb-2 mt-4 text-sm text-gray-800 dark:text-white">
+          Sample Types
+        </AppText>
         {item.sampleTypes.map((s, i) => (
           <AppText key={i} className="mb-1 pl-2 text-sm leading-[22px] text-gray-800 dark:text-white">
             • {s}
           </AppText>
         ))}
 
-        <AppText className="mb-2 mt-4 text-sm font-outfit-semibold text-gray-800 dark:text-white">
+        <AppText weight="semibold" className="mb-2 mt-4 text-sm text-gray-800 dark:text-white">
           Requesting Physician
         </AppText>
         <AppText className="mb-1 pl-2 text-sm leading-[22px] text-gray-800 dark:text-white">
           • {item.requestingPhysician}
         </AppText>
 
-        <AppText className="mb-2 mt-4 text-sm font-outfit-semibold text-gray-800 dark:text-white">
+        <AppText weight="semibold" className="mb-2 mt-4 text-sm text-gray-800 dark:text-white">
           Specimen & Logistics
         </AppText>
         <AppText className="mb-1 pl-2 text-sm leading-[22px] text-gray-800 dark:text-white">• {item.specimen}</AppText>
