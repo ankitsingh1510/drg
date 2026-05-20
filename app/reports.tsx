@@ -317,7 +317,11 @@ export default function Reports() {
           <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
-          <Text className="text-lg font-outfit-bold text-gray-800 dark:text-gray-100" numberOfLines={1} ellipsizeMode="tail">
+          <Text
+            className="font-outfit-bold text-lg text-gray-800 dark:text-gray-100"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {patientName}
           </Text>
         </View>
@@ -354,6 +358,7 @@ export default function Reports() {
               setLoading(false);
               toast.error('Failed to load PDF.', 'Please try again.', 3000);
             }}
+            enableDoubleTapZoom={true}
             onLoadProgress={percent => {}}
             enablePaging={true}
             horizontal={false}
@@ -366,7 +371,7 @@ export default function Reports() {
           {/* Page indicator */}
           {!loading && numPages > 0 && (
             <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-2">
-              <Text className="text-sm font-outfit-semibold text-white">
+              <Text className="font-outfit-semibold text-sm text-white">
                 {currentPage} / {numPages}
               </Text>
             </View>
@@ -433,7 +438,9 @@ export default function Reports() {
                     onPress={handleTalkToDrG}
                   >
                     <Feather name="video" size={20} color="white" strokeWidth={2.5} />
-                    <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">Talk</Text>
+                    <Text className="ml-2 font-outfit-extrabold text-base uppercase tracking-tight text-white">
+                      Talk
+                    </Text>
                   </TouchableOpacity>
                 </ReAnimated.View>
               )}
@@ -445,7 +452,7 @@ export default function Reports() {
                   onPress={handleChatWithDrG}
                 >
                   <Ionicons name="chatbubbles" size={20} color="white" />
-                  <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">Chat</Text>
+                  <Text className="ml-2 font-outfit-extrabold text-base uppercase tracking-tight text-white">Chat</Text>
                 </TouchableOpacity>
               </ReAnimated.View>
             </View>
@@ -458,7 +465,7 @@ export default function Reports() {
                 className="flex-row items-center justify-center rounded-full bg-slate-100 px-10 py-4 dark:bg-slate-800"
               >
                 <ActivityIndicator size="small" color={isDark ? '#fff' : colors.common.primary} />
-                <Text className="ml-3 text-base font-outfit-extrabold uppercase tracking-tight text-slate-500 dark:text-slate-400">
+                <Text className="ml-3 font-outfit-extrabold text-base uppercase tracking-tight text-slate-500 dark:text-slate-400">
                   Analyzing Report...
                 </Text>
               </TouchableOpacity>
@@ -473,7 +480,7 @@ export default function Reports() {
                 onPress={handleIngestReport}
               >
                 <MaterialIcons name="analytics" size={22} color="white" />
-                <Text className="ml-2 text-base font-outfit-extrabold uppercase tracking-tight text-white">
+                <Text className="ml-2 font-outfit-extrabold text-base uppercase tracking-tight text-white">
                   Analyze Report
                 </Text>
               </TouchableOpacity>

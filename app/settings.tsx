@@ -55,7 +55,7 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl border border-gray-300 bg-white p-5 dark:bg-gray-800"
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
@@ -322,8 +322,8 @@ const Settings = () => {
           >
             <View
               className={
-                `mt-2.5 flex-row items-center justify-center gap-4 rounded-xl border py-2.5 ` +
-                (isDarkMode ? 'border-red-900 bg-red-900' : 'border-red-200 bg-red-100')
+                `mt-2.5 flex-row items-center justify-center gap-4 rounded-xl py-2.5 ` +
+                (isDarkMode ? 'bg-red-900' : 'bg-red-100')
               }
             >
               <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />

@@ -198,7 +198,7 @@ export default function TabLayout() {
               Linking.openURL('https://wa.me/919022137932?text=I%20need%20help');
             }}
           >
-            <Animated.View style={animatedStyle}>
+            <Animated.View>
               <Image source={require('../../assets/wp.png')} style={{ width: 60, height: 60 }} contentFit="contain" />
             </Animated.View>
           </TouchableOpacity>

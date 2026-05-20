@@ -4,16 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import {
-  ClipboardList,
-  Dna,
-  LucideColumnsSettings,
-  Microscope,
-  Settings,
-  TestTube2,
-  TrendingUp,
-  User,
-} from 'lucide-react-native';
+import { ClipboardList, Dna, FileText, TestTube2, TrendingUp, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
@@ -83,7 +74,7 @@ export default function LandingScreen() {
         id: 'publications',
         label: 'Publication',
         subtitle: 'Poster & Publications',
-        icon: <Microscope size={24} color="#fff" />,
+        icon: <FileText size={24} color="#fff" />,
         color: '#F8A03C',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_PUBLICATIONS_URL || ''),
       },
