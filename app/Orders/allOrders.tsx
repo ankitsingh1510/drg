@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { ScrollView, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
 import { colors as themeColors } from '@/constants/colors';
+import { ordersAPI } from '@/services/orders';
+
+const PAGE_SIZE = 20;
 
 type OrderStatus = 'Ordered Placed' | 'Sample Accession' | 'Report Released';
 
 interface PatientOrder {
   testName: string;
   status: OrderStatus;
+  sampleType?: string;
+  orderPlacedTimestamp?: string | null;
+  sampleAccessionTimestamp?: string | null;
+  releasedDate?: string | null;
+  fullReportPath?: string | number | null;
+  documentId?: string | null;
+  assayResultIds?: string;
+  ingestionStatus?: string | null;
 }
 
 interface PatientWithOrders {
@@ -22,60 +33,94 @@ interface PatientWithOrders {
   orders: PatientOrder[];
 }
 
-const patients: PatientWithOrders[] = [
-  {
-    id: '1',
-    patientName: 'Rahul Sharma',
-    age: 52,
-    gender: 'Male',
-    orders: [
-      { testName: 'OncoIndx LBx', status: 'Ordered Placed' },
-      { testName: 'OncoIndx TBx', status: 'Sample Accession' },
-      { testName: 'OncoRisk', status: 'Report Released' },
-    ],
-  },
-  {
-    id: '2',
-    patientName: 'Vaishali Kumari',
-    age: 44,
-    gender: 'Female',
-    orders: [
-      { testName: 'OncoIndx LBx', status: 'Report Released' },
-      { testName: 'OncoIndx TBx', status: 'Sample Accession' },
-      { testName: 'OncoRisk', status: 'Report Released' },
-    ],
-  },
-  {
-    id: '3',
-    patientName: 'Shreyas Gupte',
-    age: 38,
-    gender: 'Male',
-    orders: [
-      { testName: 'OncoIndx LBx', status: 'Ordered Placed' },
-      { testName: 'OncoIndx TBx', status: 'Sample Accession' },
-      { testName: 'OncoRisk', status: 'Report Released' },
-    ],
-  },
-  {
-    id: '4',
-    patientName: 'Bhushan Verma',
-    age: 64,
-    gender: 'Male',
-    orders: [
-      { testName: 'OncoIndx LBx', status: 'Ordered Placed' },
-      { testName: 'OncoIndx TBx', status: 'Sample Accession' },
-      { testName: 'OncoRisk', status: 'Ordered Placed' },
-      { testName: 'OncoRisk', status: 'Report Released' },
-    ],
-  },
-];
+function normalizeOrderStatus(rawStatus?: string): OrderStatus {
+  const value = (rawStatus ?? '').toLowerCase();
+
+  if (value.includes('release') || value.includes('report')) {
+    return 'Report Released';
+  }
+
+  if (value.includes('accession')) {
+    return 'Sample Accession';
+  }
+
+  return 'Ordered Placed';
+}
+
+function mapApiDataToPatients(apiData: any[]): PatientWithOrders[] {
+  if (!Array.isArray(apiData)) {
+    return [];
+  }
+
+  const map = new Map<string, PatientWithOrders>();
+
+  apiData.forEach((item: any, index: number) => {
+    const key = String(item.accessionId ?? item.accessionNumber ?? item.patientName ?? index);
+    if (!map.has(key)) {
+      map.set(key, {
+        id: key,
+        patientName: item.patientName ?? 'Unknown',
+        age: parseInt(item.age) || 0,
+        gender: item.gender ?? '',
+        orders: [],
+      });
+    }
+
+    const assays = Array.isArray(item.assays) ? item.assays : [];
+
+    if (assays.length > 0) {
+      assays.forEach((assay: any) => {
+        // Derive status from boolean flags; fall back to workflowStatuses string
+        let status: OrderStatus = 'Ordered Placed';
+        if (assay?.released === true) {
+          status = 'Report Released';
+        } else if (assay?.sampleAccessioned === true) {
+          status = 'Sample Accession';
+        } else if (assay?.orderPlaced === true) {
+          status = 'Ordered Placed';
+        } else {
+          const rawStatus = Array.isArray(assay?.workflowStatuses)
+            ? assay.workflowStatuses[0]
+            : (assay?.status ?? assay?.workflowStatus ?? assay?.orderStatus ?? assay?.oncoindx_sub_pipeline);
+          status = normalizeOrderStatus(rawStatus);
+        }
+
+        map.get(key)!.orders.push({
+          testName: assay?.assayName ?? assay?.assay ?? assay?.testName ?? 'Unknown',
+          status,
+          sampleType:
+            Array.isArray(assay?.sampleTypes) && assay.sampleTypes.length > 0
+              ? assay.sampleTypes.join(' | ')
+              : (assay?.sampleType ?? undefined),
+          orderPlacedTimestamp: assay?.orderPlacedTimestamp ?? null,
+          sampleAccessionTimestamp: assay?.sampleAccessionTimestamp ?? null,
+          releasedDate: assay?.releasedDate ?? null,
+          fullReportPath: assay?.fullReportPath,
+          documentId: assay?.documentId ?? null,
+          assayResultIds: Array.isArray(assay?.assayResultIds)
+            ? assay.assayResultIds.join(',')
+            : (assay?.assayResultIds?.toString?.() ?? ''),
+          ingestionStatus: assay?.drg_ingestion_status ?? assay?.drgIngestionStatus ?? null,
+        });
+      });
+      return;
+    }
+
+    map.get(key)!.orders.push({
+      testName: item.assay ?? item.testName ?? 'Unknown',
+      status: normalizeOrderStatus(item.status ?? item.workflowStatus),
+    });
+  });
+
+  return Array.from(map.values());
+}
 
 const statusBadgeStyle: Record<OrderStatus, { bg: string; text: string; darkBg: string; darkText: string }> = {
   'Ordered Placed': {
-    bg: '#FEF3C7',
+    bg: '#fdf8e3',
     text: themeColors.common.warning,
-    darkBg: '#efeee9',
-    darkText: '#a46901',
+    darkBg: '#332f1e',
+    darkText: '#f79f07',
   },
   'Sample Accession': {
     bg: '#EEF2FF',
@@ -113,7 +158,13 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
       onPress={() =>
         router.push({
           pathname: '/Orders/orderDetails',
-          params: { patientId: patient.id, patientName: patient.patientName, age: patient.age, gender: patient.gender },
+          params: {
+            patientId: patient.id,
+            patientName: patient.patientName,
+            age: patient.age,
+            gender: patient.gender,
+            orders: JSON.stringify(patient.orders),
+          },
         })
       }
     >
@@ -143,6 +194,12 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
 
 export default function AllOrders() {
   const [search, setSearch] = useState('');
+  const [patients, setPatients] = useState<PatientWithOrders[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
@@ -150,7 +207,70 @@ export default function AllOrders() {
     text: isDark ? '#FFFFFF' : '#1F2937',
   };
 
-  const filtered = patients.filter(p => p.patientName.toLowerCase().includes(search.toLowerCase()));
+  const fetchOrders = useCallback(async (patientName = '', pageToLoad = 1, isLoadMore = false) => {
+    try {
+      if (isLoadMore) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
+      setError(null);
+      const today = new Date().toISOString().split('T')[0];
+      const response = await ordersAPI.getAssayWiseOrderStatus({
+        dateFrom: '2025-01-01',
+        dateTo: today,
+        patientName,
+        count: PAGE_SIZE,
+        page: pageToLoad,
+        restrictByRole: 'true',
+        studyId: [10],
+      });
+
+      const mappedPatients = mapApiDataToPatients(response.data);
+
+      setPatients(prev => (isLoadMore ? [...prev, ...mappedPatients] : mappedPatients));
+      setPage(pageToLoad);
+      setHasMore(pageToLoad * PAGE_SIZE < (response.totalCount ?? 0));
+    } catch (err: any) {
+      console.error('[AllOrders] fetch error:', err);
+      setError('Failed to load orders. Please try again.');
+    } finally {
+      if (isLoadMore) {
+        setLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchOrders(search.trim(), 1, false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search, fetchOrders]);
+
+  const loadMore = useCallback(() => {
+    if (loading || loadingMore || !hasMore) {
+      return;
+    }
+
+    fetchOrders(search.trim(), page + 1, true);
+  }, [fetchOrders, hasMore, loading, loadingMore, page, search]);
+
+  const renderFooter = () => {
+    if (!loadingMore) {
+      return <View className="h-8" />;
+    }
+
+    return (
+      <View className="h-16 items-center justify-center">
+        <ActivityIndicator size="small" color={isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5')} />
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#111827]">
@@ -191,12 +311,38 @@ export default function AllOrders() {
         </View>
       </View>
 
-      <ScrollView className="px-4" showsVerticalScrollIndicator={false}>
-        {filtered.map(patient => (
-          <PatientOrderCard key={patient.id} patient={patient} isDark={isDark} />
-        ))}
-        <View className="h-8" />
-      </ScrollView>
+      {loading && patients.length === 0 ? (
+        <View className="mt-16 items-center justify-center">
+          <ActivityIndicator size="large" color={isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5')} />
+          <AppText className="mt-3 text-sm text-gray-500 dark:text-[#8BA5C0]">Loading orders...</AppText>
+        </View>
+      ) : error && patients.length === 0 ? (
+        <View className="mt-16 items-center justify-center px-4">
+          <AppText className="text-center text-sm text-red-500">{error}</AppText>
+          <TouchableOpacity
+            className="mt-4 rounded-xl bg-blue-600 px-6 py-2"
+            onPress={() => fetchOrders(search.trim(), 1)}
+          >
+            <AppText className="text-sm text-white">Retry</AppText>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={patients}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => <PatientOrderCard patient={item} isDark={isDark} />}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          showsVerticalScrollIndicator={false}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={
+            <View className="mt-16 items-center justify-center">
+              <AppText className="text-sm text-gray-500 dark:text-[#8BA5C0]">No orders found.</AppText>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

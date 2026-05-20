@@ -128,7 +128,7 @@ export default function ForgotPasswordScreen() {
                         <Text className="ml-2 font-outfit-bold text-base tracking-wide text-white">Sending...</Text>
                       </View>
                     ) : (
-                      <Text className="font-outfit-bold text-base tracking-wide text-white">{'Send ResetLink'}</Text>
+                      <Text className="font-outfit-bold text-base tracking-wide text-white">{'Send Reset Link'}</Text>
                     )}
                   </TouchableOpacity>
 

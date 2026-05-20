@@ -180,7 +180,7 @@ export default function ReportsList() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={isDarkMode ? '#FDF5E6' : '#0B1929'} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="text-xl font-outfit-semibold text-[#0F2D37] dark:text-white">Patient's Reports</AppText>
+        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Patient's Reports</AppText>
         <View className="w-8" />
       </View>
 
@@ -213,7 +213,7 @@ export default function ReportsList() {
         {loading && !refreshing && (
           <View className="absolute inset-0 items-center justify-center bg-[#FDF5E6]/90 dark:bg-gray-900/90">
             <ActivityIndicator size="large" color={colors.common.primary} />
-            <Text className="mt-4 text-base font-outfit-bold tracking-tight text-gray-500 dark:text-gray-400">
+            <Text className="mt-4 font-outfit-bold text-base tracking-tight text-gray-500 dark:text-gray-400">
               Loading Reports...
             </Text>
           </View>

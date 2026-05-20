@@ -22,8 +22,9 @@ const ONBOARDING_DATA = [
     image: require('@/assets/onboarding/on1.webp'),
   },
   {
-    title: 'Capture Every Consultation',
-    description: 'Record patient discussions securely and revisit them anytime',
+    title: 'Track Every Clinical Order',
+    description:
+      'Monitor real-time test status, sample progress, and access reports instantly as soon as they are released.',
     image: require('@/assets/onboarding/on2.webp'),
   },
 ];
@@ -110,7 +111,7 @@ export default function OnboardingScreen() {
               <AppText weight="bold" className="mb-3 text-2xl leading-9 text-white">
                 {currentItem.title}
               </AppText>
-              <AppText weight="regular" className="text-sm leading-6 text-white/60">
+              <AppText weight="regular" className="text-base leading-6 text-white/60">
                 {currentItem.description}
               </AppText>
             </Animated.View>

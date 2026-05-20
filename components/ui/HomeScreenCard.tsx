@@ -70,16 +70,16 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
         </View>
       )}
       <TouchableOpacity
-        className={`items-center py-3 ${isRow ? 'px-1' : 'min-w-[45%] flex-1 px-2'} ${comingSoon ? 'opacity-60' : ''}`}
+        className={`items-center py-3 ${isRow ? 'px-1' : 'min-w-[45%] flex-1 px-2'} ${comingSoon ? 'opacity-70' : ''}`}
         onPress={!comingSoon ? onPress : undefined}
-        activeOpacity={comingSoon ? 1 : 0.7}
+        activeOpacity={comingSoon ? 1 : 0.8}
         accessibilityLabel={label}
         accessibilityHint={comingSoon ? 'Coming soon' : subtitle}
         accessibilityRole="button"
         disabled={comingSoon}
       >
         <View
-          className={`mb-2 h-[52px] w-[52px] items-center justify-center rounded-xl ${comingSoon ? 'opacity-50' : ''}`}
+          className={`mb-2 h-[52px] w-[52px] items-center justify-center rounded-xl ${comingSoon ? 'opacity-80' : ''}`}
           style={{ backgroundColor: color || '#91A3B0' }}
         >
           {icon}
