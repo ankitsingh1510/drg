@@ -1,9 +1,9 @@
-import React, { memo, useCallback } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { Pressable, RefreshControl, Text, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { colors } from '@/constants/colors';
 import { imagesAtom, newsAtom } from '@/stores/ApiData';
@@ -50,18 +50,21 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
           />
           {/* Rank Badge */}
           <View className="absolute left-4 top-4 h-8 w-8 items-center justify-center rounded-full bg-blue-500/90 shadow-sm">
-            <Text className="text-sm font-outfit-bold text-white">{index + 1}</Text>
+            <Text className="font-outfit-bold text-sm text-white">{index + 1}</Text>
           </View>
         </View>
 
         <View className="p-5">
           <View className="mb-2">
-            <Text className="text-[10px] font-outfit-medium text-gray-400 dark:text-gray-500">
+            <Text className="font-outfit-medium text-[10px] text-gray-400 dark:text-gray-500">
               {item.pubDate || 'Just now'}
             </Text>
           </View>
 
-          <Text numberOfLines={2} className="mb-2 text-xl font-outfit-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <Text
+            numberOfLines={2}
+            className="mb-2 font-outfit-bold text-xl tracking-tight text-gray-900 dark:text-gray-100"
+          >
             {item.title}
           </Text>
 
@@ -70,7 +73,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
           </Text>
 
           <View className="mt-4 flex-row items-center border-t border-gray-100 pt-4 dark:border-gray-700/50">
-            <Text className="text-xs font-outfit-semibold text-blue-500 dark:text-blue-400">Read full article</Text>
+            <Text className="font-outfit-semibold text-xs text-blue-500 dark:text-blue-400">Read full article</Text>
             <View className="ml-2 h-1 w-1 rounded-full bg-blue-200 dark:bg-blue-800" />
           </View>
         </View>
@@ -80,7 +83,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
 });
 
 const NewsCard = ({ count }: NewsCardProps) => {
-  const news = useAtomValue(newsAtom);
+  const [news, refreshNews] = useAtom(newsAtom);
   const images = useAtomValue(imagesAtom);
 
   const handleClick = useCallback((url: string) => {
@@ -93,11 +96,19 @@ const NewsCard = ({ count }: NewsCardProps) => {
     return images.results[randomIndex].urls.small;
   }, [images]);
 
-  if (!news || news.length === 0) {
-    return <Text className="mt-10 text-center text-gray-400">No news available.</Text>;
-  }
+  const [refreshing, setRefreshing] = useState(false);
 
-  const data = count === -1 ? news : news.slice(0, count);
+  useEffect(() => {
+    if (refreshing) setRefreshing(false);
+  }, [news]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refreshNews();
+  }, [refreshNews]);
+
+  const apiFailed = news === null;
+  const data = apiFailed ? [] : count === -1 ? news : news.slice(0, count);
 
   const renderItem = useCallback(
     ({ item, index }: any) => (
@@ -116,6 +127,10 @@ const NewsCard = ({ count }: NewsCardProps) => {
         }}
         keyExtractor={(item: any, index: number) => item.id?.toString() || index.toString()}
         renderItem={renderItem}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListEmptyComponent={
+          apiFailed ? () => <Text className="mt-10 text-center text-gray-400">No news available</Text> : undefined
+        }
       />
     </View>
   );

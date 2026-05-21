@@ -186,7 +186,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="profile"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'My Profile',
                   headerBackTitle: '',
                   headerBackButtonDisplayMode: 'minimal',
@@ -204,7 +204,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="reset-password"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'Change Password',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',
@@ -223,7 +223,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="news"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'Trends',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',

@@ -154,7 +154,7 @@ export default function ReportsList() {
 
   const renderEmptyComponent = useCallback(() => {
     if (loading) return null;
-    return <EmptyState type="no-patients" />;
+    return <EmptyState type="no-released-tests" />;
   }, [loading]);
 
   useFocusEffect(
@@ -184,7 +184,7 @@ export default function ReportsList() {
         <View className="w-8" />
       </View>
 
-      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />
+      {!loading && <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />}
 
       <View className="flex-1">
         <FlashList

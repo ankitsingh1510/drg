@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react-native';
@@ -7,115 +7,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
 import { colors as themeColors } from '@/constants/colors';
 import { ordersAPI } from '@/services/orders';
+import { mapApiDataToPatients, type OrderDisplayStatus, type PatientWithOrders } from '@/util/orders';
 
 const PAGE_SIZE = 20;
+const DATE_FROM = '2025-01-01';
+const STUDY_IDS = [10]; // stable reference — never re-allocated
 
-type OrderStatus = 'Ordered Placed' | 'Sample Accession' | 'Report Released';
-
-interface PatientOrder {
-  testName: string;
-  status: OrderStatus;
-  sampleType?: string;
-  orderPlacedTimestamp?: string | null;
-  sampleAccessionTimestamp?: string | null;
-  releasedDate?: string | null;
-  fullReportPath?: string | number | null;
-  documentId?: string | null;
-  assayResultIds?: string;
-  ingestionStatus?: string | null;
-}
-
-interface PatientWithOrders {
-  id: string;
-  patientName: string;
-  age: number;
-  gender: string;
-  orders: PatientOrder[];
-}
-
-function normalizeOrderStatus(rawStatus?: string): OrderStatus {
-  const value = (rawStatus ?? '').toLowerCase();
-
-  if (value.includes('release') || value.includes('report')) {
-    return 'Report Released';
-  }
-
-  if (value.includes('accession')) {
-    return 'Sample Accession';
-  }
-
-  return 'Ordered Placed';
-}
-
-function mapApiDataToPatients(apiData: any[]): PatientWithOrders[] {
-  if (!Array.isArray(apiData)) {
-    return [];
-  }
-
-  const map = new Map<string, PatientWithOrders>();
-
-  apiData.forEach((item: any, index: number) => {
-    const key = String(item.accessionId ?? item.accessionNumber ?? item.patientName ?? index);
-    if (!map.has(key)) {
-      map.set(key, {
-        id: key,
-        patientName: item.patientName ?? 'Unknown',
-        age: parseInt(item.age) || 0,
-        gender: item.gender ?? '',
-        orders: [],
-      });
-    }
-
-    const assays = Array.isArray(item.assays) ? item.assays : [];
-
-    if (assays.length > 0) {
-      assays.forEach((assay: any) => {
-        // Derive status from boolean flags; fall back to workflowStatuses string
-        let status: OrderStatus = 'Ordered Placed';
-        if (assay?.released === true) {
-          status = 'Report Released';
-        } else if (assay?.sampleAccessioned === true) {
-          status = 'Sample Accession';
-        } else if (assay?.orderPlaced === true) {
-          status = 'Ordered Placed';
-        } else {
-          const rawStatus = Array.isArray(assay?.workflowStatuses)
-            ? assay.workflowStatuses[0]
-            : (assay?.status ?? assay?.workflowStatus ?? assay?.orderStatus ?? assay?.oncoindx_sub_pipeline);
-          status = normalizeOrderStatus(rawStatus);
-        }
-
-        map.get(key)!.orders.push({
-          testName: assay?.assayName ?? assay?.assay ?? assay?.testName ?? 'Unknown',
-          status,
-          sampleType:
-            Array.isArray(assay?.sampleTypes) && assay.sampleTypes.length > 0
-              ? assay.sampleTypes.join(' | ')
-              : (assay?.sampleType ?? undefined),
-          orderPlacedTimestamp: assay?.orderPlacedTimestamp ?? null,
-          sampleAccessionTimestamp: assay?.sampleAccessionTimestamp ?? null,
-          releasedDate: assay?.releasedDate ?? null,
-          fullReportPath: assay?.fullReportPath,
-          documentId: assay?.documentId ?? null,
-          assayResultIds: Array.isArray(assay?.assayResultIds)
-            ? assay.assayResultIds.join(',')
-            : (assay?.assayResultIds?.toString?.() ?? ''),
-          ingestionStatus: assay?.drg_ingestion_status ?? assay?.drgIngestionStatus ?? null,
-        });
-      });
-      return;
-    }
-
-    map.get(key)!.orders.push({
-      testName: item.assay ?? item.testName ?? 'Unknown',
-      status: normalizeOrderStatus(item.status ?? item.workflowStatus),
-    });
-  });
-
-  return Array.from(map.values());
-}
-
-const statusBadgeStyle: Record<OrderStatus, { bg: string; text: string; darkBg: string; darkText: string }> = {
+const STATUS_BADGE: Record<OrderDisplayStatus, { bg: string; text: string; darkBg: string; darkText: string }> = {
   'Ordered Placed': {
     bg: '#fdf8e3',
     text: themeColors.common.warning,
@@ -136,8 +34,8 @@ const statusBadgeStyle: Record<OrderStatus, { bg: string; text: string; darkBg: 
   },
 };
 
-const StatusBadge = ({ status, isDark }: { status: OrderStatus; isDark: boolean }) => {
-  const style = statusBadgeStyle[status];
+const StatusBadge = React.memo(({ status, isDark }: { status: OrderDisplayStatus; isDark: boolean }) => {
+  const style = STATUS_BADGE[status];
   return (
     <View
       className="mt-1 w-full items-center justify-center rounded-full px-2.5 py-1"
@@ -148,31 +46,35 @@ const StatusBadge = ({ status, isDark }: { status: OrderStatus; isDark: boolean 
       </AppText>
     </View>
   );
-};
+});
 
-const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isDark: boolean }) => {
+const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWithOrders; isDark: boolean }) => {
+  const chevronColor = isDark ? '#8BA5C0' : '#9CA3AF';
+
+  const handlePress = useCallback(() => {
+    router.push({
+      pathname: '/Orders/orderDetails',
+      params: {
+        patientId: patient.id,
+        patientName: patient.patientName,
+        age: patient.age,
+        gender: patient.gender,
+        orders: JSON.stringify(patient.orders),
+      },
+    });
+  }, [patient]);
+
   return (
     <TouchableOpacity
       className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 dark:border-[#374151] dark:bg-[#1f2937]"
       activeOpacity={0.8}
-      onPress={() =>
-        router.push({
-          pathname: '/Orders/orderDetails',
-          params: {
-            patientId: patient.id,
-            patientName: patient.patientName,
-            age: patient.age,
-            gender: patient.gender,
-            orders: JSON.stringify(patient.orders),
-          },
-        })
-      }
+      onPress={handlePress}
     >
       <View className="mb-1 flex-row items-center justify-between">
         <AppText weight="semibold" className="text-lg text-gray-900 dark:text-white">
           {patient.patientName}
         </AppText>
-        <ChevronRight size={20} color={isDark ? '#8BA5C0' : '#9CA3AF'} />
+        <ChevronRight size={20} color={chevronColor} />
       </View>
       <AppText className="mb-2 text-xs text-gray-500 dark:text-[#8BA5C0]">
         {patient.age}Y • {patient.gender}
@@ -190,7 +92,7 @@ const PatientOrderCard = ({ patient, isDark }: { patient: PatientWithOrders; isD
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 export default function AllOrders() {
   const [search, setSearch] = useState('');
@@ -200,77 +102,83 @@ export default function AllOrders() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const colors = {
-    text: isDark ? '#FFFFFF' : '#1F2937',
-  };
+  const textColor = isDark ? '#FFFFFF' : '#1F2937';
+  const indicatorColor = isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5');
 
-  const fetchOrders = useCallback(async (patientName = '', pageToLoad = 1, isLoadMore = false) => {
-    try {
-      if (isLoadMore) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
-
+  const fetchOrders = useCallback(
+    async (patientName = '', pageToLoad = 1, isLoadMore = false) => {
+      isLoadMore ? setLoadingMore(true) : setLoading(true);
       setError(null);
-      const today = new Date().toISOString().split('T')[0];
-      const response = await ordersAPI.getAssayWiseOrderStatus({
-        dateFrom: '2025-01-01',
-        dateTo: today,
-        patientName,
-        count: PAGE_SIZE,
-        page: pageToLoad,
-        restrictByRole: 'true',
-        studyId: [10],
-      });
 
-      const mappedPatients = mapApiDataToPatients(response.data);
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const response = await ordersAPI.getAssayWiseOrderStatus({
+          dateFrom: DATE_FROM,
+          dateTo: today,
+          patientName,
+          count: PAGE_SIZE,
+          page: pageToLoad,
+          restrictByRole: 'true',
+          studyId: STUDY_IDS,
+        });
 
-      setPatients(prev => (isLoadMore ? [...prev, ...mappedPatients] : mappedPatients));
-      setPage(pageToLoad);
-      setHasMore(pageToLoad * PAGE_SIZE < (response.totalCount ?? 0));
-    } catch (err: any) {
-      console.error('[AllOrders] fetch error:', err);
-      setError('Failed to load orders. Please try again.');
-    } finally {
-      if (isLoadMore) {
-        setLoadingMore(false);
-      } else {
-        setLoading(false);
+        const mappedPatients = mapApiDataToPatients(response.data);
+        setPatients(prev => (isLoadMore ? [...prev, ...mappedPatients] : mappedPatients));
+        setPage(pageToLoad);
+        setHasMore(pageToLoad * PAGE_SIZE < (response.totalCount ?? 0));
+      } catch (err: any) {
+        console.error('[AllOrders] fetch error:', err);
+        setError('Failed to load orders. Please try again.');
+      } finally {
+        isLoadMore ? setLoadingMore(false) : setLoading(false);
       }
-    }
-  }, []);
+    },
+    [] // no deps — DATE_FROM and STUDY_IDS are module-level constants
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchOrders(search.trim(), 1, false);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [search, fetchOrders]);
 
   const loadMore = useCallback(() => {
-    if (loading || loadingMore || !hasMore) {
-      return;
-    }
-
+    if (loading || loadingMore || !hasMore) return;
     fetchOrders(search.trim(), page + 1, true);
   }, [fetchOrders, hasMore, loading, loadingMore, page, search]);
 
-  const renderFooter = () => {
-    if (!loadingMore) {
-      return <View className="h-8" />;
-    }
+  const renderItem = useCallback(
+    ({ item }: { item: PatientWithOrders }) => <PatientOrderCard patient={item} isDark={isDark} />,
+    [isDark]
+  );
 
+  const keyExtractor = useCallback((item: PatientWithOrders) => item.id, []);
+
+  const renderFooter = useCallback(() => {
+    if (!loadingMore) return <View className="h-8" />;
     return (
       <View className="h-16 items-center justify-center">
-        <ActivityIndicator size="small" color={isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5')} />
+        <ActivityIndicator size="small" color={indicatorColor} />
       </View>
     );
-  };
+  }, [loadingMore, indicatorColor]);
+
+  const ListEmptyComponent = useMemo(
+    () => (
+      <View className="mt-16 items-center justify-center">
+        <AppText className="text-sm text-gray-500 dark:text-[#8BA5C0]">No orders found.</AppText>
+      </View>
+    ),
+    []
+  );
+
+  const showSpinner = loading && patients.length === 0;
+  const showError = !loading && !!error && patients.length === 0;
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#111827]">
@@ -281,7 +189,7 @@ export default function AllOrders() {
 
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
-          <ChevronLeft size={24} color={colors.text} strokeWidth={2.5} />
+          <ChevronLeft size={24} color={textColor} strokeWidth={2.5} />
         </TouchableOpacity>
         <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
           Orders List
@@ -299,24 +207,15 @@ export default function AllOrders() {
             value={search}
             onChangeText={setSearch}
           />
-          {/* <View className="mx-3 h-6 w-[1px] bg-gray-200 dark:bg-gray-700" />
-          <View className="flex-row items-center gap-3">
-            <TouchableOpacity>
-              <ArrowUpDown size={18} color="#9CA3AF" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Calendar size={18} color="#9CA3AF" />
-            </TouchableOpacity>
-          </View> */}
         </View>
       </View>
 
-      {loading && patients.length === 0 ? (
+      {showSpinner ? (
         <View className="mt-16 items-center justify-center">
-          <ActivityIndicator size="large" color={isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5')} />
+          <ActivityIndicator size="large" color={indicatorColor} />
           <AppText className="mt-3 text-sm text-gray-500 dark:text-[#8BA5C0]">Loading orders...</AppText>
         </View>
-      ) : error && patients.length === 0 ? (
+      ) : showError ? (
         <View className="mt-16 items-center justify-center px-4">
           <AppText className="text-center text-sm text-red-500">{error}</AppText>
           <TouchableOpacity
@@ -329,18 +228,18 @@ export default function AllOrders() {
       ) : (
         <FlatList
           data={patients}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => <PatientOrderCard patient={item} isDark={isDark} />}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 16 }}
           showsVerticalScrollIndicator={false}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
-          ListEmptyComponent={
-            <View className="mt-16 items-center justify-center">
-              <AppText className="text-sm text-gray-500 dark:text-[#8BA5C0]">No orders found.</AppText>
-            </View>
-          }
+          ListEmptyComponent={ListEmptyComponent}
+          removeClippedSubviews
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          initialNumToRender={PAGE_SIZE}
         />
       )}
     </SafeAreaView>

@@ -195,7 +195,7 @@ export default function TabLayout() {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
-              Linking.openURL('https://wa.me/919022137932?text=I%20need%20help');
+              Linking.openURL('https://wa.me/919022137932');
             }}
           >
             <Animated.View>
