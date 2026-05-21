@@ -12,7 +12,6 @@ export interface Patient {
   assayName: string;
   sampleBarcode: string;
   case_sample_id: number;
-  workflowStatus: string;
   assayResultId: number;
   gender: string;
   age: string;
@@ -30,7 +29,7 @@ export interface Patient {
   full_report_html_paths: string[] | [];
   summary_report_path: string | null;
   patientName: string;
-  analysisCompletionDate: string;
+  reportReleaseDate: string;
   assayResultIds: string;
   _totalCount: number;
 }
@@ -70,7 +69,7 @@ class PatientsAPI {
       variables: {
         fetchTestsDetailsForDrGModel: {
           pagination: {
-            sort: 'desc.analysisCompletionDate',
+            sort: 'desc.reportReleaseDate',
             page,
             count,
           },

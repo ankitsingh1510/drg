@@ -20,7 +20,7 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const date = new Date(patient.analysisCompletionDate);
+      const date = new Date(patient.reportReleaseDate);
       date.setHours(0, 0, 0, 0);
 
       const diffTime = today.getTime() - date.getTime();
@@ -36,30 +36,12 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
         daysAgo,
       };
     } catch {
-      return { formatted: patient.analysisCompletionDate, daysAgo: '' };
+      return { formatted: patient.reportReleaseDate, daysAgo: '' };
     }
-  }, [patient.analysisCompletionDate]);
+  }, [patient.reportReleaseDate]);
 
-  const statusConfig = useMemo(() => {
-    const status = patient.workflowStatus.toLowerCase();
-    let label = status.toUpperCase();
-
-    switch (status) {
-      case 'released':
-      case 'success':
-        return { color: colors.common.success, label };
-      case 'ready for release':
-        return { color: colors.common.warning, label };
-      case 'failed':
-        return { color: colors.common.error, label };
-      case 'in queue':
-        return { color: colors.common.warning, label };
-      case 'sample reporting':
-        return { color: colors.common.info, label };
-      default:
-        return { color: colors.dark.textTertiary, label: patient.workflowStatus.toUpperCase() };
-    }
-  }, [patient.workflowStatus]);
+  // Backend only returns Released tests; badge is always RELEASED
+  const statusConfig = { color: colors.common.success, label: 'RELEASED' };
 
   const handleViewReport = async () => {
     setLoadingReport(true);
@@ -73,18 +55,18 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
   return (
     <View className="mx-4 mb-4 rounded-2xl border border-gray-300 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
       <View className="mb-1 flex-row items-center justify-between">
-        <Text className="flex-1 text-xl font-outfit-bold text-gray-900 dark:text-white" numberOfLines={1}>
+        <Text className="flex-1 font-outfit-bold text-xl text-gray-900 dark:text-white" numberOfLines={1}>
           {patient.patientName}
         </Text>
         <View className="ml-3 rounded-full border px-3 py-1" style={{ borderColor: statusConfig.color }}>
-          <Text className="text-[10px] font-outfit-bold tracking-widest" style={{ color: statusConfig.color }}>
+          <Text className="font-outfit-bold text-[10px] tracking-widest" style={{ color: statusConfig.color }}>
             {statusConfig.label}
           </Text>
         </View>
       </View>
 
       <View className="my-2.5 flex-row items-center justify-between gap-3">
-        <Text className="text-sm font-outfit-semibold" style={{ color: colors.common.info }}>
+        <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
           {patient.assayName}
         </Text>
         <View className="flex-row items-center gap-1">
@@ -100,24 +82,24 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
         <View className="flex-1 gap-4">
           <View>
             <Text className="mb-0.5 text-xs text-gray-400 dark:text-gray-500">Accession</Text>
-            <Text className="text-sm font-outfit-bold text-gray-900 dark:text-white">{patient.accession_number}</Text>
+            <Text className="font-outfit-bold text-sm text-gray-900 dark:text-white">{patient.accession_number}</Text>
           </View>
           <View>
             <Text className="mb-0.5 text-xs text-gray-400 dark:text-gray-500">Gender</Text>
-            <Text className="text-sm font-outfit-bold text-gray-900 dark:text-white">{patient.gender}</Text>
+            <Text className="font-outfit-bold text-sm text-gray-900 dark:text-white">{patient.gender}</Text>
           </View>
         </View>
         <View className="flex-1 gap-4">
           <View>
             <Text className="mb-0.5 text-xs text-gray-400 dark:text-gray-500">Age</Text>
-            <Text className="text-sm font-outfit-bold text-gray-900 dark:text-white">{patient.age} Years</Text>
+            <Text className="font-outfit-bold text-sm text-gray-900 dark:text-white">{patient.age} Years</Text>
           </View>
           <View>
             <Text className="mb-0.5 text-xs text-gray-400 dark:text-gray-500">Cancer Type</Text>
             <TouchableOpacity onPress={() => setDiseaseNameExpanded(!diseaseNameExpanded)} activeOpacity={0.7}>
               <Text
                 numberOfLines={diseaseNameExpanded ? undefined : 1}
-                className="text-sm font-outfit-bold text-gray-900 dark:text-white"
+                className="font-outfit-bold text-sm text-gray-900 dark:text-white"
               >
                 {patient.diseaseName || 'N/A'}
               </Text>
@@ -131,7 +113,7 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
           <User size={20} color={colors.common.info} />
         </View>
         <View className="flex-1">
-          <Text className="text-sm font-outfit-bold text-gray-800 dark:text-gray-100">{patient.physicianName}</Text>
+          <Text className="font-outfit-bold text-sm text-gray-800 dark:text-gray-100">{patient.physicianName}</Text>
           <Text className="text-xs text-gray-500 dark:text-gray-400">{patient.facility}</Text>
         </View>
       </View>
@@ -143,7 +125,9 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
         className="flex-row items-center justify-center gap-2 rounded-xl py-3.5"
         style={{ backgroundColor: colors.common.accent }}
       >
-        <Text className="text-sm font-outfit-semibold text-white">{loadingReport ? 'Opening...' : 'View Full Report'}</Text>
+        <Text className="font-outfit-semibold text-sm text-white">
+          {loadingReport ? 'Opening...' : 'View Full Report'}
+        </Text>
         {!loadingReport && <ArrowRight size={16} color="white" />}
       </TouchableOpacity>
     </View>

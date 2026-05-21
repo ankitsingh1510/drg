@@ -11,7 +11,19 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Building, Calendar, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Building,
+  Calendar,
+  ChevronLeft,
+  Globe,
+  Hash,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
@@ -24,6 +36,7 @@ import {
   ProfileHeader,
   ProfileTextField,
 } from '@/components/profile';
+import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
@@ -289,7 +302,9 @@ const Profile = () => {
         <View style={{ backgroundColor: lightBg }} className="h-10 w-10 items-center justify-center rounded-2xl">
           {icon}
         </View>
-        <Text className="flex-1 text-lg font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100">{sectionName}</Text>
+        <Text className="flex-1 font-outfit-bold text-lg tracking-tight text-gray-800 dark:text-gray-100">
+          {sectionName}
+        </Text>
       </View>
     );
   };
@@ -333,30 +348,21 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <View className="flex-row items-center justify-between px-4 py-3">
+        <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
+          <ChevronLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+          My Profile
+        </AppText>
+        <View className="w-8" />
+      </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        {/* <View className="mb-2 flex-row items-center justify-between px-5 pb-2" pointerEvents="box-none">
-          <View className="flex-row items-center gap-4">
-            <Pressable
-              hitSlop={10}
-              onPress={() => router.back()}
-              className="h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-800"
-            >
-              <ArrowLeft size={22} color={isDarkMode ? colors.dark.text : colors.light.text} strokeWidth={2.5} />
-            </Pressable>
-            <Text className="text-xl font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100">My Profile</Text>
-          </View>
-          <IconNavBar />
-        </View> */}
-
-        <ScrollView
-          className="-mt-10 flex-1 px-5"
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <ProfileHeader
             firstName={fName}
             lastName={lName}

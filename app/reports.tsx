@@ -19,6 +19,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import messaging, { onMessage } from '@react-native-firebase/messaging';
 import { useSetAtom } from 'jotai';
+import { ChevronLeft } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import Pdf from 'react-native-pdf';
 import ReAnimated, { FadeInUp } from 'react-native-reanimated';
@@ -314,7 +315,7 @@ export default function Reports() {
         className="relative flex-row items-center border-b border-gray-200 bg-[#FDF5E6] px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
       >
         <TouchableOpacity onPress={handleGoBack} className="z-10 p-2">
-          <Ionicons name="arrow-back" size={24} color={isDark ? colors.dark.text : colors.common.accent} />
+          <ChevronLeft size={24} color={isDark ? colors.dark.text : colors.common.accent} strokeWidth={2.5} />
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
           <Text

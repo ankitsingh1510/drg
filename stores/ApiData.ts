@@ -1,15 +1,15 @@
 import { atom } from 'jotai';
+import { atomWithRefresh } from 'jotai/utils';
 
-export const newsAtom = atom(async () => {
+export const newsAtom = atomWithRefresh(async () => {
   try {
     const res = await fetch(
       'https://us-central1-nandiraju-api.cloudfunctions.net/app/news?source=bing&q=genomics+cancer'
     );
-    if (!res.ok) throw new Error('Failed to fetch trending topics');
-    return await res.json(); // will be an array of todos
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    throw error;
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 });
 
@@ -18,10 +18,9 @@ export const imagesAtom = atom(async () => {
     const res = await fetch(
       'https://api.unsplash.com/search/photos?page=1&query=cancer&per_page=20&client_id=WztAjjff7Z9mPXfGCNwmu8qPlVOIjuZaDErzoSy-5Tw'
     );
-    if (!res.ok) throw new Error('Failed to fetch toimagesdos');
-    return await res.json(); // will be an array of todos
-  } catch (error) {
-    console.error('Error fetching news:', error);
-    throw error;
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 });

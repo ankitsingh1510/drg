@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { usersAPI } from '@/services/users';
@@ -64,7 +65,7 @@ export default function ForgotPasswordScreen() {
           <View className="flex-1 bg-[#1E2D50]">
             <View className="px-7 pb-10 pt-4">
               <TouchableOpacity onPress={handleBackToLogin} className="mb-5 self-start rounded-full p-1">
-                <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+                <ChevronLeft size={24} color="#FFFFFF" strokeWidth={2.5} />
               </TouchableOpacity>
               <Text className="mb-2 font-outfit-extrabold text-3xl text-white">
                 {submitted ? 'Check Your Email' : 'Reset Password'}
