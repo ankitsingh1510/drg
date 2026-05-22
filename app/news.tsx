@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { useAtom, useAtomValue } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { unwrap } from 'jotai/utils';
 import { ChevronLeft } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,23 +11,55 @@ import AppText from '@/components/ui/AppText';
 import NewsCard from '@/components/widgets/NewsCard';
 import { imagesAtom, newsAtom } from '@/stores/ApiData';
 
+type LoadableState<T> = { state: 'loading' } | { state: 'hasData'; data: T } | { state: 'hasError'; error: unknown };
+
+function createLoadableAtom<T>(anAtom: any) {
+  const LOADING = Symbol('loading');
+  const unwrappedAtom = unwrap(anAtom, () => LOADING);
+
+  return atom<LoadableState<T>>(get => {
+    try {
+      const data = get(unwrappedAtom) as T | typeof LOADING;
+      if (data === LOADING) {
+        return { state: 'loading' };
+      }
+      return { state: 'hasData', data };
+    } catch (error) {
+      return { state: 'hasError', error };
+    }
+  });
+}
+
+const newsLoadableAtom = createLoadableAtom<any[] | null>(newsAtom);
+const imagesLoadableAtom = createLoadableAtom<any>(imagesAtom);
+
 export default function NewsScreen() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const [news, refreshNews] = useAtom(newsAtom);
-  const images = useAtomValue(imagesAtom) as any;
+  const refreshNews = useSetAtom(newsAtom);
+  const newsState = useAtomValue(newsLoadableAtom);
+  const imagesState = useAtomValue(imagesLoadableAtom);
   const [refreshing, setRefreshing] = useState(false);
+  const [newsData, setNewsData] = useState<any[]>([]);
+
+  const images = imagesState.state === 'hasData' ? (imagesState.data as any) : null;
 
   useEffect(() => {
-    if (refreshing) setRefreshing(false);
-  }, [news]);
+    if (newsState.state === 'hasData') {
+      if (Array.isArray(newsState.data)) {
+        setNewsData(newsState.data);
+      } else if (newsState.data === null) {
+        setNewsData([]);
+      }
+      setRefreshing(false);
+    }
+  }, [newsState]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    refreshNews();
-    setTimeout(() => {
+    Promise.resolve(refreshNews()).finally(() => {
       setRefreshing(false);
-    }, 3000);
+    });
   }, [refreshNews]);
 
   const onPressItem = useCallback((url: string) => {
@@ -44,8 +77,8 @@ export default function NewsScreen() {
     [images]
   );
 
-  const apiFailed = news === null;
-  const data = apiFailed ? [] : news;
+  const apiFailed = newsState.state === 'hasData' && newsState.data === null;
+  const data = newsData;
 
   return (
     <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-[#111827]" edges={['top']}>
@@ -58,7 +91,7 @@ export default function NewsScreen() {
         </AppText>
         <View className="w-8" />
       </View>
-      <View className="mt-2 flex-1">
+      <View className="flex-1">
         <NewsCard
           data={data}
           refreshing={refreshing}

@@ -38,7 +38,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
             transform: [{ scale: pressed ? 0.98 : 1 }],
           },
         ]}
-        className="mx-5 mb-6 overflow-hidden rounded-[28px] bg-white dark:bg-gray-800"
+        className="mx-5 mb-6 overflow-hidden rounded-[16px] bg-white dark:bg-gray-800"
       >
         <View className="h-48 w-full overflow-hidden bg-gray-200 dark:bg-gray-700">
           <ExpoImage
@@ -96,9 +96,10 @@ const NewsCard = ({ data, refreshing, onRefresh, apiFailed, onPressItem, getImag
       <FlashList
         data={data}
         contentContainerStyle={{
-          paddingTop: 30,
+          paddingTop: 10,
           paddingBottom: 60,
         }}
+        showsVerticalScrollIndicator={false}
         keyExtractor={(item: any, index: number) => item.id?.toString() || index.toString()}
         renderItem={renderItem}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
