@@ -1,15 +1,16 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback } from 'react';
 import { Pressable, RefreshControl, Text, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import * as WebBrowser from 'expo-web-browser';
 import { FlashList } from '@shopify/flash-list';
-import { useAtom, useAtomValue } from 'jotai';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { colors } from '@/constants/colors';
-import { imagesAtom, newsAtom } from '@/stores/ApiData';
 
 type NewsCardProps = {
-  count: number;
+  data: any[];
+  refreshing: boolean;
+  onRefresh: () => void;
+  apiFailed: boolean;
+  onPressItem: (url: string) => void;
+  getImageFallback: (index: number) => string | null;
 };
 
 const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
@@ -82,39 +83,12 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
   );
 });
 
-const NewsCard = ({ count }: NewsCardProps) => {
-  const [news, refreshNews] = useAtom(newsAtom);
-  const images = useAtomValue(imagesAtom);
-
-  const handleClick = useCallback((url: string) => {
-    WebBrowser.openBrowserAsync(url);
-  }, []);
-
-  const getRandomImage = useCallback(() => {
-    if (!images?.results?.length) return null;
-    const randomIndex = Math.floor(Math.random() * images.results.length);
-    return images.results[randomIndex].urls.small;
-  }, [images]);
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    if (refreshing) setRefreshing(false);
-  }, [news]);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refreshNews();
-  }, [refreshNews]);
-
-  const apiFailed = news === null;
-  const data = apiFailed ? [] : count === -1 ? news : news.slice(0, count);
-
+const NewsCard = ({ data, refreshing, onRefresh, apiFailed, onPressItem, getImageFallback }: NewsCardProps) => {
   const renderItem = useCallback(
     ({ item, index }: any) => (
-      <NewsItem item={item} index={index} onPress={handleClick} imageFallback={getRandomImage()} />
+      <NewsItem item={item} index={index} onPress={onPressItem} imageFallback={getImageFallback(index)} />
     ),
-    [handleClick, getRandomImage]
+    [onPressItem, getImageFallback]
   );
 
   return (
