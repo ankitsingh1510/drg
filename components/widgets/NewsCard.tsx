@@ -1,5 +1,5 @@
-import React, { memo, useCallback } from 'react';
-import { Pressable, RefreshControl, Text, View } from 'react-native';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
+import { Pressable, RefreshControl, Animated as RNAnimated, Text, View } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { FlashList } from '@shopify/flash-list';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -9,9 +9,52 @@ type NewsCardProps = {
   refreshing: boolean;
   onRefresh: () => void;
   apiFailed: boolean;
+  isLoading?: boolean;
   onPressItem: (url: string) => void;
   getImageFallback: (index: number) => string | null;
 };
+
+const SkeletonBox = ({ className }: { className?: string }) => {
+  const opacity = useRef(new RNAnimated.Value(0.4)).current;
+
+  useEffect(() => {
+    const pulse = RNAnimated.loop(
+      RNAnimated.sequence([
+        RNAnimated.timing(opacity, { toValue: 1, duration: 750, useNativeDriver: true }),
+        RNAnimated.timing(opacity, { toValue: 0.4, duration: 750, useNativeDriver: true }),
+      ])
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [opacity]);
+
+  return (
+    <RNAnimated.View style={{ opacity }} className={`rounded-lg bg-gray-300 dark:bg-gray-700 ${className ?? ''}`} />
+  );
+};
+
+const NewsSkeletonItem = () => (
+  <View
+    className="mx-5 mb-6 overflow-hidden rounded-[16px] bg-white dark:bg-gray-800"
+    style={{
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+  >
+    <SkeletonBox className="h-48 w-full rounded-none" />
+    <View className="p-5">
+      <SkeletonBox className="mb-3 h-3 w-1/3" />
+      <SkeletonBox className="mb-2 h-5 w-full" />
+      <SkeletonBox className="mb-4 h-5 w-4/5" />
+      <SkeletonBox className="h-3 w-full" />
+      <SkeletonBox className="mt-1 h-3 w-3/4" />
+      <SkeletonBox className="mt-1 h-3 w-2/3" />
+    </View>
+  </View>
+);
 
 const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
   let imageUrl = item.image && item.image.length > 0 ? item.image : imageFallback;
@@ -83,13 +126,31 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
   );
 });
 
-const NewsCard = ({ data, refreshing, onRefresh, apiFailed, onPressItem, getImageFallback }: NewsCardProps) => {
+const NewsCard = ({
+  data,
+  refreshing,
+  onRefresh,
+  apiFailed,
+  isLoading,
+  onPressItem,
+  getImageFallback,
+}: NewsCardProps) => {
   const renderItem = useCallback(
     ({ item, index }: any) => (
       <NewsItem item={item} index={index} onPress={onPressItem} imageFallback={getImageFallback(index)} />
     ),
     [onPressItem, getImageFallback]
   );
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 pt-2.5">
+        {[...Array(4)].map((_, i) => (
+          <NewsSkeletonItem key={i} />
+        ))}
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1">
