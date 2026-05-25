@@ -97,6 +97,7 @@ export default function NewsScreen() {
           refreshing={refreshing}
           onRefresh={onRefresh}
           apiFailed={apiFailed}
+          isLoading={newsState.state === 'loading'}
           onPressItem={onPressItem}
           getImageFallback={getImageFallback}
         />
