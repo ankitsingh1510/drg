@@ -28,11 +28,11 @@ import { decryptToken } from '@/util/helpers';
 import { toast } from '@/util/toast';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaModal, setShowMfaModal] = useState(false);
-  const [emailError, setEmailError] = useState('');
+  const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setTargetLocation } = useAuth();
@@ -69,15 +69,11 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     let valid = true;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError('Email ID is required');
-      valid = false;
-    } else if (!emailRegex.test(email.trim())) {
-      setEmailError('Please enter a valid email address');
+    if (!identifier) {
+      setIdentifierError('Email or Username is required');
       valid = false;
     } else {
-      setEmailError('');
+      setIdentifierError('');
     }
     if (!password) {
       setPasswordError('Password is required');
@@ -90,7 +86,7 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       // Authenticate and get token
-      const response = await usersAPI.authenticateUser({ username: email, password });
+      const response = await usersAPI.authenticateUser({ username: identifier.trim(), password });
       if (response && response.token) {
         const token = response.token;
         const tokenPayload = decryptToken(token);
@@ -132,7 +128,7 @@ export default function LoginScreen() {
           setShowMfaModal(true);
         } else {
           // No MFA required, proceed with normal login
-          await completeLogin(email, password);
+          await completeLogin(identifier.trim(), password);
         }
       } else {
         throw new Error('Authentication failed');
@@ -143,9 +139,9 @@ export default function LoginScreen() {
     }
   };
 
-  const completeLogin = async (username: string, pwd: string) => {
+  const completeLogin = async (usernameOrEmail: string, pwd: string) => {
     try {
-      await login(username, pwd);
+      await login(usernameOrEmail, pwd);
     } catch (error: any) {
       throw error;
     }
@@ -248,27 +244,27 @@ export default function LoginScreen() {
             >
               {/* Email Field */}
               <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
-                Email
+                Email / Username
               </AppText>
               <View
-                className={`rounded-xl border-[1.5px] bg-white ${emailError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+                className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
                 <TextInput
                   className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
-                  placeholder="Enter your email id"
+                  placeholder="Enter your email or username"
                   placeholderTextColor="#9CA3AF"
-                  value={email}
+                  value={identifier}
                   onChangeText={text => {
-                    setEmail(text);
-                    if (text) setEmailError('');
+                    setIdentifier(text);
+                    if (text) setIdentifierError('');
                   }}
-                  keyboardType="email-address"
+                  keyboardType="default"
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
               </View>
-              {emailError ? (
-                <AppText className="mb-3 text-xs text-red-500">{emailError}</AppText>
+              {identifierError ? (
+                <AppText className="mb-3 text-xs text-red-500">{identifierError}</AppText>
               ) : (
                 <View className="mb-4" />
               )}
