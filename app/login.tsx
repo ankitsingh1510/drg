@@ -70,7 +70,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     let valid = true;
     if (!identifier) {
-      setIdentifierError('Email or Username is required');
+      setIdentifierError('Username is required');
       valid = false;
     } else {
       setIdentifierError('');
