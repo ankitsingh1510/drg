@@ -62,14 +62,14 @@ function normalizeStatus(status?: string): OrderStepStatus {
  * Reuse a single Intl.DateTimeFormat instance across all calls.
  * Creating a new formatter per call is expensive on mobile JS engines.
  */
-const DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-IN', {
   day: '2-digit',
   month: 'short',
   year: '2-digit',
 });
 
 function formatTimestamp(value?: string | null): string {
-  if (!value) return '--';
+  if (!value) return '                     ';
   try {
     return DATE_FORMATTER.format(new Date(value));
   } catch {

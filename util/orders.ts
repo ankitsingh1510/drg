@@ -59,7 +59,7 @@ export function normalizeIngestionStatus(status?: string | null): IngestionStatu
 export function formatTimestamp(value?: string | null): string {
   if (!value) return '--';
   try {
-    return new Date(value).toLocaleDateString('en-GB', {
+    return new Date(value).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
       year: '2-digit',
