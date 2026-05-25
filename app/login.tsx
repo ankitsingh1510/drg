@@ -242,23 +242,23 @@ export default function LoginScreen() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              {/* Email Field */}
+              {/* Username Field */}
               <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
-                Email / Username
+                Username
               </AppText>
               <View
                 className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
                 <TextInput
                   className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
-                  placeholder="Enter your email or username"
+                  placeholder="Enter your username"
                   placeholderTextColor="#9CA3AF"
                   value={identifier}
                   onChangeText={text => {
                     setIdentifier(text);
                     if (text) setIdentifierError('');
                   }}
-                  keyboardType="default"
+                  keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
                 />
