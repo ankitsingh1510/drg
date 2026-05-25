@@ -28,7 +28,7 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
       const daysAgo = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
 
       return {
-        formatted: date.toLocaleDateString('en-GB', {
+        formatted: date.toLocaleDateString('en-IN', {
           day: '2-digit',
           month: 'short',
           year: 'numeric',
