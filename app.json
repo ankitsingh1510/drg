@@ -54,12 +54,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/DrG-logo.png",
-          "imageWidth": 200,
+          "image": "./assets/images/Drg_logo_splash.png",
+          "imageWidth": 210,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#1A365D",
           "dark": {
-            "backgroundColor": "#000000"
+            "image": "./assets/images/Drg_logo_splash.png",
+            "backgroundColor": "#1A365D"
           }
         }
       ],
