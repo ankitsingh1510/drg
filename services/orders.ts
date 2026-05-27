@@ -38,6 +38,13 @@ export interface GetAssayWiseOrderStatusResponse {
   statusCode?: number;
 }
 
+export interface StudyListItem {
+  studyId: number;
+  studyIdentifier: string;
+  studyTitle: string;
+  studyStatus: string;
+}
+
 class OrdersAPI {
   gqlUrl: string;
 
@@ -136,6 +143,25 @@ class OrdersAPI {
       message: result?.message,
       statusCode: result?.statusCode,
     };
+  }
+
+  async getStudyList(): Promise<number[]> {
+    const reqParams: GQLRequestParams = {
+      query: `query getStudyList {
+        getStudyList
+      }`,
+    };
+
+    const gqlData = await this.getGQLResponse(reqParams);
+
+    if (gqlData?.errors?.length) {
+      console.error('[OrdersAPI] getStudyList GraphQL errors:', JSON.stringify(gqlData.errors, null, 2));
+      throw { status: 200, message: gqlData.errors[0]?.message ?? 'GraphQL error', data: gqlData };
+    }
+
+    const result = gqlData?.data?.getStudyList;
+    const studies: StudyListItem[] = result?.data ?? [];
+    return studies.map((s: StudyListItem) => s.studyId);
   }
 }
 
