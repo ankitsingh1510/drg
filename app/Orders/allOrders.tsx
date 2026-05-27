@@ -97,6 +97,7 @@ export default function AllOrders() {
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientWithOrders[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -168,6 +169,16 @@ export default function AllOrders() {
     if (loading || loadingMore || !hasMore) return;
     fetchOrders(search.trim(), page + 1, true);
   }, [fetchOrders, hasMore, loading, loadingMore, page, search]);
+
+  const onRefresh = useCallback(async () => {
+    if (loadingMore) return;
+    setRefreshing(true);
+    try {
+      await fetchOrders(search.trim(), 1, false);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchOrders, loadingMore, search]);
 
   const renderItem = useCallback(
     ({ item }: { item: PatientWithOrders }) => <PatientOrderCard patient={item} isDark={isDark} />,
@@ -249,6 +260,8 @@ export default function AllOrders() {
           renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 16 }}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
