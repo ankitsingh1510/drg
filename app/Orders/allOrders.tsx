@@ -11,7 +11,6 @@ import { mapApiDataToPatients, type OrderDisplayStatus, type PatientWithOrders }
 
 const PAGE_SIZE = 20;
 const DATE_FROM = '2025-01-01';
-const STUDY_IDS = [10]; // stable reference — never re-allocated
 
 const STATUS_BADGE: Record<OrderDisplayStatus, { bg: string; text: string; darkBg: string; darkText: string }> = {
   'Ordered Placed': {
@@ -102,6 +101,8 @@ export default function AllOrders() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [studyIds, setStudyIds] = useState<number[]>([]);
+  const [studyIdsReady, setStudyIdsReady] = useState(false);
 
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -110,7 +111,7 @@ export default function AllOrders() {
   const indicatorColor = isDark ? '#8BA5C0' : (themeColors.common.info ?? '#4F46E5');
 
   const fetchOrders = useCallback(
-    async (patientName = '', pageToLoad = 1, isLoadMore = false) => {
+    async (patientName = '', pageToLoad = 1, isLoadMore = false, ids?: number[]) => {
       isLoadMore ? setLoadingMore(true) : setLoading(true);
       setError(null);
 
@@ -123,7 +124,7 @@ export default function AllOrders() {
           count: PAGE_SIZE,
           page: pageToLoad,
           restrictByRole: 'true',
-          studyId: STUDY_IDS,
+          studyId: ids ?? studyIds,
         });
 
         const mappedPatients = mapApiDataToPatients(response.data);
@@ -137,15 +138,31 @@ export default function AllOrders() {
         isLoadMore ? setLoadingMore(false) : setLoading(false);
       }
     },
-    [] // no deps — DATE_FROM and STUDY_IDS are module-level constants
+    [studyIds]
   );
 
   useEffect(() => {
+    ordersAPI
+      .getStudyList()
+      .then(ids => {
+        setStudyIds(ids);
+        setStudyIdsReady(true);
+        fetchOrders('', 1, false, ids);
+      })
+      .catch(err => {
+        console.error('[AllOrders] getStudyList error:', err);
+        setStudyIdsReady(true);
+        fetchOrders('', 1, false, []);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!studyIdsReady) return;
     const timer = setTimeout(() => {
       fetchOrders(search.trim(), 1, false);
     }, 500);
     return () => clearTimeout(timer);
-  }, [search, fetchOrders]);
+  }, [search, fetchOrders, studyIdsReady]);
 
   const loadMore = useCallback(() => {
     if (loading || loadingMore || !hasMore) return;
