@@ -22,7 +22,7 @@ export default function ProfileTextField({
 }: ProfileTextFieldProps) {
   return (
     <View key={field.name} className="mb-5">
-      <Text className="mb-2 text-sm font-outfit-medium text-gray-600 dark:text-gray-400">
+      <Text className="mb-2 font-outfit-medium text-sm text-gray-600 dark:text-gray-400">
         {field.displayLabel}
         {field.required && <Text className="text-red-500"> *</Text>}
       </Text>
@@ -35,8 +35,11 @@ export default function ProfileTextField({
           )}
           <Text
             className={
-              value ? 'text-base text-gray-800 dark:text-gray-100' : 'text-base text-gray-400 dark:text-gray-500'
+              value
+                ? 'flex-1 text-base text-gray-800 dark:text-gray-100'
+                : 'flex-1 text-base text-gray-400 dark:text-gray-500'
             }
+            style={{ minWidth: 0 }}
           >
             {value || 'NA'}
           </Text>
@@ -56,7 +59,7 @@ export default function ProfileTextField({
             placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
             keyboardType={field.widgetType === 'email' ? 'email-address' : 'default'}
             editable={!field.readOnly}
-          style={{ textAlignVertical: 'center' }}
+            style={{ textAlignVertical: 'center' }}
           />
         </View>
       )}
