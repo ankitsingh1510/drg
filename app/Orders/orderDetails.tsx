@@ -137,7 +137,7 @@ const OrderDetailCard = memo(function OrderDetailCard({
 
       {/* Step labels */}
       <View className="mb-2 flex-row justify-between px-0.5">
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Ordered Placed</AppText>
+        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Order Placed</AppText>
         <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Sample Accession</AppText>
         <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Report Released</AppText>
       </View>

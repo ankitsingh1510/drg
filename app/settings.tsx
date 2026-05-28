@@ -198,7 +198,7 @@ const Settings = () => {
     {
       icon: <User size={24} color={colors.common.info} />,
       title: 'My Profile',
-      subtitle: 'View and edit your profile',
+      subtitle: 'View your profile',
       iconBgColor: 'bg-blue-100 dark:bg-blue-900/30',
       btn: <ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />,
       onPress: goToProfile,
