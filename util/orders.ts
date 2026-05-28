@@ -1,6 +1,6 @@
 import { IngestionStatus } from '@/types/types';
 
-export type OrderDisplayStatus = 'Ordered Placed' | 'Sample Accession' | 'Report Released';
+export type OrderDisplayStatus = 'Order Placed' | 'Sample Accession' | 'Report Released';
 
 export type OrderStepStatus = 'PLACED' | 'ACCESSION' | 'RELEASED';
 
@@ -33,7 +33,7 @@ export function normalizeOrderDisplayStatus(rawStatus?: string): OrderDisplaySta
   const value = (rawStatus ?? '').toLowerCase();
   if (value.includes('release') || value.includes('report')) return 'Report Released';
   if (value.includes('accession')) return 'Sample Accession';
-  return 'Ordered Placed';
+  return 'Order Placed';
 }
 
 /**
@@ -104,7 +104,7 @@ export function mapApiDataToPatients(apiData: any[]): PatientWithOrders[] {
         } else if (assay?.sampleAccessioned === true) {
           status = 'Sample Accession';
         } else if (assay?.orderPlaced === true) {
-          status = 'Ordered Placed';
+          status = 'Order Placed';
         } else {
           const rawStatus = Array.isArray(assay?.workflowStatuses)
             ? assay.workflowStatuses[0]

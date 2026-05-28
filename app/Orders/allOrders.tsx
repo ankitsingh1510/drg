@@ -13,7 +13,7 @@ const PAGE_SIZE = 20;
 const DATE_FROM = '2025-01-01';
 
 const STATUS_BADGE: Record<OrderDisplayStatus, { bg: string; text: string; darkBg: string; darkText: string }> = {
-  'Ordered Placed': {
+  'Order Placed': {
     bg: '#fdf8e3',
     text: themeColors.common.warning,
     darkBg: '#332f1e',
@@ -70,7 +70,7 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
       onPress={handlePress}
     >
       <View className="mb-1 flex-row items-center justify-between">
-        <AppText weight="semibold" className="text-lg text-gray-900 dark:text-white">
+        <AppText weight="semibold" className="flex-1 text-lg text-gray-900 dark:text-white">
           {patient.patientName}
         </AppText>
         <ChevronRight size={20} color={chevronColor} />
@@ -96,6 +96,7 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
 export default function AllOrders() {
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientWithOrders[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -127,7 +128,7 @@ export default function AllOrders() {
           restrictByRole: 'true',
           studyId: ids ?? studyIds,
         });
-
+        setTotalCount(response?.totalCount);
         const mappedPatients = mapApiDataToPatients(response.data);
         setPatients(prev => (isLoadMore ? [...prev, ...mappedPatients] : mappedPatients));
         setPage(pageToLoad);
@@ -225,7 +226,7 @@ export default function AllOrders() {
         <View className="w-8" />
       </View>
 
-      <View className="mb-6 px-4">
+      <View className="mb-3 px-4">
         <View className="h-12 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-[#374151] dark:bg-[#1f2937]">
           <Search size={20} color="#9CA3AF" style={{ marginRight: 8 }} />
           <TextInput
@@ -236,6 +237,11 @@ export default function AllOrders() {
             onChangeText={setSearch}
           />
         </View>
+        {totalCount > 0 && (
+          <AppText className="mt-2 text-xs uppercase tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+            {totalCount} {totalCount === 1 ? 'order' : 'orders'}
+          </AppText>
+        )}
       </View>
 
       {showSpinner ? (

@@ -184,7 +184,7 @@ export default function ReportsList() {
         <View className="w-8" />
       </View>
 
-      {!loading && <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />}
+      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} loading={loading} />
 
       <View className="flex-1">
         <FlashList

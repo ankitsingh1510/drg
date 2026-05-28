@@ -42,7 +42,7 @@ export function EmptyState({ type, onLogout }: EmptyStateProps) {
           No Released Tests Found
         </Text>
         <Text className="text-center text-sm text-slate-500 dark:text-gray-400">
-          You may don't have permission to view released tests, or none are available yet.
+          You may not have permission to view released tests, or none are available yet.
         </Text>
       </View>
     );
