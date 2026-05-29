@@ -36,7 +36,6 @@ import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
-import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 
 type SettingCardProps = {
@@ -179,16 +178,13 @@ const Settings = () => {
     });
   };
 
-  const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
-
   const resetOnboarding = () => {
-    Alert.alert('Reset Onboarding', 'This will show the onboarding screens again. Continue?', [
+    Alert.alert('Review Onboarding', 'This will show the onboarding screens again.', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Reset',
+        text: 'Continue',
         onPress: () => {
-          setHasSeenOnboarding(false);
-          router.replace('/onboarding');
+          router.replace({ pathname: '/onboarding', params: { source: 'settings' } } as any);
         },
       },
     ]);
