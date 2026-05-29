@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Image, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import { ArrowRight } from 'lucide-react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -36,6 +36,9 @@ const N = ONBOARDING_DATA.length;
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ source?: string }>();
+  const source = Array.isArray(params.source) ? params.source[0] : params.source;
+  const isFromSettings = source === 'settings';
   const { width } = useWindowDimensions();
   const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
 
@@ -70,14 +73,14 @@ export default function OnboardingScreen() {
       goTo(pageIndex + 1);
     } else {
       setHasSeenOnboarding(true);
-      router.replace('/login');
+      router.replace(isFromSettings ? '/(tabs)/home' : '/login');
     }
-  }, [pageIndex, goTo, router, setHasSeenOnboarding]);
+  }, [pageIndex, goTo, router, setHasSeenOnboarding, isFromSettings]);
 
   const handleSkip = useCallback(() => {
     setHasSeenOnboarding(true);
-    router.replace('/login');
-  }, [router, setHasSeenOnboarding]);
+    router.replace(isFromSettings ? '/(tabs)/home' : '/login');
+  }, [router, setHasSeenOnboarding, isFromSettings]);
 
   const handleBack = useCallback(() => {
     goTo(pageIndex - 1);
