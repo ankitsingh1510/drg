@@ -135,7 +135,7 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       setIsLoading(false);
-      Alert.alert('Login Failed', error.message || 'Invalid credentials');
+      Alert.alert('Login Failed', error.message || error.data?.description || 'Invalid credentials');
     }
   };
 
