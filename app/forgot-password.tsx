@@ -12,8 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Mail } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { usersAPI } from '@/services/users';
@@ -67,35 +66,57 @@ export default function ForgotPasswordScreen() {
               <TouchableOpacity onPress={handleBackToLogin} className="mb-5 self-start rounded-full p-1">
                 <ChevronLeft size={24} color="#FFFFFF" strokeWidth={2.5} />
               </TouchableOpacity>
-              <Text className="mb-2 font-outfit-extrabold text-3xl text-white">
-                {submitted ? 'Check Your Email' : 'Reset Password'}
+              <Text className="mb-2 font-outfit-extrabold text-2xl text-white">
+                {submitted ? 'Reset Link Sent' : 'Reset Password'}
               </Text>
               <Text className="font-outfit text-base leading-6 text-[#A8BFDF]">
-                {submitted ? `We've sent a reset link to ${email}` : "Enter your email and we'll send you a reset link"}
+                {submitted
+                  ? "We've sent a secure password reset link to your registered email address."
+                  : "Enter your email and we'll send you a reset link"}
               </Text>
             </View>
 
             <View className="flex-1 rounded-t-3xl bg-white px-6 pb-10 pt-8">
               {submitted ? (
-                <View className="flex-1 items-center justify-center">
-                  <View className="mb-6 items-center justify-center rounded-full bg-[#1E2D50]/10 p-6">
-                    <Ionicons name="checkmark-circle" size={64} color="#1E2D50" />
+                <View className="mt-10 flex-1 items-center">
+                  {/* Mail with checkmark icon */}
+                  <View className="mb-6 items-center justify-center rounded-2xl bg-green-100 p-6">
+                    <View className="relative">
+                      <Mail size={48} color="#22c55e" strokeWidth={1.5} />
+                      <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full bg-green-500">
+                        <Text className="text-xs font-bold text-white">✓</Text>
+                      </View>
+                    </View>
                   </View>
 
-                  <Text className="mb-3 font-outfit-bold text-2xl text-gray-900">Email Sent!</Text>
-                  <Text className="mb-1 text-center font-outfit text-sm leading-6 text-gray-500">
-                    Click the link in the email to reset your password.
+                  <Text className="mb-3 font-outfit-bold text-xl text-gray-900">Check Your Inbox</Text>
+                  <Text className="mb-4 text-center font-outfit text-base leading-6 text-gray-600">
+                    If your email is registered with DrG, you'll receive a password reset link shortly.
                   </Text>
+
                   <Text className="mb-10 text-center font-outfit text-xs text-gray-400">
-                    If you don't see it, check your spam or junk folder.
+                    Please check your inbox and spam folder.
                   </Text>
 
                   <TouchableOpacity
                     activeOpacity={0.85}
                     onPress={handleBackToLogin}
-                    className="w-full items-center rounded-xl bg-[#1E2D50] py-4"
+                    className="mb-4 w-full items-center rounded-2xl bg-[#1E2D50] py-4"
                   >
-                    <Text className="font-outfit-bold text-base tracking-wide text-white">Back to Log In</Text>
+                    <Text className="font-outfit-bold text-base tracking-wide text-white">Return to Login</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.75}
+                    onPress={() => {
+                      setSubmitted(false);
+                      setIsLoading(false);
+                    }}
+                    className="items-center py-2"
+                  >
+                    <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                      Resend Email
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -129,7 +150,7 @@ export default function ForgotPasswordScreen() {
                         <Text className="ml-2 font-outfit-bold text-base tracking-wide text-white">Sending...</Text>
                       </View>
                     ) : (
-                      <Text className="font-outfit-bold text-base tracking-wide text-white">{'Send Reset Link'}</Text>
+                      <Text className="font-outfit-bold text-base tracking-wide text-white">Send Reset Link</Text>
                     )}
                   </TouchableOpacity>
 
