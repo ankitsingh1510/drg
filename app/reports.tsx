@@ -156,7 +156,7 @@ export default function Reports() {
   });
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [pdfHeight, setPdfHeight] = useState(50); // Percentage of total height for PDF
-  const [showVideoAvatar, setShowVideoAvatar] = useState(true);
+  const [showVideoAvatar, setShowVideoAvatar] = useState<boolean | null>(null);
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
 
@@ -188,9 +188,14 @@ export default function Reports() {
   }, []);
 
   useEffect(() => {
-    configAPI.getConfig().then(config => {
-      setShowVideoAvatar(config.showVideoAvatar);
-    });
+    configAPI
+      .getConfig()
+      .then(config => {
+        setShowVideoAvatar(config.showVideoAvatar);
+      })
+      .catch(error => {
+        setShowVideoAvatar(false); // adding fallback: hide video avatar on error
+      });
   }, []);
 
   useEffect(() => {
