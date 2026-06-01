@@ -36,6 +36,7 @@ import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
+import { setHasSeenNotificationPermission } from '@/stores/mmkv';
 import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 
 type SettingCardProps = {
@@ -112,6 +113,7 @@ const Settings = () => {
         const { status: newStatus } = await Notifications.requestPermissionsAsync();
         if (newStatus === 'granted') {
           setPushNotificationsEnabled(true);
+          setHasSeenNotificationPermission(true);
         }
         return;
       } else {
