@@ -239,7 +239,7 @@ export default function Reports() {
     // Check notification permissions and show modal if not granted
     if (Device.isDevice) {
       const { status, canAskAgain } = await Notifications.getPermissionsAsync();
-      if ((status !== 'granted' || canAskAgain) && !hasSeenNotificationPermission()) {
+      if (status !== 'granted' && !hasSeenNotificationPermission()) {
         console.log('Notification permission not granted');
         setShowNotificationModal(true);
         setHasSeenNotificationPermission(true);
