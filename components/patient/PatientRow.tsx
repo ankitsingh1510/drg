@@ -65,15 +65,14 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
         </View>
       </View>
 
-      <View className="my-2.5 flex-row items-center justify-between gap-3">
-        <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+      <View className="my-2.5 flex-row items-center justify-between">
+        <Text className="flex-1 font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
           {patient.assayName}
         </Text>
         <View className="flex-row items-center gap-1">
           <Calendar size={12} color={colors.dark.textTertiary} />
           <Text className="text-xs text-gray-400 dark:text-gray-500">{dateInfo.formatted}</Text>
         </View>
-        <Text className="text-xs text-gray-400 dark:text-gray-500">{dateInfo.daysAgo}</Text>
       </View>
 
       <View className="mb-4 h-px bg-gray-300 dark:bg-gray-700" />
