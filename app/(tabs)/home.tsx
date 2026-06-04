@@ -36,8 +36,8 @@ export default function LandingScreen() {
     const items = [
       {
         id: 'patient',
-        label: 'Patient',
-        subtitle: 'Recent labs & images',
+        label: 'Reports',
+        subtitle: 'Your patient reports',
         icon: <ClipboardList size={24} color="#fff" />,
         color: '#538BF4',
         onPress: () => router.push('/reports_list' as any),
@@ -47,7 +47,7 @@ export default function LandingScreen() {
       {
         id: 'orders',
         label: 'Orders',
-        subtitle: 'Recent orders & updates',
+        subtitle: 'Order status',
         icon: <TestTube2 size={24} color="#fff" />,
         color: '#4ED0D9',
         onPress: () => router.push('/Orders/allOrders' as any),
@@ -57,7 +57,7 @@ export default function LandingScreen() {
       {
         id: 'mtb',
         label: 'MTB',
-        subtitle: 'Case discussion & Insights',
+        subtitle: 'Case library',
         icon: <Dna size={24} color="#fff" />,
         color: '#A576F4',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_MTB_URL || ''),
@@ -72,7 +72,7 @@ export default function LandingScreen() {
     () => [
       {
         id: 'publications',
-        label: 'Publication',
+        label: 'Publications',
         subtitle: 'Poster & Publications',
         icon: <FileText size={24} color="#fff" />,
         color: '#F8A03C',
@@ -80,7 +80,7 @@ export default function LandingScreen() {
       },
       {
         id: 'trends',
-        label: 'Trends',
+        label: 'News',
         subtitle: 'Latest around Genomics & NGS',
         icon: <TrendingUp size={24} color="#fff" />,
         color: '#36B879',

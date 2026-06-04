@@ -221,7 +221,7 @@ export default function AllOrders() {
           <ChevronLeft size={24} color={textColor} strokeWidth={2.5} />
         </TouchableOpacity>
         <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
-          Orders List
+          Order Details
         </AppText>
         <View className="w-8" />
       </View>
