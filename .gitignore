@@ -12,6 +12,10 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
+# Native folders
+android/
+ios/
+
 # Build artifacts
 build/
 dist/
@@ -44,9 +48,13 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# Environment files (local only)
-.env*.local
+# Environment files
+.env
+.env.local
 .env.*.local
+.env.*.development
+.env.*.production
+.env*
 
 # Sensitive files
 *.pem
