@@ -6,7 +6,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
+  StatusBar,
   Switch,
   Text,
   TouchableOpacity,
@@ -17,14 +17,26 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import { Bell, ChevronRight, HelpCircle, Lock, LogOut, Moon, Sun, Trash2, User } from 'lucide-react-native';
+import {
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Lock,
+  LogOut,
+  Moon,
+  Sun,
+  Trash2,
+  User,
+} from 'lucide-react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconNavBar from '@/components/navigation/IconNavBar';
+import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { useThemeSync } from '@/hooks/useThemeSync';
-import { hasSeenOnboardingAtom } from '@/stores/onboarding';
+import { setHasSeenNotificationPermission } from '@/stores/mmkv';
 import { showExtensionsButtonAtom, showPatientsButtonAtom } from '@/stores/ui';
 
 type SettingCardProps = {
@@ -43,15 +55,14 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      style={styles.card}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl bg-white p-5 dark:bg-gray-800"
+      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
 
         <View className="ml-3 flex-1">
-          <Text className="text-lg font-medium text-gray-800 dark:text-gray-100">{title}</Text>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</Text>
+          <AppText className="font-outfit-medium text-lg text-gray-800 dark:text-gray-100">{title}</AppText>
+          <AppText className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</AppText>
         </View>
       </View>
 
@@ -102,6 +113,7 @@ const Settings = () => {
         const { status: newStatus } = await Notifications.requestPermissionsAsync();
         if (newStatus === 'granted') {
           setPushNotificationsEnabled(true);
+          setHasSeenNotificationPermission(true);
         }
         return;
       } else {
@@ -168,16 +180,13 @@ const Settings = () => {
     });
   };
 
-  const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
-
   const resetOnboarding = () => {
-    Alert.alert('Reset Onboarding', 'This will show the onboarding screens again. Continue?', [
+    Alert.alert('Review Onboarding', 'This will show the onboarding screens again.', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Reset',
+        text: 'Continue',
         onPress: () => {
-          setHasSeenOnboarding(false);
-          router.replace('/onboarding');
+          router.replace({ pathname: '/onboarding', params: { source: 'settings' } } as any);
         },
       },
     ]);
@@ -187,7 +196,7 @@ const Settings = () => {
     {
       icon: <User size={24} color={colors.common.info} />,
       title: 'My Profile',
-      subtitle: 'View and edit your profile',
+      subtitle: 'View your profile',
       iconBgColor: 'bg-blue-100 dark:bg-blue-900/30',
       btn: <ChevronRight size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />,
       onPress: goToProfile,
@@ -218,7 +227,6 @@ const Settings = () => {
             true: colors.common.info,
           }}
           thumbColor={isDarkMode ? '#1e40af' : '#f3f4f6'}
-          style={{ alignSelf: 'center' }}
         />
       ),
     },
@@ -236,7 +244,6 @@ const Settings = () => {
             true: colors.common.success,
           }}
           thumbColor={pushNotificationsEnabled ? '#16a34a' : '#f3f4f6'}
-          style={{ alignSelf: 'center' }}
           ios_backgroundColor={colors.light.border}
         />
       ),
@@ -251,7 +258,7 @@ const Settings = () => {
           onPress={confirmDeleteAccount}
           className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
         >
-          <Text className="text-sm font-semibold text-white">Delete</Text>
+          <AppText className="font-outfit-semibold text-sm text-white">Delete</AppText>
         </TouchableOpacity>
       ),
     },
@@ -265,10 +272,22 @@ const Settings = () => {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, marginTop: -30 }} className="bg-[#FDF5E6] dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? '#0B1929' : '#FDF5E6'}
+      />
+
+      <View className="flex-row items-center justify-between px-4 py-4">
+        <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
+          <ChevronLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <AppText className="text-xl dark:text-white">Settings</AppText>
+        <View className="w-8" />
+      </View>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        className="flex-1"
+        className="flex-1 pt-4"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: headerHeight }}
       >
@@ -297,34 +316,21 @@ const Settings = () => {
               ])
             }
             activeOpacity={0.8}
-            style={{
-              marginHorizontal: 20,
-              marginBottom: 8,
-              borderRadius: 12,
-              overflow: 'hidden',
-              shadowColor: '#dc2626',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 6,
-              elevation: 3,
-            }}
+            className="mx-5 mb-2 overflow-hidden rounded-xl"
           >
             <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 18,
-                marginTop: 10,
-                paddingVertical: 10,
-                backgroundColor: isDarkMode ? '#7f1d1d' : '#fee2e2',
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDarkMode ? '#991b1b' : '#fecaca',
-              }}
+              className={
+                `mt-2.5 flex-row items-center justify-center gap-4 rounded-xl py-2.5 ` +
+                (isDarkMode ? 'bg-red-900' : 'bg-red-100')
+              }
             >
-              <LogOut size={18} color="#dc2626" strokeWidth={2} />
-              <Text style={{ color: '#dc2626', fontSize: 16, fontFamily: 'Poppins_600SemiBold' }}>Sign Out</Text>
+              <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />
+              <AppText
+                className={isDarkMode ? 'text-base text-white' : 'text-base text-red-900'}
+                style={{ fontFamily: 'Outfit_600SemiBold' }}
+              >
+                Sign Out
+              </AppText>
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -335,44 +341,44 @@ const Settings = () => {
             .springify()}
         >
           <Pressable
-            onPress={() => {
-              const now = Date.now();
-              const TAP_DELAY = 300; // Slightly shorter for better feel
+            // onPress={() => {
+            //   const now = Date.now();
+            //   const TAP_DELAY = 300; // Slightly shorter for better feel
 
-              if (now - lastTapRef.current < TAP_DELAY) {
-                tapCountRef.current += 1;
-              } else {
-                tapCountRef.current = 1;
-              }
-              lastTapRef.current = now;
+            //   if (now - lastTapRef.current < TAP_DELAY) {
+            //     tapCountRef.current += 1;
+            //   } else {
+            //     tapCountRef.current = 1;
+            //   }
+            //   lastTapRef.current = now;
 
-              if (tapTimerRef.current) {
-                clearTimeout(tapTimerRef.current);
-              }
+            //   if (tapTimerRef.current) {
+            //     clearTimeout(tapTimerRef.current);
+            //   }
 
-              tapTimerRef.current = setTimeout(() => {
-                if (tapCountRef.current === 2) {
-                  setShowPatientsButton(prev => !prev);
-                  Alert.alert(
-                    'System Info',
-                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}`
-                  );
-                } else if (tapCountRef.current >= 3) {
-                  setShowExtensionsButton(prev => !prev);
-                  Alert.alert(
-                    'System Info',
-                    `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}\nExtensions: ${!showExtensionsButton ? 'Enabled' : 'Disabled'}`
-                  );
-                }
-                tapCountRef.current = 0;
-              }, TAP_DELAY);
-            }}
+            //   tapTimerRef.current = setTimeout(() => {
+            //     if (tapCountRef.current === 2) {
+            //       setShowPatientsButton(prev => !prev);
+            //       Alert.alert(
+            //         'System Info',
+            //         `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}`
+            //       );
+            //     } else if (tapCountRef.current >= 3) {
+            //       setShowExtensionsButton(prev => !prev);
+            //       Alert.alert(
+            //         'System Info',
+            //         `Version: ${Constants.expoConfig?.version || '1.1.5'}\nBundle ID: ${Constants.expoConfig?.ios?.bundleIdentifier || 'ai.onecell.drg'}\nExtensions: ${!showExtensionsButton ? 'Enabled' : 'Disabled'}`
+            //       );
+            //     }
+            //     tapCountRef.current = 0;
+            //   }, TAP_DELAY);
+            // }}
             className="mb-8 mt-4 items-center justify-center opacity-60"
           >
-            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">Dr.G AI Assistant</Text>
-            <Text className="text-[10px] text-gray-400 dark:text-gray-500">
+            <AppText className="font-outfit-medium text-xs text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
+            <AppText className="text-[10px] text-gray-400 dark:text-gray-500">
               Version {Constants.expoConfig?.version || '1.1.5'}
-            </Text>
+            </AppText>
           </Pressable>
         </Animated.View>
 
@@ -383,13 +389,3 @@ const Settings = () => {
 };
 
 export default Settings;
-
-const styles = StyleSheet.create({
-  card: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-});

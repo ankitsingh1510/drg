@@ -65,7 +65,7 @@ export default function OtpVerificationModal({
     <Modal visible={visible} transparent animationType="fade">
       <View className="flex-1 items-center justify-center bg-black/50">
         <View className="mx-5 w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
-          <Text className="mb-2 text-2xl font-semibold text-gray-800 dark:text-gray-100">Enter Verification Code</Text>
+          <Text className="mb-2 text-2xl font-outfit-semibold text-gray-800 dark:text-gray-100">Enter Verification Code</Text>
           <Text className="text-m mb-6 text-gray-600 dark:text-gray-400">
             We've sent an OTP to your email. Please enter it below.
           </Text>
@@ -78,14 +78,14 @@ export default function OtpVerificationModal({
               maxLength={6}
               autoFocus
               textAlignVertical="center"
-              className="h-14 rounded-lg border border-gray-300 bg-white px-4 text-center text-2xl font-semibold tracking-widest dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="h-14 rounded-lg border border-gray-300 bg-white px-4 text-center text-2xl font-outfit-semibold tracking-widest dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             />
           </View>
 
           <View className="mb-4 flex-row items-center justify-center">
             <Text className="text-m text-gray-600 dark:text-gray-400">Didn't receive the code? </Text>
             <TouchableOpacity onPress={handleResendOtp}>
-              <Text className="text-m font-semibold text-blue-500">Resend</Text>
+              <Text className="text-m font-outfit-semibold text-blue-500">Resend</Text>
             </TouchableOpacity>
           </View>
 
@@ -94,7 +94,7 @@ export default function OtpVerificationModal({
               onPress={handleClose}
               className="flex-1 rounded-lg border border-gray-300 bg-white py-3 dark:border-gray-600 dark:bg-gray-700"
             >
-              <Text className="text-center font-semibold text-gray-700 dark:text-gray-200">Cancel</Text>
+              <Text className="text-center font-outfit-semibold text-gray-700 dark:text-gray-200">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleVerifyOtp}
@@ -107,7 +107,7 @@ export default function OtpVerificationModal({
                 <ActivityIndicator size="small" color="#ffffff" />
               ) : (
                 <Text
-                  className={`text-center font-semibold ${!otp ? 'text-gray-500 dark:text-gray-400' : 'text-white'}`}
+                  className={`text-center font-outfit-semibold ${!otp ? 'text-gray-500 dark:text-gray-400' : 'text-white'}`}
                 >
                   Verify
                 </Text>

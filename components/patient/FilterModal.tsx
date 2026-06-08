@@ -17,7 +17,7 @@ export function FilterModal({ visible, currentFilter, loading = false, onClose, 
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity className="flex-1 items-center justify-center bg-black/50" activeOpacity={1} onPress={onClose}>
         <View className="m-4 w-80 rounded-lg bg-white p-4 dark:bg-gray-800">
-          <Text className="mb-4 text-lg font-semibold text-slate-900 dark:text-gray-100">Filter by Status</Text>
+          <Text className="mb-4 text-lg font-outfit-semibold text-slate-900 dark:text-gray-100">Filter by Status</Text>
 
           {loading ? (
             <View className="flex-row items-center justify-center py-8">
@@ -38,7 +38,7 @@ export function FilterModal({ visible, currentFilter, loading = false, onClose, 
                 <Text
                   className={`text-sm ${
                     currentFilter === filterOption
-                      ? 'font-medium text-blue-700 dark:text-blue-400'
+                      ? 'font-outfit-medium text-blue-700 dark:text-blue-400'
                       : 'text-slate-700 dark:text-gray-300'
                   }`}
                 >

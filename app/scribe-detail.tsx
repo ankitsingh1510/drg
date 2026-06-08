@@ -47,7 +47,7 @@ export default function ScribeDetailScreen() {
       <SafeAreaView className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900">
         <Text className="text-gray-500">Session not found.</Text>
         <Pressable onPress={() => router.back()} className="mt-4">
-          <Text className="font-bold text-[#daa521]">Go Back</Text>
+          <Text className="font-outfit-bold text-[#daa521]">Go Back</Text>
         </Pressable>
       </SafeAreaView>
     );
@@ -64,7 +64,7 @@ export default function ScribeDetailScreen() {
           <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-[#daa521]/10">
             <Mic size={48} color="#daa521" />
           </View>
-          <Text className="text-center text-3xl font-bold text-gray-900 dark:text-white">
+          <Text className="text-center text-3xl font-outfit-bold text-gray-900 dark:text-white">
             {session.patientName || 'Untitled Session'}
           </Text>
         </View>
@@ -75,8 +75,8 @@ export default function ScribeDetailScreen() {
               <Phone size={20} color="#daa521" />
             </View>
             <View>
-              <Text className="text-xs font-medium text-gray-400">Phone Number</Text>
-              <Text className="text-lg font-bold text-gray-900 dark:text-white">
+              <Text className="text-xs font-outfit-medium text-gray-400">Phone Number</Text>
+              <Text className="text-lg font-outfit-bold text-gray-900 dark:text-white">
                 {session.phoneNumber || 'Not provided'}
               </Text>
             </View>
@@ -87,8 +87,8 @@ export default function ScribeDetailScreen() {
               <Calendar size={20} color="#daa521" />
             </View>
             <View>
-              <Text className="text-xs font-medium text-gray-400">Session Date</Text>
-              <Text className="text-lg font-bold text-gray-900 dark:text-white">
+              <Text className="text-xs font-outfit-medium text-gray-400">Session Date</Text>
+              <Text className="text-lg font-outfit-bold text-gray-900 dark:text-white">
                 {new Date(session.timestamp).toLocaleDateString()} at{' '}
                 {new Date(session.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
@@ -116,7 +116,7 @@ export default function ScribeDetailScreen() {
             </Pressable>
           </View>
 
-          <Text className="mt-4 font-medium text-gray-500 dark:text-gray-400">
+          <Text className="mt-4 font-outfit-medium text-gray-500 dark:text-gray-400">
             {Math.floor(currentTime)}s / {Math.floor(duration)}s
           </Text>
         </View>
@@ -174,7 +174,7 @@ export default function ScribeDetailScreen() {
           className="mt-6 flex-row items-center justify-center rounded-2xl border border-red-100 bg-red-50/50 py-4 active:opacity-80 dark:border-red-900/30 dark:bg-red-900/20"
         >
           <Trash2 size={20} color="#ef4444" />
-          <Text className="ml-2 font-bold text-red-500">Delete Session</Text>
+          <Text className="ml-2 font-outfit-bold text-red-500">Delete Session</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

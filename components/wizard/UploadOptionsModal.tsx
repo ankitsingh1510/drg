@@ -25,7 +25,7 @@ export function UploadOptionsModal({ visible, onClose, onSelectGallery, onSelect
           <View className="mb-2 items-center">
             <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
           </View>
-          <Text className="mb-6 text-center text-xl font-bold text-gray-900 dark:text-gray-100">Upload Document</Text>
+          <Text className="mb-6 text-center text-xl font-outfit-bold text-gray-900 dark:text-gray-100">Upload Document</Text>
 
           {/* Options */}
           <View className="gap-3">
@@ -42,7 +42,7 @@ export function UploadOptionsModal({ visible, onClose, onSelectGallery, onSelect
                 <Image size={24} color={isDark ? '#60a5fa' : '#2563eb'} />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Gallery</Text>
+                <Text className="text-base font-outfit-semibold text-gray-900 dark:text-gray-100">Gallery</Text>
                 <Text className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Select image from gallery</Text>
               </View>
             </TouchableOpacity>
@@ -60,7 +60,7 @@ export function UploadOptionsModal({ visible, onClose, onSelectGallery, onSelect
                 <FileText size={24} color={isDark ? '#4ade80' : '#16a34a'} />
               </View>
               <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">Files</Text>
+                <Text className="text-base font-outfit-semibold text-gray-900 dark:text-gray-100">Files</Text>
                 <Text className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Select PDF or text file</Text>
               </View>
             </TouchableOpacity>
@@ -72,7 +72,7 @@ export function UploadOptionsModal({ visible, onClose, onSelectGallery, onSelect
             className="mt-6 items-center rounded-xl border-2 border-gray-300 bg-white py-3 dark:border-gray-600 dark:bg-gray-800"
             activeOpacity={0.7}
           >
-            <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
+            <Text className="text-base font-outfit-semibold text-gray-700 dark:text-gray-300">Cancel</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>

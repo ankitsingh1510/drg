@@ -1,16 +1,21 @@
 import React, { useEffect } from 'react';
-import { LogBox, Platform, View } from 'react-native';
+import { LogBox, Platform, Text, View } from 'react-native';
 import * as Device from 'expo-device';
-import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
+  Outfit_100Thin,
+  Outfit_200ExtraLight,
+  Outfit_300Light,
+  Outfit_400Regular,
+  Outfit_500Medium,
+  Outfit_600SemiBold,
+  Outfit_700Bold,
+  Outfit_800ExtraBold,
+  Outfit_900Black,
+  useFonts,
+} from '@expo-google-fonts/outfit';
 import { getApp, initializeApp } from '@react-native-firebase/app';
 import messaging, { onMessage, onTokenRefresh } from '@react-native-firebase/messaging';
 import { useAtomValue } from 'jotai';
@@ -150,19 +155,20 @@ export default function RootLayout() {
     }
   }, [theme, colorScheme, setColorScheme]);
 
-  const [loaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
+  const [fontsLoaded] = useFonts({
+    Outfit_100Thin,
+    Outfit_200ExtraLight,
+    Outfit_300Light,
+    Outfit_400Regular,
+    Outfit_500Medium,
+    Outfit_600SemiBold,
+    Outfit_700Bold,
+    Outfit_800ExtraBold,
+    Outfit_900Black,
   });
 
-  // Don't return null while fonts are loading. Returning null prevents the
-  // root navigator from mounting which can cause navigation calls (from
-  // AuthContext) to error with "navigate before mounting". Render the
-  // layout immediately and allow fonts to apply once ready.
-  if (!loaded) {
-    console.log('Fonts not loaded yet — rendering layout to allow navigation to mount');
+  if (!fontsLoaded) {
+    return null;
   }
 
   return (
@@ -180,7 +186,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="profile"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'My Profile',
                   headerBackTitle: '',
                   headerBackButtonDisplayMode: 'minimal',
@@ -190,7 +196,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -198,7 +204,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="reset-password"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'Change Password',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',
@@ -208,7 +214,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -217,7 +223,7 @@ export default function RootLayout() {
               <Stack.Screen
                 name="news"
                 options={{
-                  headerShown: true,
+                  headerShown: false,
                   title: 'Trends',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',
@@ -227,7 +233,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -245,7 +251,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}
@@ -263,7 +269,7 @@ export default function RootLayout() {
                   },
                   headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
                   headerTitleStyle: {
-                    fontFamily: 'Poppins_600SemiBold',
+                    fontFamily: 'Outfit_600SemiBold',
                     fontSize: 18,
                   },
                 }}

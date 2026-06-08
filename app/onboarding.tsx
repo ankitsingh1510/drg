@@ -1,138 +1,179 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useCallback, useMemo } from 'react';
+import { Image, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
-import { ChevronLeft, ChevronRight, FileText, MessageSquare } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
+import { ArrowRight } from 'lucide-react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, { runOnJS, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from 'react-native-reanimated';
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppText } from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { hasSeenOnboardingAtom } from '@/stores/onboarding';
 
+const DURATION = 350;
+const EASING = Easing.out(Easing.cubic);
+
 const ONBOARDING_DATA = [
   {
-    title: 'Analyze Reports',
-    description: 'Upload your medical reports and get instant AI-powered summaries and insights tailored for you.',
-    icon: FileText,
-    image: require('@/assets/images/DrG-logo.png'),
+    title: 'Manage Patients Effortlessly',
+    description: 'Access patient reports, track progress, and stay updated — all in one place',
+    image: require('@/assets/onboarding/1.png'),
   },
   {
-    title: 'Voice & Chat',
-    description: 'Talk or chat with Dr.G to ask questions about your health and get real-time responses anytime.',
-    icon: MessageSquare,
-    image: require('@/assets/images/DrG-logo.png'),
+    title: 'Simplified Report Interpretation',
+    description: 'Understand complex genomic reports with clear, actionable insights',
+    image: require('@/assets/onboarding/2.png'),
+  },
+  {
+    title: 'Interact with AI Clinical Insights',
+    description:
+      'Ask clinical questions, explore AI-generated insights, and interact directly with reports using DrG AI',
+    image: require('@/assets/onboarding/3.png'),
   },
 ];
 
+const N = ONBOARDING_DATA.length;
+
 export default function OnboardingScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ source?: string }>();
+  const source = Array.isArray(params.source) ? params.source[0] : params.source;
+  const isFromSettings = source === 'settings';
+  const { width } = useWindowDimensions();
   const [, setHasSeenOnboarding] = useAtom(hasSeenOnboardingAtom);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+
+  // Tracks which page we're on — stored as a shared value so the
+  // dot indicator can update without a JS re-render if needed.
+  // We also keep a React state copy only for the nav buttons / isLast check.
+  const currentIndex = useSharedValue(0);
+  const [pageIndex, setPageIndex] = React.useState(0);
+
+  // The strip translateX: page 0 → 0, page 1 → -width, page 2 → -2*width
+  const translateX = useSharedValue(0);
+  const isAnimating = useSharedValue(false);
+
+  const goTo = useCallback(
+    (to: number) => {
+      'worklet';
+      if (isAnimating.value || to < 0 || to >= N) return;
+      isAnimating.value = true;
+      currentIndex.value = to;
+      translateX.value = withTiming(-to * width, { duration: DURATION, easing: EASING }, finished => {
+        if (finished) {
+          isAnimating.value = false;
+          runOnJS(setPageIndex)(to);
+        }
+      });
+    },
+    [width, currentIndex, translateX, isAnimating]
+  );
 
   const handleNext = useCallback(() => {
-    if (currentIndex < ONBOARDING_DATA.length - 1) {
-      setDirection('forward');
-      setCurrentIndex(prev => prev + 1);
+    if (pageIndex < N - 1) {
+      goTo(pageIndex + 1);
     } else {
       setHasSeenOnboarding(true);
-      router.replace('/login');
+      router.replace(isFromSettings ? '/(tabs)/home' : '/login');
     }
-  }, [currentIndex, router, setHasSeenOnboarding]);
+  }, [pageIndex, goTo, router, setHasSeenOnboarding, isFromSettings]);
+
+  const handleSkip = useCallback(() => {
+    setHasSeenOnboarding(true);
+    router.replace(isFromSettings ? '/(tabs)/home' : '/login');
+  }, [router, setHasSeenOnboarding, isFromSettings]);
 
   const handleBack = useCallback(() => {
-    if (currentIndex > 0) {
-      setDirection('backward');
-      setCurrentIndex(prev => prev - 1);
-    }
-  }, [currentIndex]);
+    goTo(pageIndex - 1);
+  }, [pageIndex, goTo]);
 
   const swipeGesture = useMemo(
     () =>
       Gesture.Pan()
         .onEnd(e => {
-          if (e.translationX < -50) {
-            runOnJS(handleNext)();
-          } else if (e.translationX > 50) {
-            runOnJS(handleBack)();
-          }
+          if (e.translationX < -50) runOnJS(handleNext)();
+          else if (e.translationX > 50) runOnJS(handleBack)();
         })
         .runOnJS(true),
-    [handleBack, handleNext]
+    [handleNext, handleBack]
   );
 
-  const currentItem = ONBOARDING_DATA[currentIndex];
-  const Icon = currentItem.icon;
+  // The whole strip moves together — no per-slide state changes ever
+  const stripStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  const isLast = pageIndex === N - 1;
 
   return (
     <GestureHandlerRootView className="flex-1">
       <GestureDetector gesture={swipeGesture}>
-        {/* bg-[#FDF5E6] dark:bg-gray-900 */}
-        <SafeAreaView className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-[#FDF5E6]'}`}>
-          <View className="flex-1 items-center justify-center px-10">
-            <Animated.View
-              key={currentIndex}
-              entering={(direction === 'forward' ? SlideInRight : SlideInLeft).duration(400)}
-              exiting={(direction === 'forward' ? SlideOutLeft : SlideOutRight).duration(400)}
-              className="items-center"
-            >
-              <View className="mb-10 items-center">
-                <Image source={currentItem.image} resizeMode="contain" className="mb-10 h-24 w-24" />
-                <View className={`rounded-full p-8 ${isDark ? 'bg-slate-800/50' : 'bg-gray-100'}`}>
-                  <Icon size={80} color={colors.common.primary} />
+        <View className="flex-1 bg-white">
+          {/* ── Image strip ── */}
+          <View className="overflow-hidden" style={{ flex: 60 }}>
+            <Animated.View style={[stripStyle, { flexDirection: 'row', width: width * N, height: '100%' }]}>
+              {ONBOARDING_DATA.map((item, i) => (
+                <View key={i} style={{ width, height: '100%' }} className="items-center justify-center">
+                  <Image source={item.image} resizeMode="contain" style={{ width: '90%', height: '90%' }} />
                 </View>
-              </View>
-
-              <Text className={`mb-4 text-center text-3xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
-                {currentItem.title}
-              </Text>
-
-              <Text className={`text-center text-lg leading-6 ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>
-                {currentItem.description}
-              </Text>
+              ))}
             </Animated.View>
           </View>
 
-          <View className="p-10">
-            {/* Pagination Dots */}
-            <View className="mb-10 flex-row justify-center gap-2">
+          {/* ── Bottom panel ── */}
+          <SafeAreaView edges={['bottom']} className="rounded-t-3xl bg-[#1A365D] px-7 pb-2 pt-6" style={{ flex: 42 }}>
+            {/* Dots */}
+            <View className="mb-7 flex-row gap-2">
               {ONBOARDING_DATA.map((_, index) => (
                 <View
                   key={index}
-                  className={`h-2 rounded-full ${
-                    index === currentIndex ? 'bg-primary w-8' : 'w-2'
-                  } ${isDark ? 'bg-neutral-600' : 'bg-gray-300'}`}
-                  style={index === currentIndex ? { backgroundColor: colors.common.primary } : undefined}
+                  className="mt-6 h-1.5 rounded-full"
+                  style={{
+                    width: index === pageIndex ? 36 : 28,
+                    backgroundColor: index === pageIndex ? '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                  }}
                 />
               ))}
             </View>
 
-            <View className="flex-row items-center justify-between">
-              {currentIndex > 0 ? (
-                <TouchableOpacity onPress={handleBack} className="flex-row items-center rounded-2xl px-6 py-4">
-                  <ChevronLeft size={20} color={isDark ? colors.dark.textSecondary : colors.light.textSecondary} />
-                  <Text className={`ml-1 font-semibold ${isDark ? 'text-neutral-400' : 'text-gray-500'}`}>Back</Text>
+            {/* Text strip — mirrors the image strip exactly */}
+            <View style={{ overflow: 'hidden', flex: 1 }}>
+              <Animated.View style={[stripStyle, { flexDirection: 'row', width: width * N }]}>
+                {ONBOARDING_DATA.map((item, i) => (
+                  <View key={i} style={{ width }}>
+                    <AppText weight="bold" className="mb-3 text-2xl leading-9 text-white">
+                      {item.title}
+                    </AppText>
+                    <AppText weight="regular" className="text-base leading-6 text-white/60" style={{ width: '80%' }}>
+                      {item.description}
+                    </AppText>
+                  </View>
+                ))}
+              </Animated.View>
+            </View>
+
+            {/* Nav buttons */}
+            <View className="mb-8 mt-auto flex-row items-center justify-between px-2 pt-2">
+              {!isLast ? (
+                <TouchableOpacity onPress={handleSkip} activeOpacity={0.7}>
+                  <AppText weight="medium" className="text-base text-white">
+                    Skip
+                  </AppText>
                 </TouchableOpacity>
               ) : (
-                <View className="w-20" />
+                <View />
               )}
-
-              <TouchableOpacity
-                onPress={handleNext}
-                className="bg-primary flex-row items-center rounded-2xl px-8 py-4 shadow-lg active:scale-95"
-                style={{ backgroundColor: colors.common.primary }}
-              >
-                <Text className="mr-2 text-lg font-bold text-white">
-                  {currentIndex === ONBOARDING_DATA.length - 1 ? 'Get Started' : 'Next'}
-                </Text>
-                <ChevronRight size={20} color="white" />
-              </TouchableOpacity>
+              <View className="h-20 w-20 rounded-full border-2 border-white">
+                <TouchableOpacity
+                  onPress={handleNext}
+                  activeOpacity={0.85}
+                  className="absolute inset-[4px] items-center justify-center rounded-full bg-white"
+                >
+                  <ArrowRight size={28} color={colors.common.navy} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </SafeAreaView>
+          </SafeAreaView>
+        </View>
       </GestureDetector>
     </GestureHandlerRootView>
   );

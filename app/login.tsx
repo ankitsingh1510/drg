@@ -5,19 +5,20 @@ import {
   BackHandler,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
-  Text,
+  ScrollView,
+  StatusBar,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OtpVerificationModal from '@/components/auth/OtpVerificationModal';
+import { AppText } from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogin } from '@/context/AuthContext';
 import { storageAPI } from '@/services/storage';
@@ -27,15 +28,15 @@ import { decryptToken } from '@/util/helpers';
 import { toast } from '@/util/toast';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showMfaModal, setShowMfaModal] = useState(false);
+  const [identifierError, setIdentifierError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const login = useLogin();
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setTargetLocation } = useAuth();
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const params = useLocalSearchParams();
 
   useEffect(() => {
@@ -67,26 +68,45 @@ export default function LoginScreen() {
   }, []);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
-      return;
+    let valid = true;
+    if (!identifier) {
+      setIdentifierError('Username is required');
+      valid = false;
+    } else {
+      setIdentifierError('');
     }
+    if (!password) {
+      setPasswordError('Password is required');
+      valid = false;
+    } else {
+      setPasswordError('');
+    }
+    if (!valid) return;
 
     try {
       setIsLoading(true);
       // Authenticate and get token
-      const response = await usersAPI.authenticateUser({ username: email, password });
+      const response = await usersAPI.authenticateUser({ username: identifier.trim(), password });
       if (response && response.token) {
         const token = response.token;
         const tokenPayload = decryptToken(token);
-        const isDrgUser = tokenPayload.assignedApplications.some(app => app.name.toLowerCase() === 'drg');
-        if (!isDrgUser) {
-          setIsLoading(false);
-          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
-          return;
-        }
         if (!tokenPayload) {
           throw new Error('Invalid token received');
+        }
+        const isMfaPending =
+          tokenPayload.user_type === 'localUser' &&
+          (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
+          !tokenPayload.isMfaVerified;
+        if (!isMfaPending && tokenPayload.assignedApplications) {
+          const isDrgUser = tokenPayload.assignedApplications.some((app: any) => app.name.toLowerCase() === 'drg');
+          if (!isDrgUser) {
+            setIsLoading(false);
+            Alert.alert(
+              'Access Denied',
+              'You do not have access to this application. Please contact an administrator.'
+            );
+            return;
+          }
         }
         if (tokenPayload.force_password_change === 1) {
           // Store token temporarily for the change password request
@@ -97,11 +117,7 @@ export default function LoginScreen() {
             pathname: '/reset-password' as any,
             params: { userMasterId: tokenPayload.sub },
           });
-        } else if (
-          tokenPayload.user_type === 'localUser' &&
-          (tokenPayload.isMfaEnabled || tokenPayload.isMfaEnforced) &&
-          !tokenPayload.isMfaVerified
-        ) {
+        } else if (isMfaPending) {
           // Store token temporarily in storage for API calls
           storage.set('token', token);
           const otpResponse = await usersAPI.sendMfaOtp('email');
@@ -112,20 +128,20 @@ export default function LoginScreen() {
           setShowMfaModal(true);
         } else {
           // No MFA required, proceed with normal login
-          await completeLogin(email, password);
+          await completeLogin(identifier.trim(), password);
         }
       } else {
         throw new Error('Authentication failed');
       }
     } catch (error: any) {
       setIsLoading(false);
-      Alert.alert('Login Failed', error.message || 'Invalid credentials');
+      Alert.alert('Login Failed', error.message || error.data?.description || 'Invalid credentials');
     }
   };
 
-  const completeLogin = async (username: string, pwd: string) => {
+  const completeLogin = async (usernameOrEmail: string, pwd: string) => {
     try {
-      await login(username, pwd);
+      await login(usernameOrEmail, pwd);
     } catch (error: any) {
       throw error;
     }
@@ -136,6 +152,14 @@ export default function LoginScreen() {
       const payload = decryptToken(verifiedToken);
       if (!payload) {
         throw new Error('Invalid token');
+      }
+      if (payload.assignedApplications) {
+        const isDrgUser = payload.assignedApplications.some((app: any) => app.name.toLowerCase() === 'drg');
+        if (!isDrgUser) {
+          setIsLoading(false);
+          Alert.alert('Access Denied', 'You do not have access to this application. Please contact an administrator.');
+          return;
+        }
       }
       setToken(verifiedToken);
       // Fetch user details using the verified token
@@ -186,150 +210,137 @@ export default function LoginScreen() {
 
   if (isLoading) {
     return (
-      <View
-        className="flex-1 items-center justify-center bg-[#FDF5E6] dark:bg-gray-900"
-        style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
-      >
+      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
         <ActivityIndicator size="large" color={colors.common.primary} />
-        <Text className="mt-4 text-lg font-medium text-slate-600 dark:text-gray-300">Securing Session...</Text>
+        <AppText weight="medium" className="mt-4 text-lg text-slate-600 dark:text-gray-300">
+          Securing Session...
+        </AppText>
       </View>
     );
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
+      <StatusBar barStyle="light-content" backgroundColor="#1E2D50" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: isDark ? colors.dark.background : '#FDF5E6' }}
-          edges={['left', 'right', 'bottom']}
-        >
-          <View className="flex-1">
+        <SafeAreaView className="flex-1 bg-[#1E2D50]" edges={['top']}>
+          <View className="flex-1 bg-[#1E2D50]">
             {/* Top Hero Section */}
-            <View className="h-[40%] w-full overflow-hidden">
-              <ExpoImage
-                source={{
-                  uri: 'https://images.unsplash.com/photo-1614935151651-0dec300bb4bd?q=80&w=1000&auto=format&fit=crop',
-                }}
-                style={{ width: '100%', height: '100%' }}
-                contentFit="cover"
-                transition={500}
-              />
-              <View className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FDF5E6] to-transparent dark:from-gray-900" />
-              <View className="absolute left-6 top-[25%]">
-                <Text className="text-4xl font-extrabold tracking-tight text-gray-800 shadow-lg dark:text-gray-100">
-                  Dr. G
-                </Text>
-                <Text className="mt-1 text-lg font-medium text-gray-600 shadow-lg shadow-md dark:text-gray-100">
-                  Intelligent Clinical Assistant
-                </Text>
-              </View>
+            <View className="px-7 pb-10 pt-9">
+              <AppText weight="extrabold" className="mb-2 text-3xl text-white">
+                Welcome to DrG
+              </AppText>
+              <AppText weight="regular" className="text-base leading-6 text-[#A8BFDF]">
+                Access patient reports &amp; clinical insights{'\n'}in one place
+              </AppText>
             </View>
 
-            {/* Login Form Container */}
-            <View className="-mt-12 flex-1 rounded-t-[40px] bg-[#FDF5E6] px-8 pt-8 dark:bg-gray-900">
-              <View className="mb-8 items-center">
-                <View className="mb-4 h-20 w-20 overflow-hidden rounded-2xl bg-white p-2 shadow-sm dark:bg-gray-800">
-                  <ExpoImage
-                    source={require('@/assets/images/DrG-logo.png')}
-                    style={{ width: '100%', height: '100%' }}
-                    contentFit="contain"
-                  />
-                </View>
-                <Text className="text-3xl font-extrabold text-gray-900 dark:text-gray-100" numberOfLines={1}>
-                  Welcome Back
-                </Text>
-                <Text className="mt-1 text-base text-gray-500 dark:text-gray-400">
-                  Please enter your details to sign in
-                </Text>
+            {/* Login Form Card */}
+            <ScrollView
+              className="flex-1 rounded-t-3xl bg-white"
+              contentContainerClassName="px-6 pt-8 pb-10"
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Username Field */}
+              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                Username
+              </AppText>
+              <View
+                className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+              >
+                <TextInput
+                  className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  placeholder="Enter your username"
+                  placeholderTextColor="#9CA3AF"
+                  value={identifier}
+                  onChangeText={text => {
+                    setIdentifier(text);
+                    if (text) setIdentifierError('');
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
+              {identifierError ? (
+                <AppText className="mb-3 text-xs text-red-500">{identifierError}</AppText>
+              ) : (
+                <View className="mb-4" />
+              )}
 
-              <View className="space-y-5">
-                {/* Email Input */}
-                <View className="flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
-                  <Ionicons
-                    name="mail-outline"
-                    size={20}
-                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      paddingVertical: 16,
-                      paddingHorizontal: 12,
-                      color: isDark ? 'white' : 'black',
-                    }}
-                    placeholder="Email Address"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-
-                {/* Password Input */}
-                <View className="mt-5 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={isDark ? colors.dark.textSecondary : colors.common.accent}
-                  />
-                  <TextInput
-                    style={{
-                      flex: 1,
-                      paddingVertical: 16,
-                      paddingHorizontal: 12,
-                      color: isDark ? 'white' : 'black',
-                    }}
-                    placeholder="Password"
-                    placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(s => !s)}
-                    accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    <Ionicons
-                      name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                      size={22}
-                      color={isDark ? colors.dark.textTertiary : '#9CA3AF'}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                {/* Forgot Password Link */}
-                <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mt-4 items-end">
-                  <Text className="text-sm font-medium" style={{ color: colors.common.primary }}>
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Login Button */}
+              {/* Password Field */}
+              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                Password
+              </AppText>
+              <View
+                className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+              >
+                <TextInput
+                  className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  placeholder="Enter your password"
+                  placeholderTextColor="#9CA3AF"
+                  value={password}
+                  onChangeText={text => {
+                    setPassword(text);
+                    if (text) setPasswordError('');
+                  }}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
                 <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="mt-10 overflow-hidden rounded-2xl shadow-xl shadow-blue-500/30"
-                  onPress={handleLogin}
-                  disabled={isLoading}
+                  onPress={() => setShowPassword(s => !s)}
+                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                  className="px-3"
                 >
-                  <View className="items-center py-4" style={{ backgroundColor: colors.common.primary }}>
-                    <Text className="text-lg font-bold uppercase tracking-wider text-white">
-                      {isLoading ? 'Processing...' : 'Login Now'}
-                    </Text>
-                  </View>
+                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#9CA3AF" />
                 </TouchableOpacity>
-
-                {/* Footer Quote or Branding */}
-                <View className="mb-10 mt-auto items-center">
-                  <Text className="text-xs text-gray-400 dark:text-gray-600">
-                    Powered by 1Cell.Ai • Precision Genomics
-                  </Text>
-                </View>
               </View>
+              {passwordError ? (
+                <AppText className="mb-2 text-xs text-red-500">{passwordError}</AppText>
+              ) : (
+                <View className="mb-2" />
+              )}
+
+              {/* Forgot Password */}
+              <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
+                <AppText weight="semibold" className="text-sm" style={{ color: colors.common.info }}>
+                  Forgot Password?
+                </AppText>
+              </TouchableOpacity>
+
+              {/* Login Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={handleLogin}
+                disabled={isLoading}
+                className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
+              >
+                <AppText weight="bold" className="text-base tracking-wide text-white">
+                  {isLoading ? 'Processing...' : 'Log In'}
+                </AppText>
+              </TouchableOpacity>
+
+              {/* Contact Support */}
+              <View className="mb-6 items-center">
+                <AppText weight="regular" className="text-sm text-gray-500">
+                  Need help accessing your account?{' '}
+                  <AppText
+                    weight="semibold"
+                    style={{ color: colors.common.info }}
+                    onPress={() => Linking.openURL('mailto:product.support@1cell.ai')}
+                  >
+                    Contact Support
+                  </AppText>
+                </AppText>
+              </View>
+            </ScrollView>
+            {/* Footer */}
+            <View className="bg-white pb-10">
+              <AppText weight="regular" className="text-center text-xs text-gray-400">
+                Secure access for registered medical professionals only
+              </AppText>
             </View>
           </View>
 

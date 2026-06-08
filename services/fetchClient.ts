@@ -37,13 +37,23 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     if (response.status === 401) {
       console.log('Authentication error — logging out.');
 
-      storage.clearAll();
+      let unauthorizedData: any = null;
+      const unauthorizedContentType = response.headers.get('content-type');
+      if (unauthorizedContentType?.includes('application/json')) {
+        unauthorizedData = await response.json().catch(() => null);
+      }
 
-      setTimeout(() => {
-        router.replace('/' as any);
-      }, 500);
+      const isLoginRequest = finalURL.includes('/api/token');
+      if (!isLoginRequest) {
+        storage.clearAll();
+        setTimeout(() => {
+          router.replace('/' as any);
+        }, 500);
+      }
 
-      throw new Error('Unauthorized');
+      const rawMessage = unauthorizedData?.description || 'Unauthorized';
+      const errorMessage = rawMessage.includes(':: ') ? rawMessage.split(':: ').pop()!.trim() : rawMessage;
+      throw { status: 401, message: errorMessage, data: unauthorizedData };
     }
 
     const contentType = response.headers.get('content-type');

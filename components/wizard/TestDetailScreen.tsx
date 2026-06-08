@@ -55,23 +55,23 @@ export function TestDetailScreen({ test, testImage, onBack }: TestDetailScreenPr
             <View className="flex-row items-center justify-between">
               {test.testVariant ? (
                 <View className="rounded-full bg-white/90 px-3 py-1">
-                  <Text className="text-xs font-bold text-blue-600">{test.testVariant}</Text>
+                  <Text className="text-xs font-outfit-bold text-blue-600">{test.testVariant}</Text>
                 </View>
               ) : (
                 <View className="rounded-full bg-white/20 px-3 py-1">
-                  <Text className="text-xs font-bold text-white">NA</Text>
+                  <Text className="text-xs font-outfit-bold text-white">NA</Text>
                 </View>
               )}
               <View className="flex-row items-center rounded-full bg-white/90 px-3 py-1.5">
                 <Ionicons name="checkmark-circle" size={14} color={conf.iconColor} style={{ marginRight: 4 }} />
-                <Text className="text-xs font-bold" style={{ color: conf.iconColor }}>
+                <Text className="text-xs font-outfit-bold" style={{ color: conf.iconColor }}>
                   {conf.label}
                 </Text>
               </View>
             </View>
             <View>
-              <Text className="text-3xl font-extrabold text-white shadow">{test.testName}</Text>
-              <Text className="mt-2 text-sm font-semibold text-white/90">
+              <Text className="text-3xl font-outfit-extrabold text-white shadow">{test.testName}</Text>
+              <Text className="mt-2 text-sm font-outfit-semibold text-white/90">
                 Confidence Score: {Math.round(test.confidence * 100)}%
               </Text>
             </View>
@@ -82,7 +82,7 @@ export function TestDetailScreen({ test, testImage, onBack }: TestDetailScreenPr
       <View className="px-5 py-6">
         <Text className="mb-1 text-base text-gray-500 dark:text-gray-400">Why {test.testName} is Recommended</Text>
         <View className="mb-6 h-0.5 bg-gray-200 dark:bg-gray-700" />
-        <Text className="mb-4 text-lg font-bold uppercase tracking-wide text-slate-800 dark:text-gray-200">
+        <Text className="mb-4 text-lg font-outfit-bold uppercase tracking-wide text-slate-800 dark:text-gray-200">
           Clinical Match Summary
         </Text>
         <View className="mb-6">
@@ -94,7 +94,7 @@ export function TestDetailScreen({ test, testImage, onBack }: TestDetailScreenPr
           ))}
         </View>
 
-        <Text className="mb-4 text-lg font-bold uppercase tracking-wide text-slate-800 dark:text-gray-200">
+        <Text className="mb-4 text-lg font-outfit-bold uppercase tracking-wide text-slate-800 dark:text-gray-200">
           How It Supports This Case
         </Text>
         <View className="mb-8 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
@@ -105,7 +105,7 @@ export function TestDetailScreen({ test, testImage, onBack }: TestDetailScreenPr
           className="items-center rounded-xl border border-gray-600 py-4 dark:border-gray-600"
           activeOpacity={0.7}
         >
-          <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">Back to Recommendations</Text>
+          <Text className="text-base font-outfit-semibold text-gray-700 dark:text-gray-300">Back to Recommendations</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

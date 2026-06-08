@@ -24,7 +24,7 @@ export default function ProfileDropdownField({
 
   return (
     <View key={field.name} className="mb-5">
-      <Text className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+      <Text className="mb-2 text-sm font-outfit-medium text-gray-600 dark:text-gray-400">
         {field.displayLabel}
         {field.required && <Text className="text-red-500"> *</Text>}
       </Text>

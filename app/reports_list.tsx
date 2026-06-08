@@ -1,10 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, BackHandler, RefreshControl, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  BackHandler,
+  RefreshControl,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
+import { ChevronLeft } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, LoadingIndicator, PatientHeader, PatientRow } from '@/components/patient';
+import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
@@ -24,6 +36,7 @@ export default function ReportsList() {
   const [totalCount, setTotalCount] = useState(0);
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
+  const isDarkMode = useColorScheme() === 'dark';
 
   const fetchPatients = useCallback(async (pageNum: number, searchQuery: string, append = false) => {
     try {
@@ -141,7 +154,7 @@ export default function ReportsList() {
 
   const renderEmptyComponent = useCallback(() => {
     if (loading) return null;
-    return <EmptyState type="no-patients" />;
+    return <EmptyState type="no-released-tests" />;
   }, [loading]);
 
   useFocusEffect(
@@ -157,8 +170,21 @@ export default function ReportsList() {
   );
 
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1, paddingTop: headerHeight }} className="bg-[#FDF5E6] dark:bg-gray-900">
-      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} />
+    <SafeAreaView className="flex-1 bg-[#FDF5E6] dark:bg-gray-900">
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? '#0B1929' : '#FDF5E6'}
+      />
+
+      <View className="flex-row items-center justify-between px-4 py-3">
+        <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
+          <ChevronLeft size={24} color={isDarkMode ? '#FDF5E6' : '#0B1929'} strokeWidth={2.5} />
+        </TouchableOpacity>
+        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Patient Reports</AppText>
+        <View className="w-8" />
+      </View>
+
+      <PatientHeader totalCount={totalCount} query={query} onSearch={handleSearch} loading={loading} />
 
       <View className="flex-1">
         <FlashList
@@ -187,7 +213,7 @@ export default function ReportsList() {
         {loading && !refreshing && (
           <View className="absolute inset-0 items-center justify-center bg-[#FDF5E6]/90 dark:bg-gray-900/90">
             <ActivityIndicator size="large" color={colors.common.primary} />
-            <Text className="mt-4 text-base font-bold tracking-tight text-gray-500 dark:text-gray-400">
+            <Text className="mt-4 font-outfit-bold text-base tracking-tight text-gray-500 dark:text-gray-400">
               Loading Reports...
             </Text>
           </View>

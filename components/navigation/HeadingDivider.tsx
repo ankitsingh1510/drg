@@ -17,7 +17,7 @@ export const HeadingDivider = ({ iconName, title, hideRightIcon, onRightButton }
     <View className="mx-[15px] mb-3 mt-2 flex-row items-center justify-between border-b border-gray-300 pb-2 dark:border-gray-600">
       <View className="flex-1 flex-row items-center gap-2">
         <Ionicons name={iconName} size={24} color={isDark ? '#60a5fa' : 'dodgerblue'} />
-        <Text className="font-poppins-semibold flex-1 text-lg font-bold text-gray-900 dark:text-gray-100">{title}</Text>
+        <Text className="flex-1 font-outfit-bold text-lg text-gray-900 dark:text-gray-100">{title}</Text>
       </View>
       {!hideRightIcon && (
         <TouchableOpacity onPress={onRightButton}>
