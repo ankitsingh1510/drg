@@ -38,6 +38,7 @@ export default function LoginScreen() {
   const { isAuthenticated, isLoading, setIsLoading, setUser, setToken, setTargetLocation } = useAuth();
   const router = useRouter();
   const params = useLocalSearchParams();
+  const passwordRef = React.useRef<TextInput>(null);
 
   useEffect(() => {
     if (params.logout === 'true') {
@@ -236,106 +237,119 @@ export default function LoginScreen() {
             </View>
 
             {/* Login Form Card */}
-            <ScrollView
-              className="flex-1 rounded-t-3xl bg-white"
-              contentContainerClassName="px-6 pt-8 pb-10"
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Username Field */}
-              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
-                Username
-              </AppText>
-              <View
-                className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+            <View className="flex-1 rounded-t-3xl bg-white">
+              <ScrollView
+                className="flex-1"
+                contentContainerClassName="px-6 pt-8 pb-10"
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
               >
-                <TextInput
-                  className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
-                  placeholder="Enter your username"
-                  placeholderTextColor="#9CA3AF"
-                  value={identifier}
-                  onChangeText={text => {
-                    setIdentifier(text);
-                    if (text) setIdentifierError('');
-                  }}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-              </View>
-              {identifierError ? (
-                <AppText className="mb-3 text-xs text-red-500">{identifierError}</AppText>
-              ) : (
-                <View className="mb-4" />
-              )}
-
-              {/* Password Field */}
-              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
-                Password
-              </AppText>
-              <View
-                className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
-              >
-                <TextInput
-                  className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
-                  placeholder="Enter your password"
-                  placeholderTextColor="#9CA3AF"
-                  value={password}
-                  onChangeText={text => {
-                    setPassword(text);
-                    if (text) setPasswordError('');
-                  }}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity
-                  onPress={() => setShowPassword(s => !s)}
-                  accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-                  className="px-3"
+                {/* Username Field */}
+                <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                  Username
+                </AppText>
+                <View
+                  className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
                 >
-                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#9CA3AF" />
-                </TouchableOpacity>
-              </View>
-              {passwordError ? (
-                <AppText className="mb-2 text-xs text-red-500">{passwordError}</AppText>
-              ) : (
-                <View className="mb-2" />
-              )}
+                  <TextInput
+                    className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                    placeholder="Enter your username"
+                    placeholderTextColor="#9CA3AF"
+                    value={identifier}
+                    onChangeText={text => {
+                      setIdentifier(text);
+                      if (text) setIdentifierError('');
+                    }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    importantForAutofill="yes"
+                    returnKeyType="next"
+                    onSubmitEditing={() => passwordRef.current?.focus()}
+                    autoComplete="username"
+                    keyboardType="default"
+                    textContentType="username"
+                  />
+                </View>
+                {identifierError ? (
+                  <AppText className="mb-3 text-xs text-red-500">{identifierError}</AppText>
+                ) : (
+                  <View className="mb-4" />
+                )}
 
-              {/* Forgot Password */}
-              <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
-                <AppText weight="semibold" className="text-sm" style={{ color: colors.common.info }}>
-                  Forgot Password?
+                {/* Password Field */}
+                <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+                  Password
                 </AppText>
-              </TouchableOpacity>
-
-              {/* Login Button */}
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={handleLogin}
-                disabled={isLoading}
-                className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
-              >
-                <AppText weight="bold" className="text-base tracking-wide text-white">
-                  {isLoading ? 'Processing...' : 'Log In'}
-                </AppText>
-              </TouchableOpacity>
-
-              {/* Contact Support */}
-              <View className="mb-6 items-center">
-                <AppText weight="regular" className="text-sm text-gray-500">
-                  Need help accessing your account?{' '}
-                  <AppText
-                    weight="semibold"
-                    style={{ color: colors.common.info }}
-                    onPress={() => Linking.openURL('mailto:product.support@1cell.ai')}
+                <View
+                  className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
+                >
+                  <TextInput
+                    ref={passwordRef}
+                    className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                    placeholder="Enter your password"
+                    placeholderTextColor="#9CA3AF"
+                    value={password}
+                    onChangeText={text => {
+                      setPassword(text);
+                      if (text) setPasswordError('');
+                    }}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoComplete="current-password"
+                    textContentType="password"
+                    importantForAutofill="yes"
+                    returnKeyType="done"
+                    onSubmitEditing={handleLogin}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(s => !s)}
+                    accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                    className="px-3"
                   >
-                    Contact Support
+                    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#9CA3AF" />
+                  </TouchableOpacity>
+                </View>
+                {passwordError ? (
+                  <AppText className="mb-2 text-xs text-red-500">{passwordError}</AppText>
+                ) : (
+                  <View className="mb-2" />
+                )}
+
+                {/* Forgot Password */}
+                <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
+                  <AppText weight="semibold" className="text-sm" style={{ color: colors.common.info }}>
+                    Forgot Password?
                   </AppText>
-                </AppText>
-              </View>
-            </ScrollView>
+                </TouchableOpacity>
+
+                {/* Login Button */}
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  onPress={handleLogin}
+                  disabled={isLoading}
+                  className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
+                >
+                  <AppText weight="bold" className="text-base tracking-wide text-white">
+                    {isLoading ? 'Processing...' : 'Log In'}
+                  </AppText>
+                </TouchableOpacity>
+
+                {/* Contact Support */}
+                <View className="mb-6 items-center">
+                  <AppText weight="regular" className="text-sm text-gray-500">
+                    Need help accessing your account?{' '}
+                    <AppText
+                      weight="semibold"
+                      style={{ color: colors.common.info }}
+                      onPress={() => Linking.openURL('mailto:product.support@1cell.ai')}
+                    >
+                      Contact Support
+                    </AppText>
+                  </AppText>
+                </View>
+              </ScrollView>
+            </View>
             {/* Footer */}
             <View className="bg-white pb-10">
               <AppText weight="regular" className="text-center text-xs text-gray-400">

@@ -14,6 +14,7 @@ import * as Device from 'expo-device';
 import { isDevice } from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { usePreventScreenCapture, useScreenshotListener } from 'expo-screen-capture';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -136,6 +137,8 @@ export default function Reports() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  // Prevent screenshots/screen recording only on this page
+  usePreventScreenCapture();
   const isFirebaseEnabled = process.env.EXPO_PUBLIC_ENABLE_FIREBASE === 'true' || false;
   let { pdfUrl, patientName, documentId, assayResultIds, ingestionStatus } = useLocalSearchParams<{
     pdfUrl: string;
@@ -159,6 +162,11 @@ export default function Reports() {
   const [showVideoAvatar, setShowVideoAvatar] = useState<boolean | null>(null);
   const containerHeight = useRef(0);
   const panY = useRef(new Animated.Value(0)).current;
+
+  // Notify user when they attempt a screenshot(iOS, Not Android, due to OS limitations, will show default screenshot prevented toast)
+  useScreenshotListener(() => {
+    return toast.info('Screenshots are disabled on this page', undefined, 3000);
+  });
 
   useEffect(() => {
     if (!assayResultIds) return;
