@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { storage } from '@/stores/mmkv';
+import { API_BASE_URL } from './env';
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+const BASE_URL = API_BASE_URL;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
   try {

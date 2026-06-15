@@ -1,5 +1,6 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type userParams } from '../types/users';
+import { API_BASE_URL, GQL_BASE_URL } from './env';
 import { apiFetch } from './fetchClient';
 
 class UsersAPI {
@@ -7,8 +8,8 @@ class UsersAPI {
   gqlUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL as string;
-    this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
+    this.baseUrl = API_BASE_URL;
+    this.gqlUrl = GQL_BASE_URL;
   }
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
@@ -42,7 +43,7 @@ class UsersAPI {
 
   async authenticateUser(paramInfo: { username: string; password: string }): Promise<any> {
     try {
-      const response = await apiFetch(process.env.EXPO_PUBLIC_API_BASE_URL + `/api/token`, {
+      const response = await apiFetch(this.baseUrl + `/api/token`, {
         method: 'POST',
         body: JSON.stringify(paramInfo),
       });

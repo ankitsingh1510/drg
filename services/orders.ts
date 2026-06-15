@@ -1,4 +1,5 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
+import { GQL_BASE_URL } from './env';
 import { apiFetch } from './fetchClient';
 
 export interface AssayOrder {
@@ -49,7 +50,7 @@ class OrdersAPI {
   gqlUrl: string;
 
   constructor() {
-    this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
+    this.gqlUrl = GQL_BASE_URL;
   }
 
   async getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {

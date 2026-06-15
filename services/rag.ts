@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { getFcmToken, storage } from '@/stores/mmkv';
+import { API_BASE_URL, GQL_BASE_URL } from './env';
 import { apiFetch } from './fetchClient';
 
 class RagAPI {
@@ -7,8 +8,8 @@ class RagAPI {
   gqlUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL as string;
-    this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
+    this.baseUrl = API_BASE_URL;
+    this.gqlUrl = GQL_BASE_URL;
   }
 
   async ingestReport(assayResultIds: string) {

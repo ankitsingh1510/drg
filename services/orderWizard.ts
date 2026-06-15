@@ -1,5 +1,6 @@
 import RNBlobUtil from 'react-native-blob-util';
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
+import { GQL_BASE_URL } from './env';
 import { apiFetch } from './fetchClient';
 
 export interface RecommendAnswers {
@@ -23,7 +24,7 @@ export interface RecommendationResponse {
 }
 
 class OrderWizardAPI {
-  gqlUrl: string = (process.env.EXPO_PUBLIC_GQL_URL as string) + '/graphql';
+  gqlUrl: string = GQL_BASE_URL + '/graphql';
 
   async getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
     try {

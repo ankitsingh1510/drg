@@ -1,5 +1,6 @@
 import { type GQLRequestParams, type GQLResponse } from '../types/api';
 import { type ESignatureData } from '../types/types';
+import { API_BASE_URL, GQL_BASE_URL } from './env';
 import { apiFetch } from './fetchClient';
 
 class StorageAPI {
@@ -7,8 +8,8 @@ class StorageAPI {
   gqlUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.EXPO_PUBLIC_API_BASE_URL as string;
-    this.gqlUrl = process.env.EXPO_PUBLIC_GQL_URL as string;
+    this.baseUrl = API_BASE_URL;
+    this.gqlUrl = GQL_BASE_URL;
   }
 
   getGQLResponse(reqParams: GQLRequestParams): Promise<GQLResponse> {
