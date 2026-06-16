@@ -376,7 +376,7 @@ const Settings = () => {
             className="mb-8 mt-4 items-center justify-center opacity-60"
           >
             <AppText className="font-outfit-medium text-xs text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
-            <AppText className="text-[10px] text-gray-400 dark:text-gray-500">
+            <AppText className="text-xs text-gray-400 dark:text-gray-500">
               Version {Constants.expoConfig?.version || '1.1.5'}
             </AppText>
           </Pressable>

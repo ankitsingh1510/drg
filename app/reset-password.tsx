@@ -38,7 +38,7 @@ const PasswordInput = memo(
     <View className="mb-4 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
       <Ionicons name={icon} size={20} color={isDark ? colors.dark.textSecondary : colors.common.accent} />
       <TextInput
-        className="flex-1 py-3.5 pl-3 font-outfit text-[15px] text-gray-900 dark:text-gray-50"
+        className="flex-1 py-3.5 pl-3 font-outfit text-base text-gray-900 dark:text-gray-50"
         placeholder={placeholder}
         placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
         value={value}

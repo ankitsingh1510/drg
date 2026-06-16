@@ -66,7 +66,7 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
     >
       {comingSoon && (
         <View className="absolute -top-[10px] z-10">
-          <AppText className="text-[10px] tracking-[0.5px] text-[#F59E0B]">COMING SOON</AppText>
+          <AppText className="text-xs tracking-[0.5px] text-[#F59E0B]">COMING SOON</AppText>
         </View>
       )}
       <TouchableOpacity
@@ -85,12 +85,12 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
           {icon}
         </View>
 
-        <AppText className="mb-0.5 text-center text-[13px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+        <AppText className="mb-0.5 text-center text-sm" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
           {label}
         </AppText>
         {subtitle ? (
           <AppText
-            className="mt-1.5 max-w-[90%] text-center text-[11px] leading-[14px]"
+            className="mt-1.5 max-w-[90%] text-center text-xs leading-[14px]"
             style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
           >
             {subtitle}
@@ -126,7 +126,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
             style={{ marginRight: 8 }}
           />
         )}
-        <AppText className="text-[15px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+        <AppText className="text-base" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
           {title}
         </AppText>
       </View>

@@ -40,7 +40,7 @@ const StatusBadge = React.memo(({ status, isDark }: { status: OrderDisplayStatus
       className="mt-1 w-full items-center justify-center rounded-full px-2.5 py-1"
       style={{ backgroundColor: isDark ? style.darkBg : style.bg }}
     >
-      <AppText className="text-[10px]" style={{ color: isDark ? style.darkText : style.text }}>
+      <AppText className="text-xs" style={{ color: isDark ? style.darkText : style.text }}>
         {status}
       </AppText>
     </View>
@@ -70,19 +70,19 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
       onPress={handlePress}
     >
       <View className="mb-1 flex-row items-center justify-between">
-        <AppText weight="semibold" className="flex-1 text-lg text-gray-900 dark:text-white">
+        <AppText weight="semibold" className="flex-1 text-xl text-gray-900 dark:text-white">
           {patient.patientName}
         </AppText>
         <ChevronRight size={20} color={chevronColor} />
       </View>
-      <AppText className="mb-2 text-xs text-gray-500 dark:text-[#8BA5C0]">
+      <AppText className="mb-2 text-sm text-gray-500 dark:text-[#8BA5C0]">
         {patient.age}Y • {patient.gender}
       </AppText>
 
       <View className="flex-row flex-wrap gap-4">
         {patient.orders.map((order, idx) => (
           <View key={idx} className="min-w-[30%] items-center justify-center">
-            <AppText weight="medium" className="text-sm text-gray-700 dark:text-gray-300">
+            <AppText weight="medium" className="text-base text-gray-700 dark:text-gray-300">
               {order.testName}
             </AppText>
             <StatusBadge status={order.status} isDark={isDark} />
@@ -227,10 +227,10 @@ export default function AllOrders() {
       </View>
 
       <View className="mb-3 px-4">
-        <View className="h-12 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-[#374151] dark:bg-[#1f2937]">
+        <View className="align-center h-12 flex-row items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-[#374151] dark:bg-[#1f2937]">
           <Search size={20} color="#9CA3AF" style={{ marginRight: 8 }} />
           <TextInput
-            className="flex-1 font-outfit text-sm text-gray-800 dark:text-white"
+            className="align-center flex-1 justify-center font-outfit text-sm text-gray-800 dark:text-white"
             placeholder="Search Patient"
             placeholderTextColor="#9CA3AF"
             value={search}

@@ -275,7 +275,7 @@ export default function ScribeScreen() {
                   </View>
                   <View className="mt-4 flex-row items-center gap-2 rounded-xl bg-gray-50 px-3 py-1.5 dark:bg-gray-900/50">
                     <Calendar size={12} color="#9ca3af" />
-                    <Text className="text-[11px] font-outfit-bold uppercase tracking-widest text-gray-400">
+                    <Text className="text-xs font-outfit-bold uppercase tracking-widest text-gray-400">
                       {new Date(item.timestamp).toLocaleDateString()} at{' '}
                       {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
