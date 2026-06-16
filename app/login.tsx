@@ -41,8 +41,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const passwordSecureRef = React.useRef<TextInput>(null);
-  const passwordVisibleRef = React.useRef<TextInput>(null);
+  const passwordRef = React.useRef<TextInput>(null);
 
   useEffect(() => {
     if (params.logout === 'true') {
@@ -71,11 +70,7 @@ export default function LoginScreen() {
   }, []);
 
   const focusPasswordField = () => {
-    if (showPassword) {
-      passwordVisibleRef.current?.focus();
-    } else {
-      passwordSecureRef.current?.focus();
-    }
+    passwordRef.current?.focus();
   };
 
   const handleLogin = async () => {
@@ -227,7 +222,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
       <StatusBar barStyle="light-content" backgroundColor="#1E2D50" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView className="flex-1 bg-[#1E2D50]" edges={['top']}>
@@ -278,6 +273,7 @@ export default function LoginScreen() {
                       autoComplete="username"
                       keyboardType="default"
                       textContentType="username"
+                      importantForAutofill="yes"
                     />
                   </View>
                   <View className="mb-1 h-4">
@@ -293,9 +289,8 @@ export default function LoginScreen() {
                       passwordError ? 'border-red-500' : 'border-gray-200'
                     } mb-1`}
                   >
-                    {/* Secure input — always mounted, hidden when showPassword */}
                     <TextInput
-                      ref={passwordSecureRef}
+                      ref={passwordRef}
                       nativeID="password"
                       className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
                       placeholder="Enter your password"
@@ -305,33 +300,12 @@ export default function LoginScreen() {
                         setPassword(text);
                         if (text) setPasswordError('');
                       }}
-                      secureTextEntry={true}
-                      style={{ display: showPassword ? 'none' : 'flex' }}
+                      secureTextEntry={!showPassword}
                       autoCapitalize="none"
                       autoCorrect={false}
-                      autoComplete="current-password"
+                      autoComplete="password"
                       textContentType="password"
-                      returnKeyType="done"
-                      onSubmitEditing={handleLogin}
-                    />
-                    {/* Visible input — always mounted, hidden when !showPassword */}
-                    <TextInput
-                      ref={passwordVisibleRef}
-                      nativeID="password"
-                      className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
-                      placeholder="Enter your password"
-                      placeholderTextColor="#9CA3AF"
-                      value={password}
-                      onChangeText={text => {
-                        setPassword(text);
-                        if (text) setPasswordError('');
-                      }}
-                      secureTextEntry={false}
-                      style={{ display: showPassword ? 'flex' : 'none' }}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      autoComplete="current-password"
-                      textContentType="password"
+                      importantForAutofill="yes"
                       returnKeyType="done"
                       onSubmitEditing={handleLogin}
                     />
