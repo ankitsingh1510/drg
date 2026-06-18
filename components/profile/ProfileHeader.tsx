@@ -25,7 +25,7 @@ export default function ProfileHeader({ firstName, lastName, organizationName }:
         <Text className="text-2xl font-outfit-bold tracking-tight text-gray-800 dark:text-gray-100" numberOfLines={1}>
           {firstName} {lastName}
         </Text>
-        <Text className="text-base font-outfit-medium text-gray-500 dark:text-gray-400">
+        <Text className="text-lg font-outfit-medium text-gray-500 dark:text-gray-400">
           {organizationName || 'User Account'}
         </Text>
       </View>

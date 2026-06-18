@@ -140,10 +140,10 @@ export default function OnboardingScreen() {
               <Animated.View style={[stripStyle, { flexDirection: 'row', width: width * N }]}>
                 {ONBOARDING_DATA.map((item, i) => (
                   <View key={i} style={{ width }}>
-                    <AppText weight="bold" className="mb-3 text-2xl leading-9 text-white">
+                    <AppText weight="bold" className="mb-3 text-3xl leading-9 text-white" style={{ width: '80%' }}>
                       {item.title}
                     </AppText>
-                    <AppText weight="regular" className="text-base leading-6 text-white/60" style={{ width: '80%' }}>
+                    <AppText weight="regular" className="text-lg leading-6 text-white/60" style={{ width: '80%' }}>
                       {item.description}
                     </AppText>
                   </View>
@@ -155,7 +155,7 @@ export default function OnboardingScreen() {
             <View className="mb-8 mt-auto flex-row items-center justify-between px-2 pt-2">
               {!isLast ? (
                 <TouchableOpacity onPress={handleSkip} activeOpacity={0.7}>
-                  <AppText weight="medium" className="text-base text-white">
+                  <AppText weight="medium" className="text-lg text-white">
                     Skip
                   </AppText>
                 </TouchableOpacity>

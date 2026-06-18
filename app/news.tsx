@@ -86,7 +86,7 @@ export default function NewsScreen() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={isDark ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+        <AppText weight="semibold" className="text-2xl text-[#0F2D37] dark:text-white">
           Trends
         </AppText>
         <View className="w-8" />

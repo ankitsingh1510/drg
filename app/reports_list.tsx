@@ -180,7 +180,7 @@ export default function ReportsList() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={isDarkMode ? '#FDF5E6' : '#0B1929'} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="font-outfit-semibold text-xl text-[#0F2D37] dark:text-white">Patient Reports</AppText>
+        <AppText className="font-outfit-semibold text-2xl text-[#0F2D37] dark:text-white">Patient Reports</AppText>
         <View className="w-8" />
       </View>
 

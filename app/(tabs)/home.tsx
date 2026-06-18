@@ -109,10 +109,10 @@ export default function LandingScreen() {
     <SafeAreaView style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight }}>
         <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <View className="flex-row items-center justify-between">
-            <View className="px-6 pb-6 pt-4">
-              <AppText className="text-base text-gray-500 dark:text-gray-400">{greeting}</AppText>
-              <AppText className="text-2xl text-gray-900 dark:text-white">
+          <View className="flex-row items-center justify-between pt-4">
+            <View className="px-6 pb-6">
+              <AppText className="text-xl text-gray-500 dark:text-gray-400">{greeting}</AppText>
+              <AppText className="text-3xl text-gray-900 dark:text-white">
                 Dr. {user?.name} {user?.lname}
               </AppText>
             </View>

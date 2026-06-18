@@ -130,16 +130,16 @@ const OrderDetailCard = memo(function OrderDetailCard({
 
   return (
     <View className="mb-4 rounded-[16px] border border-gray-200 bg-white p-5 dark:border-[#374151] dark:bg-[#1f2937]">
-      <AppText weight="semibold" className="text-base text-gray-900 dark:text-white">
+      <AppText weight="semibold" className="text-lg text-gray-900 dark:text-white">
         {order.testName}
       </AppText>
-      <AppText className="mb-4 text-xs text-gray-500 dark:text-[#8BA5C0]">{order.sampleType}</AppText>
+      <AppText className="mb-4 text-sm text-gray-500 dark:text-[#8BA5C0]">{order.sampleType}</AppText>
 
       {/* Step labels */}
       <View className="mb-2 flex-row justify-between px-0.5">
-        <AppText className="text-xs text-gray-600 dark:text-gray-400">Order Placed</AppText>
-        <AppText className="text-xs text-gray-600 dark:text-gray-400">Sample Accession</AppText>
-        <AppText className="text-xs text-gray-600 dark:text-gray-400">Report Released</AppText>
+        <AppText className="text-sm text-gray-600 dark:text-gray-400">Order Placed</AppText>
+        <AppText className="text-sm text-gray-600 dark:text-gray-400">Sample Accession</AppText>
+        <AppText className="text-sm text-gray-600 dark:text-gray-400">Report Released</AppText>
       </View>
 
       {/* Progress bar */}
@@ -154,9 +154,9 @@ const OrderDetailCard = memo(function OrderDetailCard({
       </View>
 
       <View className="mb-4 flex-row justify-between px-0.5">
-        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
-        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
-        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
+        <AppText className="text-sm text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
+        <AppText className="text-sm text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
+        <AppText className="text-sm text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
       </View>
 
       {isReleased && (
@@ -167,8 +167,8 @@ const OrderDetailCard = memo(function OrderDetailCard({
           disabled={loading}
           style={{ opacity: loading ? 0.7 : 1 }}
         >
-          {loading ? <ActivityIndicator size="small" color="#ffffff" /> : <FileText size={16} color="#ffffff" />}
-          <AppText className="text-sm text-white">{loading ? 'Opening...' : 'View Report'}</AppText>
+          {loading ? <ActivityIndicator size="small" color="#ffffff" /> : <FileText size={18} color="#ffffff" />}
+          <AppText className="text-base text-white">{loading ? 'Opening...' : 'View Report'}</AppText>
         </TouchableOpacity>
       )}
     </View>
@@ -237,7 +237,7 @@ export default function OrderDetails() {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={textColor} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+        <AppText weight="semibold" className="text-2xl text-[#0F2D37] dark:text-white">
           Orders Details
         </AppText>
         <View className="w-8" />
@@ -245,16 +245,16 @@ export default function OrderDetails() {
 
       <View className="mx-4 gap-1 px-5 py-4">
         <View className="flex-row items-center justify-between">
-          <AppText weight="semibold" className="mr-2 flex-1 text-lg text-gray-900 dark:text-white" numberOfLines={1}>
+          <AppText weight="semibold" className="mr-2 flex-1 text-xl text-gray-900 dark:text-white" numberOfLines={1}>
             {patientName}
           </AppText>
-          <AppText weight="semibold" className="text-lg text-gray-900 dark:text-white" numberOfLines={1}>
+          <AppText weight="semibold" className="text-xl text-gray-900 dark:text-white" numberOfLines={1}>
             {ordersCount}
           </AppText>
         </View>
         <View className="flex-row items-center justify-between">
-          <AppText className="text-sm text-gray-600 dark:text-[#8BA5C0]">{demographicLine}</AppText>
-          <AppText className="text-sm text-gray-600 dark:text-[#8BA5C0]">1Cell.Ai Tests Ordered</AppText>
+          <AppText className="text-base text-gray-600 dark:text-[#8BA5C0]">{demographicLine}</AppText>
+          <AppText className="text-base text-gray-600 dark:text-[#8BA5C0]">1Cell.Ai Tests Ordered</AppText>
         </View>
       </View>
 

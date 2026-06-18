@@ -22,7 +22,7 @@ export default function ProfileTextField({
 }: ProfileTextFieldProps) {
   return (
     <View key={field.name} className="mb-5">
-      <Text className="mb-2 font-outfit-medium text-sm text-gray-600 dark:text-gray-400">
+      <Text className="mb-2 font-outfit-medium text-base text-gray-600 dark:text-gray-400">
         {field.displayLabel}
         {field.required && <Text className="text-red-500"> *</Text>}
       </Text>

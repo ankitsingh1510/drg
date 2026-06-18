@@ -29,6 +29,7 @@ export interface GetAssayWiseOrderStatusParams {
   page?: number;
   restrictByRole?: boolean | string;
   studyId?: number[] | string;
+  searchKey?: string;
 }
 
 export interface GetAssayWiseOrderStatusResponse {
@@ -77,6 +78,7 @@ class OrdersAPI {
       page = 1,
       restrictByRole = 'true',
       studyId = [10],
+      searchKey = '',
     } = params;
 
     const reqParams: GQLRequestParams = {
@@ -100,6 +102,7 @@ class OrdersAPI {
           page,
           restrictByRole,
           studyId,
+          searchKey,
         },
       },
     };

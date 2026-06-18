@@ -66,10 +66,10 @@ export default function ForgotPasswordScreen() {
               <TouchableOpacity onPress={handleBackToLogin} className="mb-5 self-start rounded-full p-1">
                 <ChevronLeft size={24} color="#FFFFFF" strokeWidth={2.5} />
               </TouchableOpacity>
-              <Text className="mb-2 font-outfit-extrabold text-2xl text-white">
+              <Text className="mb-2 font-outfit-extrabold text-3xl text-white">
                 {submitted ? 'Reset Link Sent' : 'Reset Password'}
               </Text>
-              <Text className="font-outfit text-base leading-6 text-[#A8BFDF]">
+              <Text className="font-outfit text-lg leading-6 text-[#A8BFDF]">
                 {submitted
                   ? "We've sent a secure password reset link to your registered email address."
                   : "Enter your email and we'll send you a reset link"}
@@ -77,24 +77,24 @@ export default function ForgotPasswordScreen() {
             </View>
 
             <View className="flex-1 rounded-t-3xl bg-white px-6 pb-10 pt-8">
-              {submitted ? (
+              {!submitted ? (
                 <View className="mt-10 flex-1 items-center">
                   {/* Mail with checkmark icon */}
                   <View className="mb-6 items-center justify-center rounded-2xl bg-green-100 p-6">
                     <View className="relative">
                       <Mail size={48} color="#22c55e" strokeWidth={1.5} />
                       <View className="absolute -bottom-1 -right-1 h-5 w-5 items-center justify-center rounded-full bg-green-500">
-                        <Text className="text-xs font-bold text-white">✓</Text>
+                        <Text className="text-sm font-bold text-white">✓</Text>
                       </View>
                     </View>
                   </View>
 
-                  <Text className="mb-3 font-outfit-bold text-xl text-gray-900">Check Your Inbox</Text>
-                  <Text className="mb-4 text-center font-outfit text-base leading-6 text-gray-600">
+                  <Text className="mb-3 font-outfit-bold text-2xl text-gray-900">Check Your Inbox</Text>
+                  <Text className="mb-4 text-center font-outfit text-lg leading-6 text-gray-600">
                     If your email is registered with DrG, you'll receive a password reset link shortly.
                   </Text>
 
-                  <Text className="mb-10 text-center font-outfit text-xs text-gray-400">
+                  <Text className="mb-10 text-center font-outfit text-sm text-gray-400">
                     Please check your inbox and spam folder.
                   </Text>
 
@@ -103,7 +103,7 @@ export default function ForgotPasswordScreen() {
                     onPress={handleBackToLogin}
                     className="mb-4 w-full items-center rounded-2xl bg-[#1E2D50] py-4"
                   >
-                    <Text className="font-outfit-bold text-base tracking-wide text-white">Return to Login</Text>
+                    <Text className="font-outfit-bold text-lg tracking-wide text-white">Return to Login</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -114,17 +114,17 @@ export default function ForgotPasswordScreen() {
                     }}
                     className="items-center py-2"
                   >
-                    <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                    <Text className="font-outfit-semibold text-base" style={{ color: colors.common.info }}>
                       Resend Email
                     </Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <View>
-                  <Text className="mb-1.5 font-outfit-semibold text-sm text-gray-900">Email Address</Text>
+                  <Text className="mb-1.5 font-outfit-semibold text-base text-gray-900">Email Address</Text>
                   <View className="mb-1 rounded-xl border-[1.5px] border-gray-200 bg-white">
                     <TextInput
-                      className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                      className="px-3.5 py-4 font-outfit text-base text-gray-900"
                       placeholder="Enter your email id"
                       placeholderTextColor="#9CA3AF"
                       value={email}
@@ -147,15 +147,15 @@ export default function ForgotPasswordScreen() {
                     {isLoading ? (
                       <View className="flex-row items-center">
                         <ActivityIndicator size="small" color="#FFFFFF" />
-                        <Text className="ml-2 font-outfit-bold text-base tracking-wide text-white">Sending...</Text>
+                        <Text className="ml-2 font-outfit-bold text-lg tracking-wide text-white">Sending...</Text>
                       </View>
                     ) : (
-                      <Text className="font-outfit-bold text-base tracking-wide text-white">Send Reset Link</Text>
+                      <Text className="font-outfit-bold text-lg tracking-wide text-white">Send Reset Link</Text>
                     )}
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={handleBackToLogin} className="items-center py-2">
-                    <Text className="font-outfit-semibold text-sm" style={{ color: colors.common.info }}>
+                    <Text className="font-outfit-semibold text-base" style={{ color: colors.common.info }}>
                       Back to Log In
                     </Text>
                   </TouchableOpacity>

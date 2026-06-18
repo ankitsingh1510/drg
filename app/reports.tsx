@@ -324,7 +324,7 @@ export default function Reports() {
         </TouchableOpacity>
         <View className="absolute left-0 right-0 items-center">
           <Text
-            className="font-outfit-bold text-lg text-gray-800 dark:text-gray-100"
+            className="font-outfit-bold text-2xl text-gray-800 dark:text-gray-100"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -376,8 +376,8 @@ export default function Reports() {
 
           {/* Page indicator */}
           {!loading && numPages > 0 && (
-            <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-2">
-              <Text className="font-outfit-semibold text-sm text-white">
+            <View className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-1">
+              <Text className="font-outfit-semibold text-base text-white">
                 {currentPage} / {numPages}
               </Text>
             </View>
@@ -387,7 +387,7 @@ export default function Reports() {
           {loading && (
             <View className="absolute inset-0 items-center justify-center bg-white dark:bg-gray-900">
               <ActivityIndicator size="large" color={colors.common.primary} />
-              <Text className="mt-3 text-base text-slate-600 dark:text-gray-300">Loading PDF...</Text>
+              <Text className="mt-3 text-lg text-slate-600 dark:text-gray-300">Loading PDF...</Text>
             </View>
           )}
         </ReAnimated.View>
@@ -444,7 +444,7 @@ export default function Reports() {
                     onPress={handleTalkToDrG}
                   >
                     <Feather name="video" size={20} color="white" strokeWidth={2.5} />
-                    <Text className="ml-2 font-outfit-extrabold text-base uppercase tracking-tight text-white">
+                    <Text className="ml-2 font-outfit-extrabold text-lg uppercase tracking-tight text-white">
                       Talk
                     </Text>
                   </TouchableOpacity>
@@ -458,7 +458,7 @@ export default function Reports() {
                   onPress={handleChatWithDrG}
                 >
                   <Ionicons name="chatbubbles" size={20} color="white" />
-                  <Text className="ml-2 font-outfit-extrabold text-base uppercase tracking-tight text-white">Chat</Text>
+                  <Text className="ml-2 font-outfit-extrabold text-lg uppercase tracking-tight text-white">Chat</Text>
                 </TouchableOpacity>
               </ReAnimated.View>
             </View>

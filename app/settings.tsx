@@ -55,14 +55,14 @@ const SettingCard = ({ icon, title, subtitle, iconBgColor, btn, onPress }: Setti
     <Card
       onPress={onPress}
       activeOpacity={0.7}
-      className="mx-5 mb-4 min-h-[80px] flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
+      className="mx-5 mb-4 min-h-[90px] flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
     >
       <View className="flex-1 flex-row items-center">
         <View className={`rounded-full p-3 ${iconBgColor}`}>{icon}</View>
 
         <View className="ml-3 flex-1">
-          <AppText className="font-outfit-medium text-lg text-gray-800 dark:text-gray-100">{title}</AppText>
-          <AppText className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</AppText>
+          <AppText className="font-outfit-medium text-xl text-gray-800 dark:text-gray-100">{title}</AppText>
+          <AppText className="text-base text-gray-500 dark:text-gray-400">{subtitle}</AppText>
         </View>
       </View>
 
@@ -258,7 +258,7 @@ const Settings = () => {
           onPress={confirmDeleteAccount}
           className="rounded-lg bg-red-500 px-4 py-2 active:bg-red-600 dark:bg-red-600"
         >
-          <AppText className="font-outfit-semibold text-sm text-white">Delete</AppText>
+          <AppText className="font-outfit-semibold text-base text-white">Delete</AppText>
         </TouchableOpacity>
       ),
     },
@@ -282,7 +282,7 @@ const Settings = () => {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText className="text-xl dark:text-white">Settings</AppText>
+        <AppText className="text-2xl dark:text-white">Settings</AppText>
         <View className="w-8" />
       </View>
       <ScrollView
@@ -326,7 +326,7 @@ const Settings = () => {
             >
               <LogOut size={18} color={isDarkMode ? '#fff' : '#7f1d1d'} strokeWidth={2} />
               <AppText
-                className={isDarkMode ? 'text-base text-white' : 'text-base text-red-900'}
+                className={isDarkMode ? 'text-lg text-white' : 'text-lg text-red-900'}
                 style={{ fontFamily: 'Outfit_600SemiBold' }}
               >
                 Sign Out
@@ -375,8 +375,8 @@ const Settings = () => {
             // }}
             className="mb-8 mt-4 items-center justify-center opacity-60"
           >
-            <AppText className="font-outfit-medium text-xs text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
-            <AppText className="text-xs text-gray-400 dark:text-gray-500">
+            <AppText className="font-outfit-medium text-sm text-gray-500 dark:text-gray-400">Dr.G AI Assistant</AppText>
+            <AppText className="text-sm text-gray-400 dark:text-gray-500">
               Version {Constants.expoConfig?.version || '1.1.5'}
             </AppText>
           </Pressable>

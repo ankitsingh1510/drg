@@ -100,7 +100,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
 
         <View className="p-5">
           <View className="mb-2">
-            <Text className="font-outfit-medium text-xs text-gray-400 dark:text-gray-500">
+            <Text className="font-outfit-medium text-sm text-gray-400 dark:text-gray-500">
               {item.pubDate || 'Just now'}
             </Text>
           </View>
@@ -112,13 +112,13 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
             {item.title}
           </Text>
 
-          <Text numberOfLines={3} className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+          <Text numberOfLines={3} className="text-base leading-relaxed text-gray-600 dark:text-gray-400">
             {item.content}
           </Text>
 
           <View className="mt-4 flex-row items-center border-t border-gray-100 pt-4 dark:border-gray-700/50">
-            <Text className="font-outfit-semibold text-xs text-blue-500 dark:text-blue-400">Read full article</Text>
-            <View className="ml-2 h-1 w-1 rounded-full bg-blue-200 dark:bg-blue-800" />
+            <Text className="font-outfit-semibold text-base text-blue-500 dark:text-blue-400">Read full article</Text>
+            <View className="ml-2 h-2 w-2 rounded-full bg-blue-200 dark:bg-blue-800" />
           </View>
         </View>
       </Pressable>

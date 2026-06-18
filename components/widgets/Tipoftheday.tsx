@@ -84,8 +84,8 @@ export default function TipOfTheDay() {
     >
       <View className="mb-[14px] flex-row items-center justify-between">
         <View className="flex-row items-center">
-          <AppText className="font-outfit-semibold text-base" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
-            <Ionicons name={'bulb-outline'} size={15} color={isDark ? colors.dark.text : colors.common.primary} />
+          <AppText className="text-lg" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+            <Ionicons name={'bulb-outline'} size={18} color={isDark ? colors.dark.text : colors.common.primary} />
             {'  '}
             Tip of the Day
           </AppText>
@@ -114,7 +114,7 @@ export default function TipOfTheDay() {
         </View>
 
         <View className="flex-1">
-          <AppText className="font-outfit text-base leading-[22px]" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+          <AppText className="font-outfit-regular text-lg" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
             {currentTip.tip}
           </AppText>
         </View>
@@ -126,7 +126,7 @@ export default function TipOfTheDay() {
         hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
         className="mt-4 items-end"
       >
-        <AppText className="text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
+        <AppText className="text-base" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
           Next tip <Ionicons name={'arrow-forward'} size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
         </AppText>
       </TouchableOpacity>

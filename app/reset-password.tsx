@@ -38,7 +38,7 @@ const PasswordInput = memo(
     <View className="mb-4 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
       <Ionicons name={icon} size={20} color={isDark ? colors.dark.textSecondary : colors.common.accent} />
       <TextInput
-        className="flex-1 py-3.5 pl-3 font-outfit text-base text-gray-900 dark:text-gray-50"
+        className="flex-1 py-3.5 pl-3 font-outfit text-lg text-gray-900 dark:text-gray-50"
         placeholder={placeholder}
         placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
         value={value}
@@ -146,7 +146,7 @@ export default function ResetPasswordScreen() {
           <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
             <ChevronLeft size={24} color={isDark ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
           </TouchableOpacity>
-          <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+          <AppText weight="semibold" className="text-2xl text-[#0F2D37] dark:text-white">
             Change Password
           </AppText>
           <View className="w-8" />
@@ -171,10 +171,10 @@ export default function ResetPasswordScreen() {
                   <Ionicons name="lock-closed" size={32} color={colors.common.primary} />
                 </View>
 
-                <AppText weight="bold" className="mb-1.5 text-[22px] text-gray-900 dark:text-gray-50">
+                <AppText weight="bold" className="mb-1.5 text-2xl text-gray-900 dark:text-gray-50">
                   Update Your Password
                 </AppText>
-                <AppText className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">
+                <AppText className="text-center text-base text-gray-500 dark:text-gray-400">
                   {'Choose a strong password to keep\nyour account secure'}
                 </AppText>
               </View>
@@ -225,13 +225,13 @@ export default function ResetPasswordScreen() {
                 {isSubmitting ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <AppText weight="semibold" className="text-base text-white">
+                  <AppText weight="semibold" className="text-lg text-white">
                     Update Password
                   </AppText>
                 )}
               </TouchableOpacity>
               <TouchableOpacity onPress={() => router.back()} className="items-center py-2">
-                <AppText className="mt-4 text-sm" style={{ color: colors.common.info }}>
+                <AppText className="mt-4 text-base" style={{ color: colors.common.info }}>
                   Go Back
                 </AppText>
               </TouchableOpacity>

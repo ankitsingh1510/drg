@@ -230,7 +230,7 @@ export default function LoginScreen() {
               <AppText weight="extrabold" className="mb-2 text-3xl text-white">
                 Welcome to DrG
               </AppText>
-              <AppText weight="regular" className="text-base leading-6 text-[#A8BFDF]">
+              <AppText weight="regular" className="text-lg leading-6 text-[#A8BFDF]">
                 Access patient reports &amp; clinical insights{'\n'}in one place
               </AppText>
             </View>
@@ -243,14 +243,14 @@ export default function LoginScreen() {
               showsVerticalScrollIndicator={false}
             >
               {/* Username Field */}
-              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+              <AppText weight="semibold" className="mb-1.5 text-lg text-gray-900">
                 Username
               </AppText>
               <View
                 className={`rounded-xl border-[1.5px] bg-white ${identifierError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
                 <TextInput
-                  className="px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  className="px-3.5 py-4 font-outfit text-base text-gray-900"
                   placeholder="Enter your username"
                   placeholderTextColor="#9CA3AF"
                   value={identifier}
@@ -261,6 +261,7 @@ export default function LoginScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  textAlignVertical="center"
                 />
               </View>
               {identifierError ? (
@@ -270,14 +271,14 @@ export default function LoginScreen() {
               )}
 
               {/* Password Field */}
-              <AppText weight="semibold" className="mb-1.5 text-sm text-gray-900">
+              <AppText weight="semibold" className="mb-1.5 text-lg text-gray-900">
                 Password
               </AppText>
               <View
                 className={`flex-row items-center rounded-xl border-[1.5px] bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'} mb-1`}
               >
                 <TextInput
-                  className="flex-1 px-3.5 py-3.5 font-outfit text-base text-gray-900"
+                  className="flex-1 px-3.5 py-4 font-outfit text-base text-gray-900"
                   placeholder="Enter your password"
                   placeholderTextColor="#9CA3AF"
                   value={password}
@@ -288,6 +289,7 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
+                  textAlignVertical="center"
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(s => !s)}
@@ -305,7 +307,7 @@ export default function LoginScreen() {
 
               {/* Forgot Password */}
               <TouchableOpacity onPress={() => router.push('/forgot-password' as any)} className="mb-7 self-end">
-                <AppText weight="semibold" className="text-sm" style={{ color: colors.common.info }}>
+                <AppText weight="semibold" className="text-base" style={{ color: colors.common.info }}>
                   Forgot Password?
                 </AppText>
               </TouchableOpacity>
@@ -317,14 +319,14 @@ export default function LoginScreen() {
                 disabled={isLoading}
                 className="mb-7 items-center rounded-xl bg-[#1E2D50] py-4"
               >
-                <AppText weight="bold" className="text-base tracking-wide text-white">
+                <AppText weight="bold" className="text-lg tracking-wide text-white">
                   {isLoading ? 'Processing...' : 'Log In'}
                 </AppText>
               </TouchableOpacity>
 
               {/* Contact Support */}
               <View className="mb-6 items-center">
-                <AppText weight="regular" className="text-sm text-gray-500">
+                <AppText weight="regular" className="text-base text-gray-500">
                   Need help accessing your account?{' '}
                   <AppText
                     weight="semibold"
@@ -338,7 +340,7 @@ export default function LoginScreen() {
             </ScrollView>
             {/* Footer */}
             <View className="bg-white pb-10">
-              <AppText weight="regular" className="text-center text-xs text-gray-400">
+              <AppText weight="regular" className="text-center text-sm text-gray-400">
                 Secure access for registered medical professionals only
               </AppText>
             </View>

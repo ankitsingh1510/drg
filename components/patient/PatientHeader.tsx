@@ -39,11 +39,11 @@ export function PatientHeader({ totalCount, query, onSearch, loading }: PatientH
           <TextInput
             value={query}
             onChangeText={onSearch}
-            className="ml-2 flex-1 font-outfit-medium text-base text-gray-800 dark:text-gray-100"
+            className="ml-2 flex-1 font-outfit-medium text-lg text-gray-800 dark:text-gray-100"
             placeholder="Search reports, assay, physician…"
             placeholderTextColor={isDark ? '#6b7280' : '#9ca3af'}
             style={{
-              height: 48,
+              height: 52,
               paddingTop: 0,
               paddingBottom: Platform.OS === 'ios' ? 4 : 0,
               includeFontPadding: false,
@@ -54,7 +54,7 @@ export function PatientHeader({ totalCount, query, onSearch, loading }: PatientH
       </View>
       {!loading && (
         <View className="mt-2 flex-row items-center justify-between px-1">
-          <Text className="font-outfit-bold text-xs uppercase tracking-widest text-gray-400">
+          <Text className="font-outfit-bold text-sm uppercase tracking-widest text-gray-400">
             {totalCount} Total Reports
           </Text>
         </View>

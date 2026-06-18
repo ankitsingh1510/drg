@@ -1,41 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import {
-  ArrowLeft,
-  Building,
-  Calendar,
-  ChevronLeft,
-  Globe,
-  Hash,
-  Lock,
-  Mail,
-  MapPin,
-  Phone,
-  User,
-} from 'lucide-react-native';
+import { ArrowLeft, Building, Calendar, ChevronLeft, Globe, Hash, Lock, Mail, MapPin, Phone, User } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ESignatureModal from '@/components/auth/ESignatureModal';
 import MfaChangeWarningModal from '@/components/auth/MfaChangeWarningModal';
 import IconNavBar from '@/components/navigation/IconNavBar';
-import {
-  FieldDropdownModal,
-  ProfileActionButtons,
-  ProfileCheckboxField,
-  ProfileDropdownField,
-  ProfileHeader,
-  ProfileTextField,
-} from '@/components/profile';
+import { FieldDropdownModal, ProfileActionButtons, ProfileCheckboxField, ProfileDropdownField, ProfileHeader, ProfileTextField } from '@/components/profile';
 import AppText from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
@@ -43,6 +14,24 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { usersAPI } from '@/services/users';
 import type { EnumOption, ProfileField, UserProfileData } from '@/types/users';
 import { toast } from '@/util/toast';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const fieldIconMap: { [key: string]: any } = {
   name: User,
@@ -302,7 +291,7 @@ const Profile = () => {
         <View style={{ backgroundColor: lightBg }} className="h-10 w-10 items-center justify-center rounded-2xl">
           {icon}
         </View>
-        <Text className="flex-1 font-outfit-bold text-lg tracking-tight text-gray-800 dark:text-gray-100">
+        <Text className="flex-1 font-outfit-semibold text-xl tracking-tight text-gray-800 dark:text-gray-100">
           {sectionName}
         </Text>
       </View>
@@ -352,7 +341,7 @@ const Profile = () => {
         <TouchableOpacity className="h-8 w-8 items-center justify-center" onPress={() => router.back()}>
           <ChevronLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} strokeWidth={2.5} />
         </TouchableOpacity>
-        <AppText weight="semibold" className="text-xl text-[#0F2D37] dark:text-white">
+        <AppText weight="semibold" className="text-2xl text-[#0F2D37] dark:text-white">
           My Profile
         </AppText>
         <View className="w-8" />
