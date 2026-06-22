@@ -137,9 +137,9 @@ const OrderDetailCard = memo(function OrderDetailCard({
 
       {/* Step labels */}
       <View className="mb-2 flex-row justify-between px-0.5">
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Order Placed</AppText>
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Sample Accession</AppText>
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Report Released</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Order Placed</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Sample Accession</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Report Released</AppText>
       </View>
 
       {/* Progress bar */}
@@ -154,9 +154,9 @@ const OrderDetailCard = memo(function OrderDetailCard({
       </View>
 
       <View className="mb-4 flex-row justify-between px-0.5">
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
       </View>
 
       {isReleased && (

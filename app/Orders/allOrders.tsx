@@ -40,7 +40,7 @@ const StatusBadge = React.memo(({ status, isDark }: { status: OrderDisplayStatus
       className="mt-1 w-full items-center justify-center rounded-full px-2.5 py-1"
       style={{ backgroundColor: isDark ? style.darkBg : style.bg }}
     >
-      <AppText className="text-[10px]" style={{ color: isDark ? style.darkText : style.text }}>
+      <AppText className="text-xs" style={{ color: isDark ? style.darkText : style.text }}>
         {status}
       </AppText>
     </View>

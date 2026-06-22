@@ -52,7 +52,7 @@ export default function EventDetails() {
 
       <ScrollView className="px-5 pt-2.5" showsVerticalScrollIndicator={false}>
         {/* Patient Info */}
-        <AppText weight="bold" className="mb-3 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 text-sm tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           PATIENT INFO
         </AppText>
         <View className="mb-6 flex-row justify-between">
@@ -103,7 +103,7 @@ export default function EventDetails() {
             {item.title}
           </AppText>
           <View className="rounded bg-blue-100 px-2 py-1">
-            <AppText weight="bold" className="text-[10px] text-blue-600">
+            <AppText weight="bold" className="text-xs text-blue-600">
               LAB REPORT
             </AppText>
           </View>
@@ -132,13 +132,13 @@ export default function EventDetails() {
         </View>
 
         {/* AI Summary */}
-        <AppText weight="bold" className="mb-3 mt-4 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 mt-4 text-sm tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           AI SUMMARY
         </AppText>
         <AppText className="text-sm leading-[22px] text-gray-800 dark:text-white">{item.aiSummary}</AppText>
 
         {/* Patient & Test Summary */}
-        <AppText weight="bold" className="mb-3 mt-6 text-[13px] tracking-widest text-gray-500 dark:text-[#8BA5C0]">
+        <AppText weight="bold" className="mb-3 mt-6 text-sm tracking-widest text-gray-500 dark:text-[#8BA5C0]">
           PATIENT & TEST SUMMARY
         </AppText>
 

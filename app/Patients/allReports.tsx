@@ -77,7 +77,7 @@ function ReportCard({
         <Icon size={44} color={color} strokeWidth={1.2} />
       </View>
       <View className="px-2 py-2">
-        <AppText className="text-center text-[12px] text-gray-700 dark:text-white" numberOfLines={2}>
+        <AppText className="text-center text-xs text-gray-700 dark:text-white" numberOfLines={2}>
           {report.name}
         </AppText>
       </View>

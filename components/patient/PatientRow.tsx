@@ -59,7 +59,7 @@ export const PatientRow = React.memo(({ patient, onViewReport }: PatientRowProps
           {patient.patientName}
         </Text>
         <View className="ml-3 rounded-full border px-3 py-1" style={{ borderColor: statusConfig.color }}>
-          <Text className="font-outfit-bold text-[10px] tracking-widest" style={{ color: statusConfig.color }}>
+          <Text className="font-outfit-bold text-xs tracking-widest" style={{ color: statusConfig.color }}>
             {statusConfig.label}
           </Text>
         </View>
