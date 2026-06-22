@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StatusBar, TouchableOpacity, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { usePreventScreenCapture, useScreenshotListener } from 'expo-screen-capture';
 import { ChevronLeft, FileText } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ import { colors as themeColors } from '@/constants/colors';
 import { storageAPI } from '@/services/storage';
 import { type IngestionStatus } from '@/types/types';
 import { type OrderStepStatus } from '@/util/orders';
+import { toast } from '@/util/toast';
 
 interface OrderDetail {
   id: string;
@@ -176,6 +178,13 @@ const OrderDetailCard = memo(function OrderDetailCard({
 });
 
 export default function OrderDetails() {
+  // Prevent screenshots/screen recording only on this page
+  usePreventScreenCapture();
+  // Notify user when they attempt a screenshot (iOS; Android shows default OS toast)
+  useScreenshotListener(() => {
+    return toast.info('Screenshots are disabled on this page', undefined, 3000);
+  });
+
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const textColor = isDark ? '#FFFFFF' : '#1F2937';

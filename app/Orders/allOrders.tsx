@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
+import { usePreventScreenCapture, useScreenshotListener } from 'expo-screen-capture';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +9,7 @@ import AppText from '@/components/ui/AppText';
 import { colors as themeColors } from '@/constants/colors';
 import { ordersAPI } from '@/services/orders';
 import { mapApiDataToPatients, type OrderDisplayStatus, type PatientWithOrders } from '@/util/orders';
+import { toast } from '@/util/toast';
 
 const PAGE_SIZE = 20;
 const DATE_FROM = '2025-01-01';
@@ -94,6 +96,13 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
 });
 
 export default function AllOrders() {
+  // Prevent screenshots/screen recording only on this page
+  usePreventScreenCapture();
+  // Notify user when they attempt a screenshot (iOS; Android shows default OS toast)
+  useScreenshotListener(() => {
+    return toast.info('Screenshots are disabled on this page', undefined, 3000);
+  });
+
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientWithOrders[]>([]);
   const [totalCount, setTotalCount] = useState(0);
