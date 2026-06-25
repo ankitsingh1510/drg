@@ -39,6 +39,35 @@ export interface FetchTestsDetailsResponse {
   totalCount: number;
 }
 
+export interface SubjectPatient {
+  subjectId: number;
+  studyId: number;
+  suid: string;
+  patient_name: string;
+  gender: string;
+  age: string;
+  sample_analyte: string | null;
+  facility: string;
+  allPhysicianNames: string;
+  assay: string;
+  case_sample_id: number;
+  disease_name: string;
+  analysisCompletionDate: string;
+  assay_result_id: number;
+  _totalCount: number;
+}
+
+export interface FetchSubjectsDetailsResponse {
+  data: SubjectPatient[];
+}
+
+interface FetchSubjectsDetailsParams {
+  page?: number;
+  count?: number;
+  search?: string;
+  studyIds?: string[];
+}
+
 class PatientsAPI {
   gqlUrl: string;
 
@@ -86,6 +115,46 @@ class PatientsAPI {
       return response.data.fetchTestsDetailsForDrG;
     } catch (error) {
       console.error('Error fetching tests details:', error);
+      throw error;
+    }
+  }
+
+  async fetchSubjectsDetails(params: FetchSubjectsDetailsParams): Promise<FetchSubjectsDetailsResponse> {
+    const { page = 1, count = 10, search = '', studyIds } = params;
+
+    const reqParams: GQLRequestParams = {
+      query: `query fetchSubjectsDetails($fetchSubjectsDetailsModel: JSON!) {
+        fetchSubjectsDetails(fetchSubjectsDetailsModel: $fetchSubjectsDetailsModel)
+      }`,
+      variables: {
+        fetchSubjectsDetailsModel: {
+          studyFilter: studyIds || ['10'],
+          pagination: {
+            count,
+            page,
+            sort: 'desc.analysisCompletionDate',
+          },
+          filters: [
+            {
+              field: 'pipelineType',
+              sourceTable: 'case_sample_attribute_value',
+              type: 'multiselect',
+              values: ['ONCOINDX', 'ONCOPREDIKT', 'ONCOCTC', 'QPCR_ALIBREX'],
+            },
+          ],
+          getOnlyUserAssignedTests: false,
+          getTotalCount: true,
+          workflowName: 'ICARE_WORKFLOW',
+          ...(search ? { search } : {}),
+        },
+      },
+    };
+
+    try {
+      const response = await this.getGQLResponse(reqParams);
+      return response.data.fetchSubjectsDetails;
+    } catch (error) {
+      console.error('Error fetching subjects details:', error);
       throw error;
     }
   }

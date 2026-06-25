@@ -34,13 +34,23 @@ export default function LandingScreen() {
 
   const clinicalItems: HomeItem[] = useMemo(() => {
     const items = [
+      // {
+      //   id: 'patient',
+      //   label: 'Reports',
+      //   subtitle: 'Your patient reports',
+      //   icon: <ClipboardList size={24} color="#fff" />,
+      //   color: '#538BF4',
+      //   onPress: () => router.push('/reports_list' as any),
+      //   comingSoon: false,
+      //   hidden: false,
+      // },
       {
         id: 'patient',
-        label: 'Reports',
-        subtitle: 'Your patient reports',
+        label: 'Patients',
+        subtitle: 'Patient timeline & reports',
         icon: <ClipboardList size={24} color="#fff" />,
         color: '#538BF4',
-        onPress: () => router.push('/reports_list' as any),
+        onPress: () => router.push('/Patients/patientList' as any),
         comingSoon: false,
         hidden: false,
       },
