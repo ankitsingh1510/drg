@@ -244,6 +244,24 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
+                name="publications"
+                options={{
+                  headerShown: false,
+                  title: 'Publications',
+                  headerBackButtonDisplayMode: 'minimal',
+                  headerBackTitle: '',
+                  headerShadowVisible: false,
+                  headerStyle: {
+                    backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',
+                  },
+                  headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
+                  headerTitleStyle: {
+                    fontFamily: 'Outfit_600SemiBold',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <Stack.Screen
                 name="tests"
                 options={{
                   headerShown: true,

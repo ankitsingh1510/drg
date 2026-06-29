@@ -76,7 +76,7 @@ export default function LandingScreen() {
         subtitle: 'Poster & Publications',
         icon: <FileText size={24} color="#fff" />,
         color: '#F8A03C',
-        onPress: () => openInBrowser(process.env.EXPO_PUBLIC_PUBLICATIONS_URL || ''),
+        onPress: () => router.push('/publications' as any),
       },
       {
         id: 'trends',
