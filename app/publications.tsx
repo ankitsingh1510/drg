@@ -72,7 +72,7 @@ function FilterChip({
     >
       <AppText
         weight={active ? 'semibold' : 'regular'}
-        className={`text-xs ${active ? 'text-[#B8860B]' : 'text-gray-500'}`}
+        className={`text-sm ${active ? 'text-[#B8860B]' : 'text-gray-500'}`}
         numberOfLines={1}
       >
         {chipLabel}
@@ -129,7 +129,7 @@ function FilterDropdown({
       >
         {/* Header */}
         <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-2">
-          <AppText weight="semibold" className="text-sm text-gray-800">
+          <AppText weight="semibold" className="text-md text-gray-800">
             {FILTER_LABELS[filterKey]}
           </AppText>
           <View className="flex-row items-center gap-3">
@@ -215,23 +215,28 @@ function FilterOption({
 
 const PublicationCard = React.memo(function PublicationCard({
   item,
+  index,
   onPress,
 }: {
   item: Publication;
+  index: number;
   onPress: (url: string) => void;
 }) {
+  const imageNum = (index % 7) + 1;
+  const ext = imageNum === 1 ? 'png' : 'jpg';
+  const imageUrl = `${process.env.EXPO_PUBLIC_CDN_URL}/drgpublicationcards/Background-${imageNum}.${ext}`;
+
   return (
     <Pressable
       onPress={() => onPress(item.url)}
       className="mb-4 overflow-hidden rounded-xl border border-[#E2E5E9] bg-white"
     >
-      <View className="h-[140px] w-full overflow-hidden bg-[#1A2F4A]">
+      <View className="h-[100px] w-full overflow-hidden bg-[#1A2F4A]">
         <ExpoImage
-          source={item.image}
+          source={imageUrl}
           style={{ width: '100%', height: '100%' }}
           contentFit="cover"
           transition={300}
-          cachePolicy="disk"
         />
 
         {item.event && (
@@ -262,20 +267,73 @@ const PublicationCard = React.memo(function PublicationCard({
           </View>
         )}
 
-        <AppText weight="regular" className="mb-2.5 text-sm leading-[21px] text-gray-700" numberOfLines={3}>
+        <AppText weight="regular" className="mb-2.5 text-md leading-[24px] text-gray-700" numberOfLines={3}>
           {item.title}
         </AppText>
 
         <View className="mb-3 flex-row flex-wrap gap-1.5">
-          {item.cancer_type?.map(ct => (
-            <TagPill key={`cancer-${ct}`} label={ct} borderColor="#DBEAFE" bgColor="#EFF6FF" textColor="#3B82F6" />
-          ))}
-          {item.test_type?.map(tt => (
-            <TagPill key={`test-${tt}`} label={tt} borderColor="#E0E7FF" bgColor="#EEF2FF" textColor="#6366F1" />
-          ))}
-          {item.biomarker?.map(bm => (
-            <TagPill key={`bio-${bm}`} label={bm} borderColor="#E5E7EB" bgColor="#F9FAFB" textColor="#6B7280" />
-          ))}
+          {(() => {
+            const tagsToDisplay = [];
+            let remainingCount = 0;
+
+            if (item.cancer_type && item.cancer_type.length > 0) {
+              tagsToDisplay.push({
+                id: `cancer-${item.cancer_type[0]}`,
+                label: item.cancer_type[0],
+                borderColor: '#DBEAFE',
+                bgColor: '#EFF6FF',
+                textColor: '#3B82F6',
+              });
+              remainingCount += item.cancer_type.length - 1;
+            }
+
+            if (item.test_type && item.test_type.length > 0) {
+              tagsToDisplay.push({
+                id: `test-${item.test_type[0]}`,
+                label: item.test_type[0],
+                borderColor: '#E0E7FF',
+                bgColor: '#EEF2FF',
+                textColor: '#6366F1',
+              });
+              remainingCount += item.test_type.length - 1;
+            }
+
+            if (item.biomarker && item.biomarker.length > 0) {
+              tagsToDisplay.push({
+                id: `bio-${item.biomarker[0]}`,
+                label: item.biomarker[0],
+                borderColor: '#E5E7EB',
+                bgColor: '#F9FAFB',
+                textColor: '#6B7280',
+              });
+              remainingCount += item.biomarker.length - 1;
+            }
+
+            if (tagsToDisplay.length === 0) return null;
+
+            return (
+              <>
+                {tagsToDisplay.map(tag => (
+                  <TagPill
+                    key={tag.id}
+                    label={tag.label}
+                    borderColor={tag.borderColor}
+                    bgColor={tag.bgColor}
+                    textColor={tag.textColor}
+                  />
+                ))}
+                {remainingCount > 0 && (
+                  <TagPill
+                    key="more"
+                    label={`+${remainingCount} more`}
+                    borderColor="#E5E7EB"
+                    bgColor="#F9FAFB"
+                    textColor="#6B7280"
+                  />
+                )}
+              </>
+            );
+          })()}
         </View>
 
         <View className="flex-row items-center justify-end">
@@ -363,7 +421,7 @@ export default function PublicationsScreen() {
     if (publications.length > 0 && publications.length >= total) {
       return (
         <View className="items-center py-4">
-          <AppText className="text-xs text-gray-400">Showing all {total} publications</AppText>
+          <AppText className="text-xs text-gray-400">Showing all {total !== 0 ? total : null} publications</AppText>
         </View>
       );
     }
@@ -472,7 +530,7 @@ export default function PublicationsScreen() {
           <FlatList
             data={publications}
             keyExtractor={(_, index) => `pub-${index}`}
-            renderItem={({ item }) => <PublicationCard item={item} onPress={openItem} />}
+            renderItem={({ item, index }) => <PublicationCard item={item} index={index} onPress={openItem} />}
             contentContainerStyle={{ paddingTop: 12, paddingBottom: 40, paddingHorizontal: 20 }}
             showsVerticalScrollIndicator={false}
             onEndReached={handleLoadMore}
