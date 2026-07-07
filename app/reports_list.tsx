@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { addScreenshotListener, usePreventScreenCapture } from 'expo-screen-capture';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
 import { ChevronLeft } from 'lucide-react-native';
@@ -22,8 +23,10 @@ import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 import { IngestionStatus } from '@/types/types';
+import { toast } from '@/util/toast';
 
 export default function ReportsList() {
+  usePreventScreenCapture();
   const { user } = useAuth();
   const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -37,6 +40,14 @@ export default function ReportsList() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const isDarkMode = useColorScheme() === 'dark';
+
+  // Notify user when they attempt a screenshot
+  useEffect(() => {
+    const subscription = addScreenshotListener(() => {
+      toast.info('Screenshots are disabled on this page', undefined, 3000);
+    });
+    return () => subscription.remove();
+  }, []);
 
   const fetchPatients = useCallback(async (pageNum: number, searchQuery: string, append = false) => {
     try {
