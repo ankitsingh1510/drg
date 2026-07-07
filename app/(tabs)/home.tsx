@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
-import { Alert, BackHandler, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useAtom } from 'jotai';
-import { ClipboardList, Dna, FileText, TestTube2, TrendingUp, User } from 'lucide-react-native';
+import { Bell, ClipboardList, Dna, FileText, TestTube2, TrendingUp, User } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AppText from '@/components/ui/AppText';
@@ -36,10 +36,10 @@ export default function LandingScreen() {
     const items = [
       {
         id: 'patient',
-        label: 'Reports',
-        subtitle: 'Your patient reports',
-        icon: <ClipboardList size={24} color="#fff" />,
-        color: '#538BF4',
+        label: 'Patient reports',
+        subtitle: 'Reports & insights',
+        icon: <ClipboardList size={28} color="#3B82F6" />,
+        color: '#EFF6FF',
         onPress: () => router.push('/reports_list' as any),
         comingSoon: false,
         hidden: false,
@@ -47,9 +47,9 @@ export default function LandingScreen() {
       {
         id: 'orders',
         label: 'Orders',
-        subtitle: 'Order status',
-        icon: <TestTube2 size={24} color="#fff" />,
-        color: '#4ED0D9',
+        subtitle: 'Track test progress',
+        icon: <TestTube2 size={28} color="#F59E0B" />,
+        color: '#FFFBEB',
         onPress: () => router.push('/Orders/allOrders' as any),
         comingSoon: false,
         hidden: false,
@@ -58,11 +58,11 @@ export default function LandingScreen() {
         id: 'mtb',
         label: 'MTB',
         subtitle: 'Case library',
-        icon: <Dna size={24} color="#fff" />,
-        color: '#A576F4',
+        icon: <Dna size={24} color="#A576F4" />,
+        color: '#F8FAFC',
         onPress: () => openInBrowser(process.env.EXPO_PUBLIC_MTB_URL || ''),
         comingSoon: true,
-        hidden: false,
+        hidden: true,
       },
     ];
     return items.filter((item: any) => !item.hidden) as HomeItem[];
@@ -73,17 +73,17 @@ export default function LandingScreen() {
       {
         id: 'publications',
         label: 'Publications',
-        subtitle: 'Poster & Publications',
-        icon: <FileText size={24} color="#fff" />,
-        color: '#F8A03C',
+        subtitle: 'Research & posters',
+        icon: <FileText size={28} color="#10B981" />,
+        color: '#ECFDF5',
         onPress: () => router.push('/publications' as any),
       },
       {
         id: 'trends',
         label: 'News',
-        subtitle: 'Latest around Genomics & NGS',
-        icon: <TrendingUp size={24} color="#fff" />,
-        color: '#36B879',
+        subtitle: 'Latest clinical updates',
+        icon: <TrendingUp size={28} color="#DC2626" />,
+        color: '#FEF2F2',
         onPress: () => router.push('/news' as any),
       },
     ],
@@ -106,31 +106,60 @@ export default function LandingScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-[#FDF5E6] dark:bg-gray-900">
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: headerHeight }}>
-        <View className="bg-[#FDF5E6] pb-8 dark:bg-gray-900">
-          <View className="flex-row items-center justify-between">
-            <View className="px-6 pb-6 pt-4">
-              <AppText className="text-base text-gray-500 dark:text-gray-400">{greeting}</AppText>
-              <AppText className="text-2xl text-gray-900 dark:text-white">
-                Dr. {user?.name} {user?.lname}
-              </AppText>
-            </View>
-            <TouchableOpacity
-              onPress={() => router.push('/settings' as any)}
-              className="mx-4 mb-4 rounded-2xl border p-3"
-              style={{
-                backgroundColor: isDark ? colors.dark.cardBackground : colors.light.cardBackground,
-                borderColor: isDark ? '#374151' : '#EBEBEB',
-              }}
-            >
-              <User size={28} color={colorScheme === 'dark' ? '#fff' : colors.common.accent} strokeWidth={1.3} />
-            </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1 }} className="bg-[#1A365D] dark:bg-gray-900">
+      <View className="bg-[#1A365D] dark:bg-gray-900">
+        <View className="flex-row items-center px-6 pb-2 pt-6">
+          <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-white/20">
+            <AppText className="font-outfit-bold text-lg text-white">
+              {((user?.name || 'N')[0] + (user?.lname || 'A')[0]).toUpperCase()}
+            </AppText>
           </View>
+          <View>
+            <AppText className="font-outfit text-sm text-gray-300 dark:text-gray-400">Hello, Welcome</AppText>
+            <AppText className="font-outfit-bold text-xl text-white dark:text-white">
+              Dr. {user?.name || 'N'} {user?.lname || 'A'}
+            </AppText>
+          </View>
+        </View>
 
-          <HomeSection title="Clinical Workspace" headerIcon="flask-outline" items={clinicalItems} />
-          <HomeSection title="Education & Research" headerIcon="book-outline" items={educationItems} />
+        <View
+          style={{
+            backgroundColor: '#DAA52029',
+            paddingVertical: 4,
+            width: '30%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 8,
+            margin: 18,
+            marginBottom: 0,
+          }}
+        >
+          <AppText className="font-outfit-semibold text-xs tracking-wider text-[#F59E0B]">COMING SOON</AppText>
+        </View>
 
+        <View
+          style={{
+            marginHorizontal: 20,
+            marginTop: 24,
+          }}
+        >
+          <View className="flex-row items-center justify-between">
+            <AppText className="font-outfit-bold text-xl leading-[28px] text-white">
+              The future of{'\n'}Molecular Case{'\n'}Discussions
+            </AppText>
+            <Image
+              source={require('@/assets/home_banner.png')}
+              className="h-[180px] w-[200px]"
+              resizeMode="contain"
+              style={{ position: 'absolute', right: 0 }}
+            />
+          </View>
+        </View>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="mt-6 flex-1 bg-[#F8FAFC] pt-6 dark:bg-gray-900">
+          <HomeSection title="Clinical Workspace" headerIcon="" items={clinicalItems} layout="grid" />
+          <HomeSection title="Education & Research" headerIcon="" items={educationItems} layout="grid" />
           <TipOfTheDay />
         </View>
       </ScrollView>

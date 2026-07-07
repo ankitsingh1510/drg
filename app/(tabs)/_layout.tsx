@@ -53,8 +53,8 @@ export default function TabLayout() {
     elevation: 12,
   };
 
-  const ACTIVE_COLOR = '#daa521';
-  const INACTIVE_COLOR = '#9ca3af';
+  const ACTIVE_COLOR = '#1A365D';
+  const INACTIVE_COLOR = '#939393';
 
   const sharedHeaderOptions = {
     headerShown: true,
@@ -130,7 +130,7 @@ export default function TabLayout() {
 
   return (
     <>
-      {/* <Tabs
+      <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle,
@@ -158,16 +158,16 @@ export default function TabLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-        name="reports_list"
-        options={{
-          ...sharedHeaderOptions,
-          title: 'Reports',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={23} color={color} />
-          ),
-        }}
-        />
+        {/* <Tabs.Screen
+          name="reports_list"
+          options={{
+            ...sharedHeaderOptions,
+            title: 'Reports',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={23} color={color} />
+            ),
+          }}
+        /> */}
         <Tabs.Screen
           name="scribe"
           options={{
@@ -181,15 +181,23 @@ export default function TabLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            ...sharedHeaderOptions,
             title: 'Settings',
             tabBarIcon: ({ color, focused }) => (
               <Ionicons name={focused ? 'settings' : 'settings-outline'} size={23} color={color} />
             ),
           }}
         />
-      </Tabs> */}
-      <LandingScreen />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'person' : 'person-outline'} size={23} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+      {/* <LandingScreen /> */}
       <GestureDetector gesture={panGesture}>
         <Animated.View entering={FadeInDown.delay(1000).springify()} style={dragStyle}>
           <TouchableOpacity
@@ -211,8 +219,8 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   chatBot: {
     position: 'absolute',
-    bottom: 62,
-    right: 32,
+    bottom: 60,
+    right: 20,
     zIndex: 99,
   },
   chatIcon: {

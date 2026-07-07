@@ -62,7 +62,7 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
       entering={FadeInUp.delay(index * 100)
         .duration(600)
         .springify()}
-      className="max-w-[33%] flex-1 flex-row items-center justify-center"
+      className={`max-w-[48%] flex-1 flex-row items-center justify-center p-2`}
     >
       {comingSoon && (
         <View className="absolute -top-[10px] z-10">
@@ -70,7 +70,15 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
         </View>
       )}
       <TouchableOpacity
-        className={`items-center py-3 ${isRow ? 'px-1' : 'min-w-[45%] flex-1 px-2'} ${comingSoon ? 'opacity-70' : ''}`}
+        className={`h-[150px] w-full rounded-2xl p-4 ${comingSoon ? 'opacity-70' : ''}`}
+        style={{
+          backgroundColor: color || '#FFF',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.08,
+          shadowRadius: 6,
+          elevation: 3,
+        }}
         onPress={!comingSoon ? onPress : undefined}
         activeOpacity={comingSoon ? 1 : 0.8}
         accessibilityLabel={label}
@@ -79,19 +87,19 @@ const HomeTile: React.FC<HomeItem & { layout: 'row' | 'grid'; index: number }> =
         disabled={comingSoon}
       >
         <View
-          className={`mb-2 h-[52px] w-[52px] items-center justify-center rounded-xl ${comingSoon ? 'opacity-80' : ''}`}
-          style={{ backgroundColor: color || '#91A3B0' }}
+          className={`mb-3 h-[56px] w-[56px] items-center justify-center rounded-2xl ${comingSoon ? 'opacity-80' : ''}`}
+          style={{ backgroundColor: isDark ? colors.dark.cardBackground : '#FFFFFF' }}
         >
           {icon}
         </View>
 
-        <AppText className="mb-0.5 text-center text-base" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+        <AppText className="mt-2 text-[16px] font-semibold" style={{ color: isDark ? '#f3f4f6' : '#111827' }}>
           {label}
         </AppText>
         {subtitle ? (
           <AppText
-            className="mt-1.5 max-w-[90%] text-center text-sm leading-[14px]"
-            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+            className="mt-1 max-w-[95%] text-[14px] leading-[18px]"
+            style={{ color: isDark ? '#9ca3af' : '#6B7280' }}
           >
             {subtitle}
           </AppText>
@@ -110,14 +118,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 }) => {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const bgColor = cardBackground || (isDark ? colors.dark.cardBackground : colors.light.cardBackground);
 
   return (
-    <View
-      className="mx-4 mb-4 rounded-2xl border px-2.5 pb-2 pt-4"
-      style={{ backgroundColor: bgColor, borderColor: isDark ? '#374151' : '#EBEBEB' }}
-    >
-      <View className="mb-3 flex-row items-center px-1">
+    <View className="mx-4 mb-2 px-1 pb-1 pt-1">
+      <View className="mb-3 flex-row items-center">
         {headerIcon && (
           <Ionicons
             name={headerIcon as any}
@@ -126,16 +130,15 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
             style={{ marginRight: 8 }}
           />
         )}
-        <AppText className="text-base" style={{ color: isDark ? '#f3f4f6' : '#1f2937' }}>
+        <AppText className="text-[18px] font-semibold" style={{ color: isDark ? '#f3f4f6' : '#111827' }}>
           {title}
         </AppText>
       </View>
 
-      <View className={`w-full flex-row items-start pb-1 ${layout === 'grid' ? 'flex-wrap gap-3' : ''}`}>
+      <View className={`w-full flex-row pb-1 ${layout === 'grid' ? 'flex-wrap justify-between' : ''}`}>
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             <HomeTile {...item} layout={layout} index={index} />
-            {index < items.length - 1 && <TileDivider />}
           </React.Fragment>
         ))}
       </View>
