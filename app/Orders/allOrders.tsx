@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
-import { usePreventScreenCapture, useScreenshotListener } from 'expo-screen-capture';
+import { router, useFocusEffect } from 'expo-router';
+import { addScreenshotListener, allowScreenCaptureAsync, preventScreenCaptureAsync } from 'expo-screen-capture';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -96,12 +96,19 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
 });
 
 export default function AllOrders() {
-  // Prevent screenshots/screen recording only on this page
-  usePreventScreenCapture();
-  // Notify user when they attempt a screenshot (iOS; Android shows default OS toast)
-  useScreenshotListener(() => {
-    return toast.info('Screenshots are disabled on this page', undefined, 3000);
-  });
+  // Prevent screenshots/screen recording; re-applies on every focus (handles back-navigation edge case)
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync('all-orders');
+      const screenshotSub = addScreenshotListener(() => {
+        toast.info('Screenshots are disabled on this page', undefined, 3000);
+      });
+      return () => {
+        allowScreenCaptureAsync('all-orders');
+        screenshotSub.remove();
+      };
+    }, [])
+  );
 
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientWithOrders[]>([]);
@@ -240,7 +247,7 @@ export default function AllOrders() {
           <Search size={20} color="#9CA3AF" style={{ marginRight: 8 }} />
           <TextInput
             className="flex-1 font-outfit text-sm text-gray-800 dark:text-white"
-            placeholder="Search Patient"
+            placeholder="Search"
             placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}

@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StatusBar, TouchableOpacity, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { usePreventScreenCapture, useScreenshotListener } from 'expo-screen-capture';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { addScreenshotListener, allowScreenCaptureAsync, preventScreenCaptureAsync } from 'expo-screen-capture';
 import { ChevronLeft, FileText } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -178,12 +178,19 @@ const OrderDetailCard = memo(function OrderDetailCard({
 });
 
 export default function OrderDetails() {
-  // Prevent screenshots/screen recording only on this page
-  usePreventScreenCapture();
-  // Notify user when they attempt a screenshot (iOS; Android shows default OS toast)
-  useScreenshotListener(() => {
-    return toast.info('Screenshots are disabled on this page', undefined, 3000);
-  });
+  // Prevent screenshots/screen recording; re-applies on every focus (handles back-navigation edge case)
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync('order-details');
+      const screenshotSub = addScreenshotListener(() => {
+        toast.info('Screenshots are disabled on this page', undefined, 3000);
+      });
+      return () => {
+        allowScreenCaptureAsync('order-details');
+        screenshotSub.remove();
+      };
+    }, [])
+  );
 
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
