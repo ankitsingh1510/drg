@@ -38,7 +38,7 @@ const PasswordInput = memo(
     <View className="mb-4 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4 dark:border-gray-700 dark:bg-gray-800">
       <Ionicons name={icon} size={20} color={isDark ? colors.dark.textSecondary : colors.common.accent} />
       <TextInput
-        className="flex-1 py-3.5 pl-3 font-outfit text-[15px] text-gray-900 dark:text-gray-50"
+        className="flex-1 py-3.5 pl-3 font-outfit text-base text-gray-900 dark:text-gray-50"
         placeholder={placeholder}
         placeholderTextColor={isDark ? '#6B7280' : '#9CA3AF'}
         value={value}
@@ -171,7 +171,7 @@ export default function ResetPasswordScreen() {
                   <Ionicons name="lock-closed" size={32} color={colors.common.primary} />
                 </View>
 
-                <AppText weight="bold" className="mb-1.5 text-[22px] text-gray-900 dark:text-gray-50">
+                <AppText weight="bold" className="mb-1.5 text-2xl text-gray-900 dark:text-gray-50">
                   Update Your Password
                 </AppText>
                 <AppText className="text-center text-sm leading-5 text-gray-500 dark:text-gray-400">

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { addScreenshotListener, allowScreenCaptureAsync, preventScreenCaptureAsync } from 'expo-screen-capture';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FlashList } from '@shopify/flash-list';
 import { ChevronLeft } from 'lucide-react-native';
@@ -22,6 +23,7 @@ import { useAuth, useLogout } from '@/context/AuthContext';
 import { type Patient, patientsAPI } from '@/services/patients';
 import { storageAPI } from '@/services/storage';
 import { IngestionStatus } from '@/types/types';
+import { toast } from '@/util/toast';
 
 export default function ReportsList() {
   const { user } = useAuth();
@@ -156,6 +158,20 @@ export default function ReportsList() {
     if (loading) return null;
     return <EmptyState type="no-released-tests" />;
   }, [loading]);
+
+  // Prevent screenshots/screen recording; re-applies on every focus (handles back-navigation edge case)
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync('reports-list');
+      const screenshotSub = addScreenshotListener(() => {
+        toast.info('Screenshots are disabled on this page', undefined, 3000);
+      });
+      return () => {
+        allowScreenCaptureAsync('reports-list');
+        screenshotSub.remove();
+      };
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {

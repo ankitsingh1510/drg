@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StatusBar, TouchableOpacity, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { addScreenshotListener, allowScreenCaptureAsync, preventScreenCaptureAsync } from 'expo-screen-capture';
 import { ChevronLeft, FileText } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,7 @@ import { colors as themeColors } from '@/constants/colors';
 import { storageAPI } from '@/services/storage';
 import { type IngestionStatus } from '@/types/types';
 import { type OrderStepStatus } from '@/util/orders';
+import { toast } from '@/util/toast';
 
 interface OrderDetail {
   id: string;
@@ -137,9 +139,9 @@ const OrderDetailCard = memo(function OrderDetailCard({
 
       {/* Step labels */}
       <View className="mb-2 flex-row justify-between px-0.5">
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Order Placed</AppText>
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Sample Accession</AppText>
-        <AppText className="text-[10px] text-gray-600 dark:text-gray-400">Report Released</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Order Placed</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Sample Accession</AppText>
+        <AppText className="text-xs text-gray-600 dark:text-gray-400">Report Released</AppText>
       </View>
 
       {/* Progress bar */}
@@ -154,9 +156,9 @@ const OrderDetailCard = memo(function OrderDetailCard({
       </View>
 
       <View className="mb-4 flex-row justify-between px-0.5">
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
-        <AppText className="text-[10px] text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.placed)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.accession)}</AppText>
+        <AppText className="text-xs text-blue-500">{formatTimestamp(order.dates.released)}</AppText>
       </View>
 
       {isReleased && (
@@ -176,6 +178,20 @@ const OrderDetailCard = memo(function OrderDetailCard({
 });
 
 export default function OrderDetails() {
+  // Prevent screenshots/screen recording; re-applies on every focus (handles back-navigation edge case)
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync('order-details');
+      const screenshotSub = addScreenshotListener(() => {
+        toast.info('Screenshots are disabled on this page', undefined, 3000);
+      });
+      return () => {
+        allowScreenCaptureAsync('order-details');
+        screenshotSub.remove();
+      };
+    }, [])
+  );
+
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
   const textColor = isDark ? '#FFFFFF' : '#1F2937';

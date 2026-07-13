@@ -443,7 +443,7 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
             backgroundColor: colors.common.primary,
           }}
         >
-          <Text className="text-[15px] leading-5" style={{ color: '#ffffff' }}>
+          <Text className="text-base leading-5" style={{ color: '#ffffff' }}>
             {message.text}
           </Text>
         </View>
@@ -637,13 +637,13 @@ export default function ElevenLabsChat({ documentId, token, userId, onClose }: E
                 />
               ))}
             </View>
-            <Text className="ml-3 font-outfit-medium text-[13px]" style={{ color: colors.common.primary }}>
+            <Text className="ml-3 font-outfit-medium text-sm" style={{ color: colors.common.primary }}>
               Listening...
             </Text>
           </View>
         ) : (
           <TextInput
-            className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-[15px]"
+            className="mr-2 flex-1 rounded-[20px] border px-4 py-2.5 text-base"
             style={{
               backgroundColor: isDark ? colors.dark.background : '#f9fafb',
               color: isDark ? colors.dark.text : colors.light.text,

@@ -106,7 +106,7 @@ export default function PatientList() {
         <View className="h-12 flex-row items-center rounded-full border border-gray-200 bg-gray-50 px-4 dark:border-[#1A3050] dark:bg-[#0F2235]">
           <Search size={20} color={colors.textSecondary} style={{ marginRight: 8 }} />
           <TextInput
-            className="flex-1 font-outfit text-[15px] text-gray-800 dark:text-white"
+            className="flex-1 font-outfit text-base text-gray-800 dark:text-white"
             placeholder="Search Patient"
             placeholderTextColor={colors.textSecondary}
             value={search}

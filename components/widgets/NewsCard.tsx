@@ -100,7 +100,7 @@ const NewsItem = memo(({ item, index, imageFallback, onPress }: any) => {
 
         <View className="p-5">
           <View className="mb-2">
-            <Text className="font-outfit-medium text-[10px] text-gray-400 dark:text-gray-500">
+            <Text className="font-outfit-medium text-xs text-gray-400 dark:text-gray-500">
               {item.pubDate || 'Just now'}
             </Text>
           </View>

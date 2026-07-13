@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { addScreenshotListener, allowScreenCaptureAsync, preventScreenCaptureAsync } from 'expo-screen-capture';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +9,7 @@ import AppText from '@/components/ui/AppText';
 import { colors as themeColors } from '@/constants/colors';
 import { ordersAPI } from '@/services/orders';
 import { mapApiDataToPatients, type OrderDisplayStatus, type PatientWithOrders } from '@/util/orders';
+import { toast } from '@/util/toast';
 
 const PAGE_SIZE = 20;
 const DATE_FROM = '2025-01-01';
@@ -40,7 +42,7 @@ const StatusBadge = React.memo(({ status, isDark }: { status: OrderDisplayStatus
       className="mt-1 w-full items-center justify-center rounded-full px-2.5 py-1"
       style={{ backgroundColor: isDark ? style.darkBg : style.bg }}
     >
-      <AppText className="text-[10px]" style={{ color: isDark ? style.darkText : style.text }}>
+      <AppText className="text-xs" style={{ color: isDark ? style.darkText : style.text }}>
         {status}
       </AppText>
     </View>
@@ -94,6 +96,20 @@ const PatientOrderCard = React.memo(({ patient, isDark }: { patient: PatientWith
 });
 
 export default function AllOrders() {
+  // Prevent screenshots/screen recording; re-applies on every focus (handles back-navigation edge case)
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync('all-orders');
+      const screenshotSub = addScreenshotListener(() => {
+        toast.info('Screenshots are disabled on this page', undefined, 3000);
+      });
+      return () => {
+        allowScreenCaptureAsync('all-orders');
+        screenshotSub.remove();
+      };
+    }, [])
+  );
+
   const [search, setSearch] = useState('');
   const [patients, setPatients] = useState<PatientWithOrders[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -231,7 +247,7 @@ export default function AllOrders() {
           <Search size={20} color="#9CA3AF" style={{ marginRight: 8 }} />
           <TextInput
             className="flex-1 font-outfit text-sm text-gray-800 dark:text-white"
-            placeholder="Search Patient"
+            placeholder="Search"
             placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}

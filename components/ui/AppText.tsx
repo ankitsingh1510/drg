@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
+import { fontSize, FontSizeKey } from '@/util/responsiveFont';
 
 type FontWeight = 'regular' | 'thin' | 'extralight' | 'light' | 'medium' | 'semibold' | 'bold' | 'extrabold' | 'black';
 
@@ -18,11 +19,23 @@ const weightClass: Record<FontWeight, string> = {
 export interface AppTextProps extends TextProps {
   className?: string;
   weight?: FontWeight;
+  size?: FontSizeKey;
 }
 
-export const AppText: React.FC<AppTextProps> = ({ style, className = '', weight = 'regular', children, ...props }) => {
+export const AppText: React.FC<AppTextProps> = ({
+  style,
+  className = '',
+  weight = 'regular',
+  size,
+  children,
+  ...props
+}) => {
   return (
-    <Text className={`${weightClass[weight]} ${className}`} style={style} {...props}>
+    <Text
+      className={`${weightClass[weight]} ${className}`}
+      style={[size !== undefined ? { fontSize: fontSize[size] } : undefined, style]}
+      {...props}
+    >
       {children}
     </Text>
   );

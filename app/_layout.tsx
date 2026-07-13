@@ -30,6 +30,7 @@ import { useThemeSync } from '@/hooks/useThemeSync';
 import { storageAPI } from '@/services/storage';
 import { setFcmToken } from '@/stores/mmkv';
 import { activeReportAtom } from '@/stores/report';
+import { useFontScaleVars } from '@/util/responsiveFont';
 import { toast } from '@/util/toast';
 import '../global.css';
 
@@ -145,6 +146,7 @@ export default function RootLayout() {
   }, []);
 
   const { theme, colorScheme, setColorScheme } = useThemeSync();
+  const fontScaleVars = useFontScaleVars();
 
   useEffect(() => {
     if (theme !== colorScheme) {
@@ -175,7 +177,10 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AuthProvider>
         <GestureHandlerRootView className="flex-1">
-          <View className={`flex-1 ${theme === 'dark' ? 'dark' : ''} bg-[#FDF5E6] dark:bg-gray-900`}>
+          <View
+            className={`flex-1 ${theme === 'dark' ? 'dark' : ''} bg-[#FDF5E6] dark:bg-gray-900`}
+            style={fontScaleVars}
+          >
             <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
             <Stack screenOptions={STACK_OPTIONS}>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -225,6 +230,24 @@ export default function RootLayout() {
                 options={{
                   headerShown: false,
                   title: 'Trends',
+                  headerBackButtonDisplayMode: 'minimal',
+                  headerBackTitle: '',
+                  headerShadowVisible: false,
+                  headerStyle: {
+                    backgroundColor: theme === 'dark' ? '#111827' : '#FDF5E6',
+                  },
+                  headerTintColor: theme === 'dark' ? '#f9fafb' : '#111827',
+                  headerTitleStyle: {
+                    fontFamily: 'Outfit_600SemiBold',
+                    fontSize: 18,
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="publications"
+                options={{
+                  headerShown: false,
+                  title: 'Publications',
                   headerBackButtonDisplayMode: 'minimal',
                   headerBackTitle: '',
                   headerShadowVisible: false,
